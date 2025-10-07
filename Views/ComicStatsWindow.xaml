@@ -1,0 +1,281 @@
+<Window x:Class="ComicReader.Views.ComicStatsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="📊 Estadísticas de Lectura" 
+        Height="700" Width="1000"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip"
+        Background="{DynamicResource WindowBackgroundBrush}">
+    <Window.Resources>
+        <Style TargetType="GroupBox" x:Key="StatsGroupBox">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource FocusBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="StatValue">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="{DynamicResource Font.Header}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="StatLabel">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,5,0,0"/>
+        </Style>
+
+        <Style TargetType="Button" x:Key="ActionButton" BasedOn="{StaticResource PrimaryButtonStyle}">
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+    </Window.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{DynamicResource WindowBackgroundBrush}">
+        <Grid Margin="20" Background="{DynamicResource WindowBackgroundBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Título principal -->
+            <TextBlock Grid.Row="0" Text="📊 Estadísticas de Lectura" 
+                       FontSize="28" FontWeight="Bold" 
+                       FontFamily="{DynamicResource Font.Header}"
+                       Foreground="{DynamicResource PrimaryBrush}" 
+                       HorizontalAlignment="Center" 
+                       Margin="0,0,0,30"/>
+
+            <!-- Contenido principal -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Panel izquierdo -->
+                <StackPanel Grid.Column="0">
+                    <!-- Estadísticas generales -->
+                    <GroupBox Header="📈 Resumen General" Style="{StaticResource StatsGroupBox}">
+                        <UniformGrid Columns="4" Rows="2">
+                            <Border BorderBrush="{DynamicResource FocusBorderBrush}" Background="{DynamicResource CardBackgroundBrush}" BorderThickness="1" Margin="5" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Stats.TotalComicsRead}" Style="{StaticResource StatValue}"/>
+                                    <TextBlock Text="Cómics Leídos" Style="{StaticResource StatLabel}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border BorderBrush="{DynamicResource FocusBorderBrush}" Background="{DynamicResource CardBackgroundBrush}" BorderThickness="1" Margin="5" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Stats.TotalPagesRead}" Style="{StaticResource StatValue}"/>
+                                    <TextBlock Text="Páginas Leídas" Style="{StaticResource StatLabel}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border BorderBrush="{DynamicResource FocusBorderBrush}" Background="{DynamicResource CardBackgroundBrush}" BorderThickness="1" Margin="5" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Stats.TotalReadingTimeFormatted}" Style="{StaticResource StatValue}" FontSize="18"/>
+                                    <TextBlock Text="Tiempo Total" Style="{StaticResource StatLabel}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border BorderBrush="{DynamicResource FocusBorderBrush}" Background="{DynamicResource CardBackgroundBrush}" BorderThickness="1" Margin="5" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Stats.CurrentStreak}" Style="{StaticResource StatValue}"/>
+                                    <TextBlock Text="Días Consecutivos" Style="{StaticResource StatLabel}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border BorderBrush="{DynamicResource FocusBorderBrush}" Background="{DynamicResource CardBackgroundBrush}" BorderThickness="1" Margin="5" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Stats.ComicsThisWeek}" Style="{StaticResource StatValue}"/>
+                                    <TextBlock Text="Esta Semana" Style="{StaticResource StatLabel}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border BorderBrush="{DynamicResource FocusBorderBrush}" Background="{DynamicResource CardBackgroundBrush}" BorderThickness="1" Margin="5" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Stats.ComicsThisMonth}" Style="{StaticResource StatValue}"/>
+                                    <TextBlock Text="Este Mes" Style="{StaticResource StatLabel}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border BorderBrush="{DynamicResource FocusBorderBrush}" Background="{DynamicResource CardBackgroundBrush}" BorderThickness="1" Margin="5" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Stats.AverageReadingTimeFormatted}" Style="{StaticResource StatValue}" FontSize="18"/>
+                                    <TextBlock Text="Promedio/Sesión" Style="{StaticResource StatLabel}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border BorderBrush="{DynamicResource FocusBorderBrush}" Background="{DynamicResource CardBackgroundBrush}" BorderThickness="1" Margin="5" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Stats.LongestSessionFormatted}" Style="{StaticResource StatValue}" FontSize="18"/>
+                                    <TextBlock Text="Sesión Más Larga" Style="{StaticResource StatLabel}"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                    </GroupBox>
+
+                    <!-- Progreso de cómics -->
+                    <GroupBox Header="📚 Progreso Actual" Style="{StaticResource StatsGroupBox}">
+                        <ListView ItemsSource="{Binding RecentProgress}" MaxHeight="200">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="Título" Width="200">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Title}" FontWeight="Medium"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Header="Progreso" Width="120">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <ProgressBar Value="{Binding ProgressPercentage, Mode=OneWay}" 
+                                                                 Height="12" 
+                                                                 Background="{DynamicResource CardBackgroundBrush}"
+                                                                 Foreground="{DynamicResource HighlightBrush}"/>
+                                                    <TextBlock Text="{Binding ProgressPercentage, StringFormat='{}{0:F0}%'}" 
+                                                               HorizontalAlignment="Center" 
+                                                               FontSize="10"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Header="Páginas" Width="80">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Progress, StringFormat='{}{0} / '}" 
+                                                           HorizontalAlignment="Right">
+                                                    <Run Text="{Binding TotalPages}"/>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Header="Última Lectura" Width="100">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding LastRead, StringFormat='dd/MM HH:mm'}" 
+                                                           FontSize="10"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </GroupBox>
+                </StackPanel>
+
+                <!-- Panel derecho -->
+                <StackPanel Grid.Column="1">
+                    <!-- Género favorito -->
+                    <GroupBox Header="🏆 Favoritos" Style="{StaticResource StatsGroupBox}">
+                        <StackPanel>
+                            <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="8" Padding="15" Margin="0,0,0,10" BorderBrush="{DynamicResource FocusBorderBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="Género Favorito" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                                    <TextBlock Text="{Binding Stats.FavoriteGenre}" 
+                                               FontSize="18" FontWeight="Bold" 
+                                               Foreground="{DynamicResource PrimaryBrush}" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Aquí podrías agregar más estadísticas favoritas -->
+                            <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="8" Padding="15" Margin="0,0,0,10" BorderBrush="{DynamicResource FocusBorderBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="Día Favorito" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                                    <TextBlock Text="{Binding Stats.FavoriteDay}"
+                                               FontSize="16" FontWeight="Bold" 
+                                               Foreground="{DynamicResource SecondaryBrush}" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="{DynamicResource CardBackgroundBrush}" CornerRadius="8" Padding="15" BorderBrush="{DynamicResource FocusBorderBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="Formato Preferido" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}"/>
+                                    <TextBlock Text="{Binding Stats.PreferredFormat}"
+                                               FontSize="16" FontWeight="Bold" 
+                                               Foreground="{DynamicResource PrimaryBrush}" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <!-- Sesiones de hoy -->
+                    <GroupBox Header="📅 Sesiones de Hoy" Style="{StaticResource StatsGroupBox}">
+                        <ListView ItemsSource="{Binding TodaySessions}" MaxHeight="250">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="Hora" Width="60">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding StartTimeFormatted}" FontWeight="Bold"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Header="Cómic" Width="120">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding ComicTitle}" 
+                                                           FontSize="11"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Header="Duración" Width="60">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding DurationFormatted}" 
+                                                           HorizontalAlignment="Right"
+                                                           FontSize="11"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Header="Páginas" Width="50">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding PagesRead}" 
+                                                           HorizontalAlignment="Right"
+                                                           FontSize="11"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+
+            <!-- Panel de botones -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+        <Button Content="📊 Exportar Estadísticas" 
+            Style="{StaticResource ActionButton}"
+            Click="ExportStats_Click"/>
+        <Button Content="🔄 Resetear Estadísticas" 
+            Style="{StaticResource DangerButtonStyle}"
+            Padding="15,8" Margin="5"
+            Click="ResetStats_Click"/>
+        <Button Content="❌ Cerrar" 
+            Style="{StaticResource SecondaryButtonStyle}"
+            Padding="15,8" Margin="5"
+            IsCancel="True" 
+            Click="CloseWindow_Click"/>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Window>

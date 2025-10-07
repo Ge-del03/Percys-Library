@@ -1,0 +1,18 @@
+<Project>
+  <!-- Excluir siempre archivos huérfanos/duplicados. Esto aplica a builds normales y temporales (wpftmp). -->
+  <ItemGroup>
+    <!-- Excluir archivos huérfanos que puedan quedar en cache o ser recogidos por builds temporales -->
+    <Compile Remove="MainWindow.ZoomCompat.g.cs" />
+    <!-- No incluir archivos de diseño legacy -->
+    <Compile Remove="Views\DesignTimeStubs.g.cs" />
+    <Compile Remove="Views\DesignTimeMainWindowFix.g.cs" />
+  </ItemGroup>
+
+  <!-- Incluir stubs de InitializeComponent únicamente en tiempo de diseño para limpiar errores del editor -->
+  <PropertyGroup Condition="'$(DesignTimeBuild)' == 'true'">
+    <DefineConstants>$(DefineConstants);DESIGN_TIME</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(DesignTimeBuild)' == 'true'">
+    <Compile Include="Views\DesignTime\InitializeComponentStubs.cs" />
+  </ItemGroup>
+</Project>

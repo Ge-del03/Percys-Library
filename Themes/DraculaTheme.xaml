@@ -1,0 +1,54 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Paleta Dracula: https://draculatheme.com/ -->
+    <Color x:Key="BackgroundColor">#282A36</Color>
+    <Color x:Key="HeaderBackground">#44475A</Color>
+    <Color x:Key="TextColor">#F8F8F2</Color>
+    <Color x:Key="TextSecondaryColor">#E2E2DC</Color>
+    <Color x:Key="TextDisabledColor">#6272A4</Color>
+    <Color x:Key="PrimaryColor">#BD93F9</Color>
+    <Color x:Key="SecondaryColor">#50FA7B</Color>
+    <Color x:Key="HighlightColor">#6272A4</Color>
+    <Color x:Key="FocusBorderColor">#8BE9FD</Color>
+
+    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+    <SolidColorBrush x:Key="HeaderBackgroundBrush" Color="{StaticResource HeaderBackground}"/>
+    <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}"/>
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="{StaticResource TextSecondaryColor}"/>
+    <SolidColorBrush x:Key="TextDisabledBrush" Color="{StaticResource TextDisabledColor}"/>
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}"/>
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="#303241"/>
+    <SolidColorBrush x:Key="HighlightBrush" Color="{StaticResource HighlightColor}"/>
+    <SolidColorBrush x:Key="HighlightTextBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="FocusBorderBrush" Color="{StaticResource FocusBorderColor}"/>
+  <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource HighlightColor}"/>
+  <SolidColorBrush x:Key="AccentColorBrush" Color="#BD93F9"/>
+  <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+  <SolidColorBrush x:Key="BorderBrush" Color="#6272A4"/>
+  <SolidColorBrush x:Key="ItemBackgroundBrush" Color="{StaticResource CardBackgroundBrush}"/>
+  <SolidColorBrush x:Key="ItemHoverBrush" Color="#44475A"/>
+  <SolidColorBrush x:Key="ItemSelectedBrush" Color="#44475A"/>
+  <SolidColorBrush x:Key="CurrentPageBrush" Color="#BD93F9"/>
+  <SolidColorBrush x:Key="AccentHoverBrush" Color="#8BE9FD"/>
+  <SolidColorBrush x:Key="AccentPressedBrush" Color="#50FA7B"/>
+  <SolidColorBrush x:Key="DisabledBrush" Color="#44475A"/>
+  <SolidColorBrush x:Key="DisabledTextBrush" Color="#6272A4"/>
+  <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+
+    <!-- Botones por tema -->
+    <SolidColorBrush x:Key="ButtonPrimaryBrush" Color="#BD93F9"/>
+    <SolidColorBrush x:Key="ButtonPrimaryTextBrush" Color="#282A36"/>
+    <SolidColorBrush x:Key="ButtonPrimaryBorderBrush" Color="#8BE9FD"/>
+  <SolidColorBrush x:Key="ButtonSecondaryBrush" Color="#303241"/>
+  <SolidColorBrush x:Key="ButtonSecondaryTextBrush" Color="#F8F8F2"/>
+  <SolidColorBrush x:Key="ButtonSecondaryBorderBrush" Color="#6272A4"/>
+  <SolidColorBrush x:Key="ButtonDangerBrush" Color="#FF5555"/>
+  <SolidColorBrush x:Key="ButtonDangerTextBrush" Color="#282A36"/>
+  <SolidColorBrush x:Key="ButtonDangerBorderBrush" Color="#BD93F9"/>
+
+  <!-- Tipografías del tema (Dracula: JetBrains Mono para acentos, Segoe UI para UI) -->
+  <FontFamily x:Key="Font.Primary">Segoe UI</FontFamily>
+  <FontFamily x:Key="Font.Header">Segoe UI Semibold</FontFamily>
+  <FontFamily x:Key="Font.Mono">"JetBrains Mono", Cascadia Code</FontFamily>
+</ResourceDictionary>

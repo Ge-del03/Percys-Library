@@ -1,0 +1,15 @@
+<UserControl x:Class="ComicReader.Views.ContinuousComicView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Background="Black">
+        <ListBox x:Name="PagesList" 
+                 Background="Transparent" 
+                 BorderThickness="0">
+        </ListBox>
+        
+        <Border x:Name="ControlPanel" 
+                Background="Transparent" 
+                Visibility="Collapsed">
+        </Border>
+    </Grid>
+</UserControl>

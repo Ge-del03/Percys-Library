@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>ComicReader</RootNamespace>
+  <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <AssemblyTitle>Percy's Library</AssemblyTitle>
+    <Product>Percy's Library</Product>
+    <Company>Percy's Library</Company>
+  <ApplicationIcon>icono.ico</ApplicationIcon>
+    <AssemblyName>PercysLibrary</AssemblyName>
+    <DefineConstants>$(DefineConstants);SUPPORT_PDF</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="MainWindow.ZoomCompat.g.cs" />
+    <!-- Restaurado: permitir que los XAML de marcadores generen sus .g.cs -->
+  </ItemGroup>
+  <Target Name="PreBuildKillPercys" BeforeTargets="BeforeBuild">
+    <Message Importance="high" Text="Ejecutando limpieza de procesos Percy (si existen)..." />
+  <!-- Excluir duplicado de MainWindow en Views para evitar doble registro de la clase -->
+  <ItemGroup>
+    <Page Remove="Views\MainWindow.xaml" />
+    <Compile Remove="Views\MainWindow.xaml.cs" />
+  </ItemGroup>
+    <Exec Command="pwsh -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\tools\kill-dotnet-percys.ps1&quot;" ContinueOnError="true" />
+  </Target>
+
+  <ItemGroup>
+    <Resource Include="icono.ico" />
+  </ItemGroup>
+  
+  <!-- Copiar el icono de portada de archivos al directorio de salida para usarlo como DefaultIcon y placeholder -->
+  <ItemGroup>
+    <Content Include="logo de archivo.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
+  
+  
+  <ItemGroup>
+    <PackageReference Include="SharpCompress" Version="0.32.2" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.8" />
+    <PackageReference Include="Docnet.Core" Version="2.6.0" />
+    <PackageReference Include="Tesseract" Version="5.2.0" />
+  </ItemGroup>
+
+  <!-- Evitar generar el .exe (apphost) en Debug para que no se bloquee por procesos externos -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <UseAppHost>false</UseAppHost>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Exclusión permanente de duplicados de MainWindow en carpeta Views (OneDrive puede recrearlos) -->
+    <Compile Remove="Views\MainWindow.xaml.cs" />
+    <Compile Remove="Views\MainWindow.Logic.cs" />
+    <Page Remove="Views\MainWindow.xaml" />
+    <None Remove="Views\MainWindow.xaml" />
+    <Resource Remove="Views\MainWindow.xaml" />
+    <!-- Neutralizar si reaparecen -->
+    <None Include="Views\MainWindow.xaml" Condition="Exists('Views\MainWindow.xaml')" />
+    <None Include="Views\MainWindow.xaml.cs" Condition="Exists('Views\MainWindow.xaml.cs')" />
+    <None Include="Views\MainWindow.Logic.cs" Condition="Exists('Views\MainWindow.Logic.cs')" />
+  </ItemGroup>
+</Project>
+

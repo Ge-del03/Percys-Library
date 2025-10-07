@@ -1,0 +1,47 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Estilos / recursos mínimos para garantizar que la ventana siempre carga -->
+  <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#1E1E1E"/>
+  <SolidColorBrush x:Key="HeaderBackgroundBrush" Color="#2A2A2A"/>
+  <SolidColorBrush x:Key="ForegroundBrush" Color="#FFFFFF"/>
+  <SolidColorBrush x:Key="AccentColorBrush" Color="#FF8A2F"/>
+  <!-- Brochas mínimas adicionales para evitar fallos si aún no cargó el tema completo -->
+  <SolidColorBrush x:Key="TextBrush" Color="#FFFFFF"/>
+  <SolidColorBrush x:Key="CardBackgroundBrush" Color="#262626"/>
+  <SolidColorBrush x:Key="HighlightBrush" Color="#444444"/>
+  <SolidColorBrush x:Key="HighlightTextBrush" Color="#FFFFFF"/>
+  <SolidColorBrush x:Key="FocusBorderBrush" Color="#4B5563"/>
+  <!-- Botones (si estilos avanzados no están disponibles todavía) -->
+  <SolidColorBrush x:Key="ButtonPrimaryBrush" Color="#3B82F6"/>
+  <SolidColorBrush x:Key="ButtonPrimaryTextBrush" Color="#FFFFFF"/>
+  <SolidColorBrush x:Key="ButtonPrimaryBorderBrush" Color="#2563EB"/>
+  <SolidColorBrush x:Key="ButtonSecondaryBrush" Color="#374151"/>
+  <SolidColorBrush x:Key="ButtonSecondaryTextBrush" Color="#F1F5F9"/>
+  <SolidColorBrush x:Key="ButtonSecondaryBorderBrush" Color="#4B5563"/>
+
+  <Style x:Key="AppTitleTextStyle" TargetType="TextBlock">
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Foreground" Value="{DynamicResource AccentColorBrush}"/>
+  </Style>
+  <Style x:Key="WindowControlButton" TargetType="Button">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderBrush" Value="Transparent"/>
+    <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+    <Setter Property="Padding" Value="4,0"/>
+    <Setter Property="Cursor" Value="Hand"/>
+  </Style>
+  <Style x:Key="ComicButtonStyle" TargetType="Button" BasedOn="{StaticResource WindowControlButton}"/>
+  <!-- Botones mínimos de respaldo (evitan fallos si BaseStyles no cargó aún) -->
+  <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource WindowControlButton}">
+    <Setter Property="Background" Value="#3B82F6"/>
+    <Setter Property="Foreground" Value="White"/>
+    <Setter Property="Padding" Value="8,4"/>
+    <Setter Property="Margin" Value="2"/>
+  </Style>
+  <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource WindowControlButton}">
+    <Setter Property="Background" Value="#374151"/>
+    <Setter Property="Foreground" Value="#F1F5F9"/>
+    <Setter Property="Padding" Value="8,4"/>
+    <Setter Property="Margin" Value="2"/>
+  </Style>
+</ResourceDictionary>

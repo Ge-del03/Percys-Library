@@ -1,0 +1,67 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Tema Superman Clásico: Azul, rojo y dorado inspirado en el Hombre de Acero -->
+    <Color x:Key="BackgroundColor">#001F3F</Color>
+    <Color x:Key="HeaderBackground">#DC143C</Color>
+    <Color x:Key="TextColor">#FFFFFF</Color>
+    <Color x:Key="TextSecondaryColor">#FFD700</Color>
+    <Color x:Key="TextDisabledColor">#6B7280</Color>
+    <Color x:Key="PrimaryColor">#DC143C</Color>
+    <Color x:Key="SecondaryColor">#FFD700</Color>
+    <Color x:Key="HighlightColor">#FFD700</Color>
+    <Color x:Key="FocusBorderColor">#FFD700</Color>
+    <Color x:Key="CardBackground">#003366</Color>
+    <Color x:Key="FooterBackground">#DC143C</Color>
+
+    <!-- Brushes base del tema -->
+    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+    <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+    <SolidColorBrush x:Key="HeaderBackgroundBrush" Color="{StaticResource HeaderBackground}"/>
+    <SolidColorBrush x:Key="FooterBackgroundBrush" Color="{StaticResource FooterBackground}"/>
+    <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}"/>
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="{StaticResource TextSecondaryColor}"/>
+    <SolidColorBrush x:Key="TextColorBrush" Color="{StaticResource TextColor}"/>
+    <SolidColorBrush x:Key="HeaderTextColorBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}"/>
+    <SolidColorBrush x:Key="PrimaryColorBrush" Color="{StaticResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="SecondaryColorBrush" Color="{StaticResource SecondaryColor}"/>
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackground}"/>
+    <SolidColorBrush x:Key="HighlightBrush" Color="{StaticResource HighlightColor}"/>
+    <SolidColorBrush x:Key="HighlightTextBrush" Color="#000000"/>
+    <SolidColorBrush x:Key="FocusBorderBrush" Color="{StaticResource FocusBorderColor}"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource HighlightColor}"/>
+    <SolidColorBrush x:Key="AccentColorBrush" Color="{StaticResource HighlightColor}"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="#004080"/>
+    <SolidColorBrush x:Key="ItemBackgroundBrush" Color="{StaticResource CardBackground}"/>
+    <SolidColorBrush x:Key="ItemHoverBrush" Color="#004499"/>
+    <SolidColorBrush x:Key="ItemSelectedBrush" Color="#DC143C"/>
+    <SolidColorBrush x:Key="CurrentPageBrush" Color="#FFD700"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#FFC107"/>
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="#FF8F00"/>
+    <SolidColorBrush x:Key="DisabledBrush" Color="#004080"/>
+    <SolidColorBrush x:Key="DisabledTextBrush" Color="{StaticResource TextDisabledColor}"/>
+    <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+    <SolidColorBrush x:Key="PlaceholderImageBrush" Color="#004080"/>
+
+    <!-- Botones por tema -->
+    <SolidColorBrush x:Key="ButtonPrimaryBrush" Color="#DC143C"/>
+    <SolidColorBrush x:Key="ButtonPrimaryTextBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="ButtonPrimaryBorderBrush" Color="#B91C3C"/>
+    <SolidColorBrush x:Key="ButtonPrimaryHoverBrush" Color="#C21E3C"/>
+    <SolidColorBrush x:Key="ButtonSecondaryBrush" Color="#FFD700"/>
+    <SolidColorBrush x:Key="ButtonSecondaryTextBrush" Color="#000000"/>
+    <SolidColorBrush x:Key="ButtonSecondaryBorderBrush" Color="#E6C200"/>
+    <SolidColorBrush x:Key="ButtonSecondaryHoverBrush" Color="#FFC107"/>
+
+    <!-- Colores específicos del HomeView -->
+    <SolidColorBrush x:Key="HomeBackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+    <SolidColorBrush x:Key="HomeTitleBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="HomeSubtitleBrush" Color="#FFD700"/>
+    
+    <!-- Colores dinámicos para fondo del HomeView -->
+    <Color x:Key="HomeBackgroundColor1">#001F3F</Color>
+    <Color x:Key="HomeBackgroundColor2">#DC143C</Color>
+    <Color x:Key="HomeBackgroundColor3">#FFD700</Color>
+    <Color x:Key="HomeBackgroundColor4">#4169E1</Color>
+</ResourceDictionary>

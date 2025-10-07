@@ -1,0 +1,304 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- 30 FONDOS ÉPICOS PARA HOMEVIEW INSPIRADOS EN CÓMICS -->
+    
+    <!-- 1. Superman Clásico - Azul, Rojo, Dorado -->
+    <LinearGradientBrush x:Key="SupermanHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#001F3F" Offset="0"/>
+        <GradientStop Color="#DC143C" Offset="0.35"/>
+        <GradientStop Color="#FFD700" Offset="0.7"/>
+        <GradientStop Color="#4169E1" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 2. Batman Nocturno - Negro, Gris, Amarillo -->
+    <LinearGradientBrush x:Key="BatmanHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0A0A0A" Offset="0"/>
+        <GradientStop Color="#1C1C1C" Offset="0.35"/>
+        <GradientStop Color="#2C2C2C" Offset="0.7"/>
+        <GradientStop Color="#FFCC00" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 3. Spiderman Clásico - Rojo, Azul -->
+    <LinearGradientBrush x:Key="SpidermanHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#8B0000" Offset="0"/>
+        <GradientStop Color="#DC143C" Offset="0.35"/>
+        <GradientStop Color="#4169E1" Offset="0.7"/>
+        <GradientStop Color="#191970" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 4. Wonder Woman - Rojo, Dorado, Azul -->
+    <LinearGradientBrush x:Key="WonderWomanHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#8B0000" Offset="0"/>
+        <GradientStop Color="#B22222" Offset="0.35"/>
+        <GradientStop Color="#FFD700" Offset="0.7"/>
+        <GradientStop Color="#4169E1" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 5. Green Lantern - Verde Esmeralda, Negro Espacio -->
+    <LinearGradientBrush x:Key="GreenLanternHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#001A00" Offset="0"/>
+        <GradientStop Color="#006400" Offset="0.35"/>
+        <GradientStop Color="#00FF7F" Offset="0.7"/>
+        <GradientStop Color="#E6E6FA" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 6. Flash Velocidad - Rojo, Amarillo Eléctrico -->
+    <LinearGradientBrush x:Key="FlashHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#2C0A0A" Offset="0"/>
+        <GradientStop Color="#DC143C" Offset="0.35"/>
+        <GradientStop Color="#FF4500" Offset="0.7"/>
+        <GradientStop Color="#FFFF00" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 7. Aquaman Océano - Azul Profundo, Aguamarina -->
+    <LinearGradientBrush x:Key="AquamanHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#001122" Offset="0"/>
+        <GradientStop Color="#003366" Offset="0.35"/>
+        <GradientStop Color="#20B2AA" Offset="0.7"/>
+        <GradientStop Color="#FFD700" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 8. X-Men - Amarillo, Azul Mutante -->
+    <LinearGradientBrush x:Key="XMenHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0A1628" Offset="0"/>
+        <GradientStop Color="#1E2A3A" Offset="0.35"/>
+        <GradientStop Color="#FFD700" Offset="0.7"/>
+        <GradientStop Color="#4A90E2" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 9. Iron Man Tech - Dorado, Rojo Metálico -->
+    <LinearGradientBrush x:Key="IronManHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#2F1B14" Offset="0"/>
+        <GradientStop Color="#B8860B" Offset="0.35"/>
+        <GradientStop Color="#FFD700" Offset="0.7"/>
+        <GradientStop Color="#DC143C" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 10. Hulk Gamma - Verde Radiactivo -->
+    <LinearGradientBrush x:Key="HulkHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0B2F0B" Offset="0"/>
+        <GradientStop Color="#228B22" Offset="0.35"/>
+        <GradientStop Color="#32CD32" Offset="0.7"/>
+        <GradientStop Color="#ADFF2F" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 11. Thor Asgard - Azul, Dorado, Plata -->
+    <LinearGradientBrush x:Key="ThorHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#1E3A8A" Offset="0"/>
+        <GradientStop Color="#3B82F6" Offset="0.35"/>
+        <GradientStop Color="#FFD700" Offset="0.7"/>
+        <GradientStop Color="#C0C0C0" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 12. Capitán América - Rojo, Blanco, Azul -->
+    <LinearGradientBrush x:Key="CaptainAmericaHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0F172A" Offset="0"/>
+        <GradientStop Color="#DC2626" Offset="0.35"/>
+        <GradientStop Color="#F8F9FA" Offset="0.7"/>
+        <GradientStop Color="#1E40AF" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 13. Black Panther Wakanda - Púrpura, Negro -->
+    <LinearGradientBrush x:Key="BlackPantherHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0A0A0A" Offset="0"/>
+        <GradientStop Color="#2D1B69" Offset="0.35"/>
+        <GradientStop Color="#8B5CF6" Offset="0.7"/>
+        <GradientStop Color="#C084FC" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 14. Doctor Strange Místico - Púrpura, Dorado Místico -->
+    <LinearGradientBrush x:Key="DrStrangeHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#1A0033" Offset="0"/>
+        <GradientStop Color="#4A148C" Offset="0.35"/>
+        <GradientStop Color="#9C27B0" Offset="0.7"/>
+        <GradientStop Color="#FFD700" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 15. Deadpool Caos - Rojo, Negro, Amarillo -->
+    <LinearGradientBrush x:Key="DeadpoolHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0A0A0A" Offset="0"/>
+        <GradientStop Color="#DC143C" Offset="0.35"/>
+        <GradientStop Color="#2C2C2C" Offset="0.7"/>
+        <GradientStop Color="#FFFF00" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 16. Capitana Marvel Cósmica - Azul, Dorado, Rojo -->
+    <LinearGradientBrush x:Key="CaptainMarvelHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0B1426" Offset="0"/>
+        <GradientStop Color="#1E40AF" Offset="0.35"/>
+        <GradientStop Color="#FBBF24" Offset="0.7"/>
+        <GradientStop Color="#EF4444" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 17. Wolverine Salvaje - Amarillo, Negro, Azul -->
+    <LinearGradientBrush x:Key="WolverineHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#1F2937" Offset="0"/>
+        <GradientStop Color="#FBBF24" Offset="0.35"/>
+        <GradientStop Color="#1F2937" Offset="0.7"/>
+        <GradientStop Color="#3B82F6" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 18. Silver Surfer Cósmico - Plata, Azul Espacio -->
+    <LinearGradientBrush x:Key="SilverSurferHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0F0F23" Offset="0"/>
+        <GradientStop Color="#6B7280" Offset="0.35"/>
+        <GradientStop Color="#C0C0C0" Offset="0.7"/>
+        <GradientStop Color="#E0E7FF" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 19. Daredevil Vigilante - Rojo Oscuro, Negro -->
+    <LinearGradientBrush x:Key="DaredevilHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0A0A0A" Offset="0"/>
+        <GradientStop Color="#450A0A" Offset="0.35"/>
+        <GradientStop Color="#991B1B" Offset="0.7"/>
+        <GradientStop Color="#DC2626" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 20. Era Dorada Vintage - Sepia, Dorado -->
+    <LinearGradientBrush x:Key="GoldenAgeHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#2C1810" Offset="0"/>
+        <GradientStop Color="#8B4513" Offset="0.35"/>
+        <GradientStop Color="#D4AF37" Offset="0.7"/>
+        <GradientStop Color="#FFD700" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 21. Era Plata Psicodélica - Púrpura, Rosa, Cian -->
+    <LinearGradientBrush x:Key="SilverAgeHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#1A0033" Offset="0"/>
+        <GradientStop Color="#7C3AED" Offset="0.35"/>
+        <GradientStop Color="#FF1493" Offset="0.7"/>
+        <GradientStop Color="#00FFFF" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 22. Cómics Underground - Amarillo, Naranja, Negro -->
+    <LinearGradientBrush x:Key="UndergroundHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#1B1B1B" Offset="0"/>
+        <GradientStop Color="#FF4500" Offset="0.35"/>
+        <GradientStop Color="#FFFF00" Offset="0.7"/>
+        <GradientStop Color="#FF6347" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 23. Neo-noir Moderno - Negro, Blanco, Rojo -->
+    <LinearGradientBrush x:Key="NeoNoirHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0A0A0A" Offset="0"/>
+        <GradientStop Color="#2D2D2D" Offset="0.35"/>
+        <GradientStop Color="#FF0000" Offset="0.7"/>
+        <GradientStop Color="#F5F5F5" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 24. Manga Suave - Rosa, Azul Cielo -->
+    <LinearGradientBrush x:Key="MangaHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#FAF8F3" Offset="0"/>
+        <GradientStop Color="#FFC0CB" Offset="0.35"/>
+        <GradientStop Color="#FF69B4" Offset="0.7"/>
+        <GradientStop Color="#87CEEB" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 25. Cyberpunk Futuro - Cian, Magenta, Negro -->
+    <LinearGradientBrush x:Key="CyberpunkHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0A0A0A" Offset="0"/>
+        <GradientStop Color="#1A1A2E" Offset="0.35"/>
+        <GradientStop Color="#FF00FF" Offset="0.7"/>
+        <GradientStop Color="#00FFFF" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 26. Indie Artístico - Naranja, Verde, Crema -->
+    <LinearGradientBrush x:Key="IndieHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#2F1B14" Offset="0"/>
+        <GradientStop Color="#8B4513" Offset="0.35"/>
+        <GradientStop Color="#FF8C00" Offset="0.7"/>
+        <GradientStop Color="#228B22" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 27. Cosmic Marvel - Púrpura Galáctico -->
+    <LinearGradientBrush x:Key="CosmicHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0B0B2F" Offset="0"/>
+        <GradientStop Color="#1A1A4A" Offset="0.35"/>
+        <GradientStop Color="#8A2BE2" Offset="0.7"/>
+        <GradientStop Color="#FFD700" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 28. Fantastic Four - Azul, Blanco, Naranja -->
+    <LinearGradientBrush x:Key="FantasticFourHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#1E3A8A" Offset="0"/>
+        <GradientStop Color="#3B82F6" Offset="0.35"/>
+        <GradientStop Color="#F8F9FA" Offset="0.7"/>
+        <GradientStop Color="#FB923C" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 29. Guardians Galaxy - Verde, Rosa, Púrpura -->
+    <LinearGradientBrush x:Key="GuardiansHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0F2027" Offset="0"/>
+        <GradientStop Color="#2C5530" Offset="0.35"/>
+        <GradientStop Color="#EC4899" Offset="0.7"/>
+        <GradientStop Color="#8B5CF6" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 23. Avengers Unidos - Rojo, Dorado, Azul, Púrpura -->
+    <LinearGradientBrush x:Key="AvengersHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#1E40AF" Offset="0"/>
+        <GradientStop Color="#DC2626" Offset="0.25"/>
+        <GradientStop Color="#FBBF24" Offset="0.5"/>
+        <GradientStop Color="#7C3AED" Offset="0.75"/>
+        <GradientStop Color="#059669" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 24. Guardians Galaxy - Cósmica púrpura ámbar -->
+    <LinearGradientBrush x:Key="GuardiansGalaxyHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0F172A" Offset="0"/>
+        <GradientStop Color="#7C3AED" Offset="0.35"/>
+        <GradientStop Color="#F59E0B" Offset="0.7"/>
+        <GradientStop Color="#EF4444" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 25. Justice League - Liga de la Justicia DC -->
+    <LinearGradientBrush x:Key="JusticeLeagueHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#1E3A8A" Offset="0"/>
+        <GradientStop Color="#DC2626" Offset="0.25"/>
+        <GradientStop Color="#FBBF24" Offset="0.5"/>
+        <GradientStop Color="#16A34A" Offset="0.75"/>
+        <GradientStop Color="#C026D3" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 26. Venom Symbiote - Negro siniestro magenta -->
+    <LinearGradientBrush x:Key="VenomHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#000000" Offset="0"/>
+        <GradientStop Color="#1F1F1F" Offset="0.35"/>
+        <GradientStop Color="#8B0000" Offset="0.7"/>
+        <GradientStop Color="#FF0080" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 27. Phoenix Force - Fuego cósmico ardiente -->
+    <LinearGradientBrush x:Key="PhoenixHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#8B0000" Offset="0"/>
+        <GradientStop Color="#FF4500" Offset="0.35"/>
+        <GradientStop Color="#FFD700" Offset="0.7"/>
+        <GradientStop Color="#FF6347" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 28. Sinestro Corps - Miedo amarillo dorado -->
+    <LinearGradientBrush x:Key="SinestroHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#4B0082" Offset="0"/>
+        <GradientStop Color="#FFD700" Offset="0.35"/>
+        <GradientStop Color="#FFFF00" Offset="0.7"/>
+        <GradientStop Color="#FFA500" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 29. Bronze Age - Era de bronce vintage -->
+    <LinearGradientBrush x:Key="BronzeAgeHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#8B4513" Offset="0"/>
+        <GradientStop Color="#CD853F" Offset="0.35"/>
+        <GradientStop Color="#DAA520" Offset="0.7"/>
+        <GradientStop Color="#B8860B" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- 30. Modern Age - Era moderna tech -->
+    <LinearGradientBrush x:Key="ModernAgeHomeBackground" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#111827" Offset="0"/>
+        <GradientStop Color="#1E40AF" Offset="0.35"/>
+        <GradientStop Color="#06B6D4" Offset="0.7"/>
+        <GradientStop Color="#10B981" Offset="1"/>
+    </LinearGradientBrush>
+
+</ResourceDictionary>

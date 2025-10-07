@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug ComicReader (F5)",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}\\bin\\Debug\\net6.0-windows\\ComicReader.exe",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "preLaunchTask": "Build ComicReader",
+      "console": "internalConsole"
+    }
+  ]
+}

@@ -1,0 +1,345 @@
+<Window x:Class="ComicReader.Views.AdvancedSearchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Búsqueda Avanzada - Percy's Library" 
+        Height="700" Width="1100"
+        WindowStartupLocation="CenterScreen"
+        Background="#1e1e1e">
+    
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#3498db"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2980b9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#2d2d30"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="BorderBrush" Value="#3e3e42"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="#2d2d30"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="BorderBrush" Value="#3e3e42"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Barra de búsqueda principal -->
+        <Grid Grid.Row="0" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox x:Name="SearchBox" 
+                     Grid.Column="0"
+                     FontSize="16"
+                     Padding="15,12"
+                     Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Return" Command="{Binding SearchCommand}"/>
+                </TextBox.InputBindings>
+            </TextBox>
+
+            <Button Grid.Column="1" Content="🔍 Buscar" Click="SearchButton_Click" Width="120"/>
+            <Button Grid.Column="2" Content="⚙️ Opciones" Click="ToggleOptionsButton_Click" Width="120"/>
+        </Grid>
+
+        <!-- Panel de opciones avanzadas (colapsable) -->
+        <Expander x:Name="OptionsPanel" 
+                  Grid.Row="1" 
+                  Header="Opciones Avanzadas" 
+                  IsExpanded="False"
+                  Foreground="White"
+                  Background="#2d2d30"
+                  Padding="15"
+                  Margin="0,0,0,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Tipos de búsqueda -->
+                <GroupBox Grid.Row="0" Grid.Column="0" Header="Buscar en" Foreground="White" Margin="5">
+                    <StackPanel>
+                        <CheckBox x:Name="SearchInFileName" Content="Nombre de archivo" IsChecked="True"/>
+                        <CheckBox x:Name="SearchInPath" Content="Ruta completa"/>
+                        <CheckBox x:Name="SearchInMetadata" Content="Metadatos"/>
+                        <CheckBox x:Name="SearchInAnnotations" Content="Anotaciones"/>
+                        <CheckBox x:Name="SearchInTags" Content="Etiquetas"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Filtros de tamaño -->
+                <GroupBox Grid.Row="0" Grid.Column="1" Header="Tamaño de archivo" Foreground="White" Margin="5">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Mínimo (MB):" Foreground="White" Width="100" VerticalAlignment="Center"/>
+                            <TextBox x:Name="MinSizeBox" Width="100"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Máximo (MB):" Foreground="White" Width="100" VerticalAlignment="Center"/>
+                            <TextBox x:Name="MaxSizeBox" Width="100"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Filtros de fecha -->
+                <GroupBox Grid.Row="1" Grid.Column="0" Header="Fecha de modificación" Foreground="White" Margin="5">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Desde:" Foreground="White" Width="60" VerticalAlignment="Center"/>
+                            <DatePicker x:Name="FromDatePicker" Width="150"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Hasta:" Foreground="White" Width="60" VerticalAlignment="Center"/>
+                            <DatePicker x:Name="ToDatePicker" Width="150"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Opciones adicionales -->
+                <GroupBox Grid.Row="1" Grid.Column="1" Header="Opciones" Foreground="White" Margin="5">
+                    <StackPanel>
+                        <CheckBox x:Name="CaseSensitiveBox" Content="Sensible a mayúsculas"/>
+                        <CheckBox x:Name="UseRegexBox" Content="Usar expresiones regulares"/>
+                        <CheckBox x:Name="IncludeArchivedBox" Content="Incluir archivados"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Formatos de archivo -->
+                <GroupBox Grid.Row="2" Grid.ColumnSpan="2" Header="Formatos de archivo" Foreground="White" Margin="5">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Content=".cbz" IsChecked="True" Margin="10,5"/>
+                        <CheckBox Content=".cbr" IsChecked="True" Margin="10,5"/>
+                        <CheckBox Content=".cb7" IsChecked="True" Margin="10,5"/>
+                        <CheckBox Content=".cbt" IsChecked="True" Margin="10,5"/>
+                        <CheckBox Content=".pdf" IsChecked="True" Margin="10,5"/>
+                        <CheckBox Content=".epub" Margin="10,5"/>
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+        </Expander>
+
+        <!-- Resultados de búsqueda -->
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Encabezado de resultados -->
+            <Border Grid.Row="0" Background="#2d2d30" Padding="10" Margin="0,0,0,5">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock x:Name="ResultsCountText" 
+                               Grid.Column="0"
+                               Text="0 resultados encontrados" 
+                               Foreground="White" 
+                               FontSize="14"
+                               VerticalAlignment="Center"/>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <TextBlock Text="Ordenar por:" Foreground="White" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <ComboBox x:Name="SortComboBox" Width="150" SelectionChanged="SortComboBox_SelectionChanged">
+                            <ComboBoxItem Content="Relevancia" IsSelected="True"/>
+                            <ComboBoxItem Content="Nombre"/>
+                            <ComboBoxItem Content="Fecha"/>
+                            <ComboBoxItem Content="Tamaño"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Lista de resultados -->
+            <ListBox x:Name="ResultsList"
+                     Grid.Row="1"
+                     Background="#252526"
+                     BorderThickness="0"
+                     MouseDoubleClick="ResultsList_MouseDoubleClick"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="#2d2d30" 
+                                Margin="5" 
+                                Padding="15"
+                                BorderBrush="#3e3e42"
+                                BorderThickness="1"
+                                CornerRadius="5">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Icono/Thumbnail -->
+                                <Border Grid.Column="0" 
+                                        Background="#3e3e42" 
+                                        Width="50" 
+                                        Height="70"
+                                        CornerRadius="3"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="📖" 
+                                               FontSize="24" 
+                                               HorizontalAlignment="Center" 
+                                               VerticalAlignment="Center"/>
+                                </Border>
+
+                                <!-- Información -->
+                                <StackPanel Grid.Column="1" Margin="15,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding ComicName}" 
+                                               Foreground="White" 
+                                               FontSize="15" 
+                                               FontWeight="Bold"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    
+                                    <TextBlock Text="{Binding ComicPath}" 
+                                               Foreground="#999999" 
+                                               FontSize="11"
+                                               TextTrimming="CharacterEllipsis"
+                                               Margin="0,3,0,0"/>
+                                    
+                                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                        <Border Background="#3498db" 
+                                                Padding="5,2" 
+                                                CornerRadius="3" 
+                                                Margin="0,0,5,0">
+                                            <TextBlock Text="{Binding MatchType}" 
+                                                       Foreground="White" 
+                                                       FontSize="10"/>
+                                        </Border>
+                                        
+                                        <Border Background="#2ecc71" 
+                                                Padding="5,2" 
+                                                CornerRadius="3"
+                                                Visibility="{Binding PageNumber, Converter={StaticResource NullToCollapsedConverter}}">
+                                            <TextBlock Foreground="White" 
+                                                       FontSize="10">
+                                                <Run Text="Página "/>
+                                                <Run Text="{Binding PageNumber}"/>
+                                            </TextBlock>
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- Relevancia y acciones -->
+                                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Relevance, StringFormat=Relevancia: {0:P0}}" 
+                                               Foreground="#e67e22" 
+                                               FontSize="12"
+                                               HorizontalAlignment="Right"/>
+                                    
+                                    <Button Content="Abrir" 
+                                            Margin="0,5,0,0" 
+                                            Padding="20,5"
+                                            Background="#27ae60"
+                                            Click="OpenComicButton_Click"
+                                            Tag="{Binding}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Mensaje cuando no hay resultados -->
+            <StackPanel x:Name="NoResultsPanel" 
+                        Grid.Row="1"
+                        VerticalAlignment="Center" 
+                        HorizontalAlignment="Center"
+                        Visibility="Collapsed">
+                <TextBlock Text="🔍" 
+                           FontSize="48" 
+                           HorizontalAlignment="Center" 
+                           Opacity="0.5"/>
+                <TextBlock Text="No se encontraron resultados" 
+                           Foreground="White" 
+                           FontSize="18" 
+                           HorizontalAlignment="Center"
+                           Margin="0,10,0,0"/>
+                <TextBlock Text="Intenta con otros términos de búsqueda" 
+                           Foreground="#999999" 
+                           FontSize="13" 
+                           HorizontalAlignment="Center"
+                           Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <!-- Barra de progreso -->
+            <ProgressBar x:Name="SearchProgress"
+                         Grid.Row="1"
+                         Height="4"
+                         VerticalAlignment="Top"
+                         Background="Transparent"
+                         Foreground="#3498db"
+                         IsIndeterminate="True"
+                         Visibility="Collapsed"/>
+        </Grid>
+
+        <!-- Barra de estado y acciones -->
+        <Border Grid.Row="3" 
+                Background="#2d2d30" 
+                Padding="15,10" 
+                Margin="0,15,0,0"
+                BorderBrush="#3e3e42"
+                BorderThickness="0,1,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock x:Name="StatusText" 
+                           Grid.Column="0"
+                           Text="Listo para buscar" 
+                           Foreground="#999999" 
+                           VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="📊 Exportar CSV" Click="ExportButton_Click" Background="#9b59b6"/>
+                    <Button Content="❌ Cerrar" Click="CloseButton_Click" Background="#7f8c8d"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,53 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Paleta Solarized Dark: https://ethanschoonover.com/solarized/ -->
+  <Color x:Key="BackgroundColor">#002B36</Color>
+  <Color x:Key="HeaderBackground">#073642</Color>
+  <Color x:Key="TextColor">#EEE8D5</Color>
+  <Color x:Key="TextSecondaryColor">#93A1A1</Color>
+  <Color x:Key="TextDisabledColor">#586E75</Color>
+  <Color x:Key="PrimaryColor">#268BD2</Color>
+  <Color x:Key="SecondaryColor">#2AA198</Color>
+  <Color x:Key="HighlightColor">#586E75</Color>
+  <Color x:Key="FocusBorderColor">#B58900</Color>
+
+  <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+  <SolidColorBrush x:Key="HeaderBackgroundBrush" Color="{StaticResource HeaderBackground}"/>
+  <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}"/>
+  <SolidColorBrush x:Key="SecondaryTextBrush" Color="{StaticResource TextSecondaryColor}"/>
+  <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
+  <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}"/>
+  <SolidColorBrush x:Key="CardBackgroundBrush" Color="#073642"/>
+  <SolidColorBrush x:Key="HighlightBrush" Color="{StaticResource HighlightColor}"/>
+  <SolidColorBrush x:Key="HighlightTextBrush" Color="#FDF6E3"/>
+  <SolidColorBrush x:Key="FocusBorderBrush" Color="{StaticResource FocusBorderColor}"/>
+  <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource HighlightColor}"/>
+  <SolidColorBrush x:Key="AccentColorBrush" Color="{StaticResource HighlightColor}"/>
+  <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+  <SolidColorBrush x:Key="BorderBrush" Color="#586E75"/>
+  <SolidColorBrush x:Key="ItemBackgroundBrush" Color="{StaticResource CardBackgroundBrush}"/>
+  <SolidColorBrush x:Key="ItemHoverBrush" Color="#073642"/>
+  <SolidColorBrush x:Key="ItemSelectedBrush" Color="#D33682"/>
+  <SolidColorBrush x:Key="CurrentPageBrush" Color="#268BD2"/>
+  <SolidColorBrush x:Key="AccentHoverBrush" Color="#93A1A1"/>
+  <SolidColorBrush x:Key="AccentPressedBrush" Color="#EEE8D5"/>
+  <SolidColorBrush x:Key="DisabledBrush" Color="#073642"/>
+  <SolidColorBrush x:Key="DisabledTextBrush" Color="#586E75"/>
+  <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+
+  <!-- Botones por tema -->
+  <SolidColorBrush x:Key="ButtonPrimaryBrush" Color="#268BD2"/>
+  <SolidColorBrush x:Key="ButtonPrimaryTextBrush" Color="#FDF6E3"/>
+  <SolidColorBrush x:Key="ButtonPrimaryBorderBrush" Color="#2AA198"/>
+  <SolidColorBrush x:Key="ButtonSecondaryBrush" Color="#073642"/>
+  <SolidColorBrush x:Key="ButtonSecondaryTextBrush" Color="#EEE8D5"/>
+  <SolidColorBrush x:Key="ButtonSecondaryBorderBrush" Color="#586E75"/>
+  <SolidColorBrush x:Key="ButtonDangerBrush" Color="#DC322F"/>
+  <SolidColorBrush x:Key="ButtonDangerTextBrush" Color="#FDF6E3"/>
+  <SolidColorBrush x:Key="ButtonDangerBorderBrush" Color="#B58900"/>
+
+  <!-- Tipografías del tema (Solarized: Segoe UI + Consolas) -->
+  <FontFamily x:Key="Font.Primary">Segoe UI</FontFamily>
+  <FontFamily x:Key="Font.Header">Segoe UI Semibold</FontFamily>
+  <FontFamily x:Key="Font.Mono">Consolas</FontFamily>
+</ResourceDictionary>

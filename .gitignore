@@ -1,0 +1,5 @@
+# Seguridad: nunca versionar certificados privados
+*.pfx
+*.p12
+
+# Salidas locales (vacío por ahora)

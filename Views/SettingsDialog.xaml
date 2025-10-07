@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window x:Class="ComicReader.Views.SettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:ComicReader.Views"
+        Title="Configuración Avanzada - ComicReader Pro"
+        Width="1200" Height="750"
+        MinWidth="1000" MinHeight="650"
+        WindowStyle="SingleBorderWindow"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
+        ShowInTaskbar="True"
+        Icon="../icono.ico">
+
+    <Window.Resources>
+        <!-- Estilos modernos para navegación -->
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="15,12"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="5,2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                               Background="{TemplateBinding Background}" 
+                               Padding="{TemplateBinding Padding}"
+                               CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#8A2BE2" Offset="0"/>
+                                            <GradientStop Color="#9932CC" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#7B68EE"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Botón seleccionado -->
+        <Style x:Key="SelectedNavButtonStyle" TargetType="Button" BasedOn="{StaticResource NavButtonStyle}">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#8A2BE2" Offset="0"/>
+                        <GradientStop Color="#9932CC" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <!-- Botones de acción -->
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <!-- Compact action buttons: smaller padding and width to avoid wrapping -->
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Margin" Value="4,0"/>
+            <Setter Property="MinWidth" Value="100"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                               Background="{TemplateBinding Background}" 
+                               CornerRadius="6"
+                               Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.9"/>
+                                <Setter TargetName="border" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.05" ScaleY="1.05"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Estilo para ComboBox temático -->
+        <Style x:Key="ThemeComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Background" Value="#2B2B3F"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#8A2BE2"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <Grid>
+                                <ToggleButton x:Name="ToggleButton" 
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
+                                            ClickMode="Press"/>
+                                <ContentPresenter x:Name="ContentSite"
+                                                IsHitTestVisible="False" 
+                                                Content="{TemplateBinding SelectionBoxItem}"
+                                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                Margin="{TemplateBinding Padding}"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Left"/>
+                                <Popup x:Name="Popup" 
+                                     Placement="Bottom"
+                                     IsOpen="{TemplateBinding IsDropDownOpen}"
+                                     AllowsTransparency="True" 
+                                     Focusable="False"
+                                     PopupAnimation="Slide">
+                                    <Border Background="#2B2B3F" BorderBrush="#8A2BE2" BorderThickness="1" CornerRadius="6">
+                                        <ScrollViewer MaxHeight="200">
+                                            <StackPanel IsItemsHost="True"/>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <!-- Contenido principal con fondo -->
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#1E1E1E" Offset="0"/>
+                <GradientStop Color="#2D2D30" Offset="0.5"/>
+                <GradientStop Color="#1E1E1E" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        
+        <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Panel de navegación -->
+                <Border Grid.Column="0">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#1E1E2E" Offset="0"/>
+                            <GradientStop Color="#252535" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden" Margin="10">
+                        <StackPanel Margin="0,20">
+                            <!-- Navegación principal -->
+                            <TextBlock Text="📱 CONFIGURACIÓN GENERAL" Foreground="#FFD700" FontSize="12" FontWeight="Bold" 
+                                      Margin="15,0,0,10" Opacity="0.8"/>
+                            <Button x:Name="NavSummary" Content="📊 Resumen General" Tag="0" Style="{StaticResource SelectedNavButtonStyle}" Click="NavButton_Click"/>
+                            <Button x:Name="NavAppearance" Content="🎨 Temas y Apariencia" Tag="1" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click"/>
+                            <Button x:Name="NavHomeBackgrounds" Content="🌟 Fondos HomeView" Tag="2" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click"/>
+                            
+                            <TextBlock Text="📖 EXPERIENCIA DE LECTURA" Foreground="#FFD700" FontSize="12" FontWeight="Bold" 
+                                      Margin="15,20,0,10" Opacity="0.8"/>
+                            <Button x:Name="NavReading" Content="📖 Controles de Lectura" Tag="3" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click"/>
+                            <Button x:Name="NavAnimations" Content="✨ Animaciones" Tag="4" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click"/>
+                            <Button x:Name="NavFullscreen" Content="🖥️ Pantalla Completa" Tag="5" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click"/>
+                            
+                            <TextBlock Text="⚡ SISTEMA Y RENDIMIENTO" Foreground="#FFD700" FontSize="12" FontWeight="Bold" 
+                                      Margin="15,20,0,10" Opacity="0.8"/>
+                            <Button x:Name="NavPerformance" Content="⚡ Rendimiento" Tag="6" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click"/>
+                            <Button x:Name="NavPdf" Content="📄 PDF Avanzado" Tag="7" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click"/>
+                            
+                            <TextBlock Text="🔧 HERRAMIENTAS" Foreground="#FFD700" FontSize="12" FontWeight="Bold" 
+                                      Margin="15,20,0,10" Opacity="0.8"/>
+                            <Button x:Name="NavTools" Content="🔧 Respaldo y Herramientas" Tag="8" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click"/>
+                            <Button x:Name="NavStats" Content="📈 Estadísticas" Tag="9" Style="{StaticResource NavButtonStyle}" Click="NavButton_Click"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+                
+                <!-- Área de contenido principal -->
+                <Grid Grid.Column="1">
+                    <Grid.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#1A1A2E" Offset="0"/>
+                            <GradientStop Color="#16213E" Offset="0.5"/>
+                            <GradientStop Color="#1A1A2E" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Grid.Background>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Encabezado dinámico -->
+                    <Border Grid.Row="0" Padding="30,25">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#8A2BE2" Offset="0"/>
+                                <GradientStop Color="#9932CC" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <StackPanel>
+                            <TextBlock x:Name="HeaderTitle" Text="📊 Resumen General del Sistema"
+                                      FontSize="22"
+                                      FontWeight="Bold"
+                                      Foreground="#FFD700"
+                                      Margin="0,0,0,8">
+                                <TextBlock.Effect>
+                                    <DropShadowEffect Color="#FFD700" BlurRadius="10" ShadowDepth="0" Opacity="0.8"/>
+                                </TextBlock.Effect>
+                            </TextBlock>
+                            <TextBlock x:Name="HeaderDescription" Text="Consulta el estado del sistema y accede a configuraciones principales para optimizar tu experiencia de lectura."
+                                      FontSize="14"
+                                      Foreground="#FFFFFF"
+                                      TextWrapping="Wrap"
+                                      Opacity="0.9"
+                                      LineHeight="20"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Contenido dinámico -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden" Padding="20">
+                        <Grid x:Name="ContentContainer">
+                            <!-- Los paneles se definirán en el code-behind para mayor flexibilidad -->
+                        </Grid>
+                    </ScrollViewer>
+                    
+                    <!-- Botones de acción -->
+                    <Border Grid.Row="2" Padding="30,20">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#8A2BE2" Offset="0"/>
+                                <GradientStop Color="#9932CC" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Grid>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <Button x:Name="ResetButton" Content="🔄 Restablecer Todo" 
+                                       Background="#FF6B35" Foreground="White"
+                                       Style="{StaticResource ActionButtonStyle}" Click="Reset_Click"/>
+                                <Button x:Name="ImportButton" Content="📂 Importar Config" 
+                                       Background="#4A9EFF" Foreground="White"
+                                       Style="{StaticResource ActionButtonStyle}" Click="Import_Click"/>
+                                <Button x:Name="ExportButton" Content="💾 Exportar Config" 
+                                       Background="#28A745" Foreground="White"
+                                       Style="{StaticResource ActionButtonStyle}" Click="Export_Click"/>
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button x:Name="ApplyButton" Content="✅ Aplicar" 
+                                       Background="#28A745" Foreground="White"
+                                       Style="{StaticResource ActionButtonStyle}" Click="Apply_Click"/>
+                                <Button x:Name="OkButton" Content="✅ Aceptar" 
+                                       Background="#007BFF" Foreground="White"
+                                       Style="{StaticResource ActionButtonStyle}" Click="Ok_Click"/>
+                                <Button x:Name="CancelButton" Content="❌ Cancelar" 
+                                       Background="#6C757D" Foreground="White"
+                                       Style="{StaticResource ActionButtonStyle}" Click="Cancel_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+</Window>

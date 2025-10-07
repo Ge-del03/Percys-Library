@@ -1,0 +1,62 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Tema Retro Comic: Estilo psicodélico años 60-70 con colores vibrantes -->
+  <Color x:Key="BackgroundColor">#FFF5E6</Color>
+  <Color x:Key="HeaderBackground">#FF4500</Color>
+  <Color x:Key="TextColor">#3F2832</Color>
+  <Color x:Key="TextSecondaryColor">#704214</Color>
+  <Color x:Key="TextDisabledColor">#A0845C</Color>
+  <Color x:Key="PrimaryColor">#FF1493</Color>
+  <Color x:Key="SecondaryColor">#32CD32</Color>
+  <Color x:Key="HighlightColor">#FFD700</Color>
+  <Color x:Key="FocusBorderColor">#FF1493</Color>
+  <Color x:Key="CardBackground">#FFFFFF</Color>
+  <Color x:Key="FooterBackground">#32CD32</Color>
+
+  <!-- Brushes base del tema -->
+  <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+  <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+  <SolidColorBrush x:Key="HeaderBackgroundBrush" Color="{StaticResource HeaderBackground}"/>
+  <SolidColorBrush x:Key="FooterBackgroundBrush" Color="{StaticResource FooterBackground}"/>
+  <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}"/>
+  <SolidColorBrush x:Key="SecondaryTextBrush" Color="{StaticResource TextSecondaryColor}"/>
+  <SolidColorBrush x:Key="TextColorBrush" Color="{StaticResource TextColor}"/>
+  <SolidColorBrush x:Key="HeaderTextColorBrush" Color="#FFFFFF"/>
+  <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
+  <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}"/>
+  <SolidColorBrush x:Key="PrimaryColorBrush" Color="{StaticResource PrimaryColor}"/>
+  <SolidColorBrush x:Key="SecondaryColorBrush" Color="{StaticResource SecondaryColor}"/>
+  <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackground}"/>
+  <SolidColorBrush x:Key="HighlightBrush" Color="{StaticResource HighlightColor}"/>
+  <SolidColorBrush x:Key="HighlightTextBrush" Color="#2E0854"/>
+  <SolidColorBrush x:Key="FocusBorderBrush" Color="{StaticResource FocusBorderColor}"/>
+  <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource HighlightColor}"/>
+  <SolidColorBrush x:Key="AccentColorBrush" Color="{StaticResource HighlightColor}"/>
+  <SolidColorBrush x:Key="BorderBrush" Color="#FF69B4"/>
+  <SolidColorBrush x:Key="ItemBackgroundBrush" Color="{StaticResource CardBackgroundBrush}"/>
+  <SolidColorBrush x:Key="ItemHoverBrush" Color="#FFE4E6"/>
+  <SolidColorBrush x:Key="ItemSelectedBrush" Color="#FFB6C1"/>
+  <SolidColorBrush x:Key="CurrentPageBrush" Color="#FFD700"/>
+  <SolidColorBrush x:Key="AccentHoverBrush" Color="#FFC107"/>
+  <SolidColorBrush x:Key="AccentPressedBrush" Color="#FF8F00"/>
+  <SolidColorBrush x:Key="DisabledBrush" Color="#F0F0F0"/>
+  <SolidColorBrush x:Key="DisabledTextBrush" Color="{StaticResource TextDisabledColor}"/>
+  <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+  <SolidColorBrush x:Key="PlaceholderImageBrush" Color="#FFE4E6"/>
+
+  <!-- Botones por tema -->
+  <SolidColorBrush x:Key="ButtonPrimaryBrush" Color="#8B4513"/>
+  <SolidColorBrush x:Key="ButtonPrimaryTextBrush" Color="#FFFFFF"/>
+  <SolidColorBrush x:Key="ButtonPrimaryBorderBrush" Color="#654321"/>
+  <SolidColorBrush x:Key="ButtonSecondaryBrush" Color="#F5F5DC"/>
+  <SolidColorBrush x:Key="ButtonSecondaryTextBrush" Color="#3F2832"/>
+  <SolidColorBrush x:Key="ButtonSecondaryBorderBrush" Color="#D2B48C"/>
+  <SolidColorBrush x:Key="ButtonDangerBrush" Color="#FF4500"/>
+  <SolidColorBrush x:Key="ButtonDangerTextBrush" Color="#FFFFFF"/>
+  <SolidColorBrush x:Key="ButtonDangerBorderBrush" Color="#FF6347"/>
+
+  <!-- Tipografías del tema -->
+  <FontFamily x:Key="Font.Primary">"Cooper Black", "Impact", Segoe UI</FontFamily>
+  <FontFamily x:Key="Font.Header">"Cooper Black", "Impact", Segoe UI Black</FontFamily>
+  <FontFamily x:Key="Font.Mono">"Courier New", Consolas</FontFamily>
+</ResourceDictionary>

@@ -1,0 +1,185 @@
+<!--
+    STUB de MainWindow duplicado
+    ------------------------------------------------------------
+    Este archivo fue reemplazado intencionalmente por un stub vacío.
+    El proyecto excluye Views/MainWindow.xaml para evitar la excepción en runtime
+    causada por dos definiciones XAML con x:Class="ComicReader.MainWindow".
+    Si necesitas crear una nueva vista, usa otro nombre (por ejemplo ReaderHostWindow).
+-->
+<Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Intencionadamente vacío -->
+</Grid>
+<Window x:Class="ComicReader.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:commands="clr-namespace:ComicReader.Commands"
+        mc:Ignorable="d"
+        Title="{Binding Title, RelativeSource={RelativeSource Self}}"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Icon="icono.ico"
+        WindowStyle="None" AllowsTransparency="False" ResizeMode="CanResize"
+        AllowDrop="True"
+        Closing="MainWindow_Closing"
+        StateChanged="Window_StateChanged">
+
+    <Window.InputBindings>
+        <!-- Navegación de páginas -->
+        <KeyBinding Key="Right" Command="NavigationCommands.NextPage"/>
+        <KeyBinding Key="Left" Command="NavigationCommands.PreviousPage"/>
+        <KeyBinding Modifiers="Control" Key="O" Command="ApplicationCommands.Open"/>
+        <!-- Comandos propios -->
+        <KeyBinding Modifiers="Control" Key="Add" Command="{x:Static commands:ReaderCommands.IncreaseZoom}"/>
+        <KeyBinding Modifiers="Control" Key="Subtract" Command="{x:Static commands:ReaderCommands.DecreaseZoom}"/>
+        <KeyBinding Modifiers="Control" Key="D0" Command="{x:Static commands:ReaderCommands.ResetZoom}"/>
+        <KeyBinding Modifiers="Control" Key="F" Command="{x:Static commands:ReaderCommands.GoToPage}"/>
+        <KeyBinding Modifiers="Control" Key="T" Command="{x:Static commands:ReaderCommands.ToggleThumbnails}"/>
+        <KeyBinding Modifiers="Control" Key="N" Command="{x:Static commands:ReaderCommands.ToggleNightMode}"/>
+        <KeyBinding Modifiers="Alt" Key="Enter" Command="{x:Static commands:ReaderCommands.ToggleImmersive}"/>
+        <KeyBinding Modifiers="Control" Key="B" Command="{x:Static commands:ReaderCommands.AddBookmarkToggle}"/>
+        <!-- Nuevos atajos -->
+        <KeyBinding Modifiers="Control,Shift" Key="F" Command="{x:Static commands:ReaderCommands.OpenSearch}"/>
+        <KeyBinding Modifiers="Control,Alt" Key="L" Command="{x:Static commands:ReaderCommands.OpenLibraryManager}"/>
+        <KeyBinding Modifiers="Control,Alt" Key="G" Command="{x:Static commands:ReaderCommands.OpenStats}"/>
+        <KeyBinding Modifiers="Control,Shift" Key="O" Command="{x:Static commands:ReaderCommands.OpenFavorites}"/>
+        <KeyBinding Modifiers="Control,Shift" Key="A" Command="{x:Static commands:ReaderCommands.OpenAnnotations}"/>
+        <KeyBinding Modifiers="Control,Shift" Key="P" Command="{x:Static commands:ReaderCommands.OpenPresentation}"/>
+        <KeyBinding Modifiers="Control,Shift" Key="C" Command="{x:Static commands:ReaderCommands.ToggleContinuous}"/>
+        <KeyBinding Modifiers="Control,Shift" Key="D" Command="{x:Static commands:ReaderCommands.DeleteCurrentBookmark}"/>
+    </Window.InputBindings>
+
+    <Window.Resources>
+        <DataTemplate x:Key="ThumbnailItemTemplate">
+            <Border Margin="8" Background="#2A2A2A" CornerRadius="6" Padding="6">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Image Source="{Binding Thumbnail}" Stretch="Uniform" Height="140"/>
+                    <TextBlock Grid.Row="1" Text="{Binding PageNumber}" Foreground="#DDD" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+        <DataTemplate x:Key="BookmarkItemTemplate">
+            <Border Margin="6" Background="#333" CornerRadius="6" Padding="6">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Border Background="#222" CornerRadius="4" Height="110" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                        <Image Source="{Binding Thumbnail}" Stretch="Uniform" Margin="2"/>
+                    </Border>
+                    <StackPanel Grid.Row="1" Margin="0,6,0,0">
+                        <TextBlock Text="{Binding Name}" Foreground="#FFF" FontWeight="Bold" TextWrapping="Wrap"/>
+                        <TextBlock Foreground="#AAA" FontSize="11">
+                            <Run Text="Pág. "/><Run Text="{Binding PageNumber}"/>
+                        </TextBlock>
+                        <TextBlock Text="{Binding CreatedDate, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" Foreground="#666" FontSize="10"/>
+                    </StackPanel>
+                </Grid>
+                <Border.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Ir a página" Command="{x:Static commands:ReaderCommands.OpenBookmark}"/>
+                        <MenuItem Header="Renombrar" Command="{x:Static commands:ReaderCommands.RenameBookmark}"/>
+                        <MenuItem Header="Eliminar" Command="{x:Static commands:ReaderCommands.DeleteBookmark}"/>
+                    </ContextMenu>
+                </Border.ContextMenu>
+            </Border>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" x:Name="CustomTitleBar"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                MouseLeftButtonDown="DragWindow_MouseLeftButtonDown"
+                Height="40">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
+                    <TextBlock Text="📚 Percy's Library"
+                               FontSize="20"
+                               Foreground="{DynamicResource AccentColorBrush}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="📖" ToolTip="Entrar al modo lectura" Click="EnterReadingMode_Click" Style="{StaticResource WindowControlButton}"/>
+                    <Button Content="⚙" ToolTip="Configuración" Click="OpenSettingsDialog_Click" Style="{StaticResource WindowControlButton}"/>
+                    <Button Content="─" Click="Minimize_Click" Style="{StaticResource WindowControlButton}"/>
+                    <Button x:Name="MaxRestoreButton" Click="MaximizeRestore_Click" Style="{StaticResource WindowControlButton}"/>
+                    <Button Content="✕" Click="Close_Click" Style="{StaticResource WindowControlButton}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" x:Name="ReaderTopBar"
+                Background="{DynamicResource HeaderBackgroundBrush}"
+                Padding="8" IsEnabled="{Binding IsReaderViewActive, RelativeSource={RelativeSource AncestorType=Window}}">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <Button Content="🏠" Click="HomeButton_Click" Style="{StaticResource SecondaryButtonStyle}" Margin="2,0"/>
+                    <Button Content="📂" Click="OpenFile_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0"/>
+                    <Button Content="⟨" Click="PrevPage_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0"/>
+                    <Button Content="⟩" Click="NextPage_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="Pág" Foreground="#ccc" Margin="0,0,6,0"/>
+                    <TextBlock x:Name="PageIndicator" Text="— / —" Foreground="White" FontWeight="Bold"/>
+                    <Slider x:Name="PageSlider" Width="220" Minimum="1" Maximum="1" Value="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="PageSlider_ValueChanged" Margin="12,0,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
+                    <Button x:Name="BookmarkButton" Content="🔖" Command="{x:Static commands:ReaderCommands.AddBookmarkToggle}" Margin="2,0"/>
+                    <Button Content="－" Click="ZoomOut_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
+                    <Button Content="100%" Click="Zoom100_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
+                    <Button Content="＋" Click="ZoomIn_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
+                    <Button Content="☰" Click="ToggleThumbnails_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
+                    <Button Content="⇳" Command="{x:Static commands:ReaderCommands.ToggleContinuous}" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="ThumbCol" Width="0"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border x:Name="ThumbPanel" Grid.Column="0" Width="240" Background="#1E1E1E" Visibility="Collapsed">
+                <DockPanel>
+                    <Border Background="#252525" DockPanel.Dock="Top" Padding="6,4">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding PanelHeaderText, RelativeSource={RelativeSource AncestorType=Window}}" Foreground="#DDD" FontWeight="Bold" FontSize="13"/>
+                        </StackPanel>
+                    </Border>
+                    <ListBox x:Name="ThumbList"
+                             Background="Transparent"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                             VirtualizingPanel.IsVirtualizing="True"
+                             VirtualizingPanel.VirtualizationMode="Recycling"
+                             SelectionChanged="ThumbList_SelectionChanged"
+                             MouseDoubleClick="ThumbList_MouseDoubleClick"
+                             ItemTemplate="{StaticResource ThumbnailItemTemplate}">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+            <ContentControl Grid.Column="1" x:Name="MainContentArea" Content="{Binding CurrentView}"/>
+        </Grid>
+    </Grid>
+</Window>
