@@ -1260,6 +1260,46 @@ namespace ComicReader.Views
             }
         }
 
+        private void MarkOrRestart_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is FrameworkElement fe && fe.DataContext is ContinueItem item)
+                {
+                    // Si está completado, reiniciar a página 1. Si no, marcar como completado.
+                    if (item.IsCompleted || (item.PageCount > 0 && item.LastPage >= item.PageCount))
+                    {
+                        // Reiniciar
+                        item.LastPage = 1;
+                        item.IsCompleted = false;
+                    }
+                    else
+                    {
+                        // Marcar como completado
+                        item.LastPage = item.PageCount > 0 ? item.PageCount : item.LastPage;
+                        item.IsCompleted = true;
+                    }
+
+                    // Actualizar servicio y persistir
+                    try
+                    {
+                        ComicReader.Services.ContinueReadingService.Instance.UpsertProgress(item.FilePath, item.LastPage, item.PageCount);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogException("Error actualizando progreso desde MarkOrRestart_Click", ex);
+                    }
+
+                    // Forzar actualización de la vista
+                    RebuildRecentView();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("Error en MarkOrRestart_Click", ex);
+            }
+        }
+
         private void ContinueSearchBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == System.Windows.Input.Key.Escape && !string.IsNullOrEmpty(ContinueSearchTerm))

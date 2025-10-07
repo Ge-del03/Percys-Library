@@ -127,3 +127,4 @@ c:\Users\O11CE\OneDrive\Desktop\ComicReader\obj\Debug\net8.0-windows\refint\Perc
 c:\Users\O11CE\OneDrive\Desktop\ComicReader\obj\Debug\net8.0-windows\PercysLibrary.pdb
 c:\Users\O11CE\OneDrive\Desktop\ComicReader\obj\Debug\net8.0-windows\ComicReader.genruntimeconfig.cache
 c:\Users\O11CE\OneDrive\Desktop\ComicReader\obj\Debug\net8.0-windows\ref\PercysLibrary.dll
+c:\Users\O11CE\OneDrive\Desktop\ComicReader\obj\Debug\net8.0-windows\ComicReader.sourcelink.json

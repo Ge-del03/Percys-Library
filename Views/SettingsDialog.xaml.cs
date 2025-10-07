@@ -15,8 +15,8 @@ namespace ComicReader.Views
 {
     public partial class SettingsDialog : Window
     {
-        private readonly UserAppSettings _original;
-        private readonly UserAppSettings _draft;
+    private readonly UserAppSettings _original = null!;
+    private readonly UserAppSettings _draft = null!;
         // Guardar valores originales para poder revertir si el usuario cierra sin aplicar
         private readonly string? _originalTheme;
         private readonly string? _originalHomeBackground;
@@ -24,10 +24,10 @@ namespace ComicReader.Views
     // Colecciones globales de botones para que la selección sea exclusiva en todo el diálogo
     private readonly List<Button> _allThemeButtons = new List<Button>();
     private readonly List<Button> _allBackgroundButtons = new List<Button>();
-        private bool _hasPendingChanges = false;
+    private bool _hasPendingChanges = false;
         private int _currentSectionIndex = 0;
 
-        // Lista de todos los temas disponibles
+    // Lista de todos los temas disponibles
         private readonly Dictionary<string, string> _availableThemes = new Dictionary<string, string>
         {
             { "DarkTheme", "🌙 Oscuro Clásico" },
@@ -110,6 +110,35 @@ namespace ComicReader.Views
             { "SinestroHomeBackground", "💛 Sinestro Corps" }
         };
 
+        // Secciones: títulos y descripciones para UpdateSectionTitle
+        private readonly string[] _sectionTitles = new[]
+        {
+            "📊 Resumen General del Sistema",
+            "🎨 Temas y Personalización",
+            "🌟 Fondos Épicos HomeView",
+            "📖 Controles de Lectura Avanzados",
+            "✨ Animaciones y Efectos",
+            "🖥️ Configuración Pantalla Completa",
+            "⚡ Optimización de Rendimiento",
+            "📄 Procesamiento PDF Avanzado",
+            "🔧 Herramientas de Respaldo",
+            "📈 Estadísticas y Métricas"
+        };
+
+        private readonly string[] _sectionDescriptions = new[]
+        {
+            "Información general del sistema, estadísticas de uso y accesos rápidos a configuraciones principales.",
+            "Personaliza completamente la apariencia de ComicReader con temas profesionales y efectos visuales avanzados.",
+            "Transforma tu pantalla de inicio con fondos épicos inspirados en superhéroes de Marvel y DC Comics.",
+            "Configura controles de navegación, zoom, direcciones de lectura y comportamientos automáticos.",
+            "Ajusta animaciones, transiciones y efectos visuales para una experiencia de lectura cinematográfica.",
+            "Optimiza la experiencia inmersiva en pantalla completa con controles personalizados.",
+            "Configura caché, memoria, rendimiento y optimizaciones para máximo rendimiento del sistema.",
+            "Configuraciones avanzadas para renderizado, calidad y procesamiento de archivos PDF.",
+            "Herramientas de respaldo, exportación de configuraciones y utilidades de mantenimiento.",
+            "Consulta métricas detalladas, estadísticas de lectura y análisis de uso de la aplicación."
+        };
+
         public SettingsDialog() : this(SettingsManager.Settings) { }
 
         public SettingsDialog(UserAppSettings settings)
@@ -145,10 +174,19 @@ namespace ComicReader.Views
         {
             try
             {
-                // Botones habilitados por defecto
-                _hasPendingChanges = true;
+                // Si hay cambios pendientes, habilitar Apply/Ok de forma segura usando FindName
+                var applyBtn = GetActionButton("ApplyButton");
+                var okBtn = GetActionButton("OkButton");
+                var cancelBtn = GetActionButton("CancelButton");
+
+                if (applyBtn != null) applyBtn.IsEnabled = _hasPendingChanges;
+                if (okBtn != null) okBtn.IsEnabled = _hasPendingChanges;
+                if (cancelBtn != null) cancelBtn.IsEnabled = true;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                try { Logger.LogException("Error updating action buttons", ex); } catch { }
+            }
         }
 
         #region Navegación
@@ -317,11 +355,15 @@ namespace ComicReader.Views
             UpdateSectionTitle(index);
             
             // Ocultar todos los paneles
-            foreach (UIElement child in ContentContainer.Children)
+            var container = this.FindName("ContentContainer") as Panel;
+            if (container != null)
             {
-                if (child is FrameworkElement element)
+                foreach (UIElement child in container.Children)
                 {
-                    element.Visibility = Visibility.Collapsed;
+                    if (child is FrameworkElement element)
+                    {
+                        element.Visibility = Visibility.Collapsed;
+                    }
                 }
             }
             
@@ -342,7 +384,8 @@ namespace ComicReader.Views
             
             if (index >= 0 && index < panelNames.Length)
             {
-                var targetPanel = ContentContainer.Children.OfType<FrameworkElement>()
+                var container2 = this.FindName("ContentContainer") as Panel;
+                var targetPanel = container2?.Children.OfType<FrameworkElement>()
                     .FirstOrDefault(e => e.Name == panelNames[index]);
                 
                 if (targetPanel != null)
@@ -354,11 +397,15 @@ namespace ComicReader.Views
 
         private void HideAllSections()
         {
-            foreach (UIElement child in ContentContainer.Children)
+            var container3 = this.FindName("ContentContainer") as Panel;
+            if (container3 != null)
             {
-                if (child is FrameworkElement element)
+                foreach (UIElement child in container3.Children)
                 {
-                    element.Visibility = Visibility.Collapsed;
+                    if (child is FrameworkElement element)
+                    {
+                        element.Visibility = Visibility.Collapsed;
+                    }
                 }
             }
         }
@@ -521,8 +568,11 @@ namespace ComicReader.Views
                 // Destacar tema actual
                 if (theme.Key == _draft.Theme || (theme.Key + "Theme") == _draft.Theme)
                 {
-                    themeButton.Background = new SolidColorBrush(categoryColor);
-                    themeButton.Effect = new DropShadowEffect { Color = categoryColor, BlurRadius = 8, ShadowDepth = 0 };
+                    themeButton.Background = GetHighlightBrush(categoryColor);
+                    themeButton.Effect = new DropShadowEffect { Color = LightenColor(categoryColor, 0.35), BlurRadius = 12, ShadowDepth = 0 };
+                    themeButton.Foreground = new SolidColorBrush(Colors.White);
+                    themeButton.FontWeight = FontWeights.SemiBold;
+                    themeButton.BorderThickness = new Thickness(2);
                 }
 
                 themeButton.Click += (s, e) =>
@@ -555,13 +605,15 @@ namespace ComicReader.Views
                 {
                     btn.Background = new SolidColorBrush(Colors.Transparent);
                     btn.Effect = null;
+                    btn.Foreground = new SolidColorBrush(Color.FromRgb(200,200,200));
                 }
                 catch { }
             }
             try
             {
-                selectedButton.Background = new SolidColorBrush(categoryColor);
-                selectedButton.Effect = new DropShadowEffect { Color = categoryColor, BlurRadius = 8, ShadowDepth = 0 };
+                selectedButton.Background = GetHighlightBrush(categoryColor);
+                selectedButton.Effect = new DropShadowEffect { Color = LightenColor(categoryColor, 0.35), BlurRadius = 12, ShadowDepth = 0 };
+                selectedButton.Foreground = new SolidColorBrush(Colors.White);
             }
             catch { }
         }
@@ -681,8 +733,11 @@ namespace ComicReader.Views
                 // Destacar fondo actual
                 if (bg.Key == _draft.HomeBackground)
                 {
-                    bgButton.Background = new SolidColorBrush(categoryColor);
-                    bgButton.Effect = new DropShadowEffect { Color = categoryColor, BlurRadius = 8, ShadowDepth = 0 };
+                    bgButton.Background = GetHighlightBrush(categoryColor);
+                    bgButton.Effect = new DropShadowEffect { Color = LightenColor(categoryColor, 0.35), BlurRadius = 12, ShadowDepth = 0 };
+                    bgButton.Foreground = new SolidColorBrush(Colors.White);
+                    bgButton.FontWeight = FontWeights.SemiBold;
+                    bgButton.BorderThickness = new Thickness(2);
                 }
 
                 bgButton.Click += (s, e) =>
@@ -715,15 +770,40 @@ namespace ComicReader.Views
                 {
                     btn.Background = new SolidColorBrush(Colors.Transparent);
                     btn.Effect = null;
+                    btn.Foreground = new SolidColorBrush(Color.FromRgb(200,200,200));
                 }
                 catch { }
             }
             try
             {
-                selectedButton.Background = new SolidColorBrush(categoryColor);
-                selectedButton.Effect = new DropShadowEffect { Color = categoryColor, BlurRadius = 8, ShadowDepth = 0 };
+                selectedButton.Background = GetHighlightBrush(categoryColor);
+                selectedButton.Effect = new DropShadowEffect { Color = LightenColor(categoryColor, 0.35), BlurRadius = 12, ShadowDepth = 0 };
+                selectedButton.Foreground = new SolidColorBrush(Colors.White);
             }
             catch { }
+        }
+
+        // Helper: devuelve un color más claro
+        private Color LightenColor(Color input, double factor)
+        {
+            factor = Math.Max(0, Math.Min(1, factor));
+            byte R = (byte)(input.R + (255 - input.R) * factor);
+            byte G = (byte)(input.G + (255 - input.G) * factor);
+            byte B = (byte)(input.B + (255 - input.B) * factor);
+            return Color.FromRgb(R, G, B);
+        }
+
+        // Helper: crea un gradiente de highlight más brillante para selección
+        private Brush GetHighlightBrush(Color baseColor)
+        {
+            var light = LightenColor(baseColor, 0.40);
+            var brush = new LinearGradientBrush();
+            brush.StartPoint = new Point(0, 0);
+            brush.EndPoint = new Point(1, 0);
+            brush.GradientStops.Add(new GradientStop(light, 0.0));
+            brush.GradientStops.Add(new GradientStop(baseColor, 0.6));
+            brush.Opacity = 0.95;
+            return brush;
         }
 
         private StackPanel CreateReadingPanel()
@@ -1413,34 +1493,56 @@ namespace ComicReader.Views
 
         private Button[] FindAllButtons()
         {
-            return new[]
+            var names = new[] { "NavSummary", "NavAppearance", "NavHomeBackgrounds", "NavReading", "NavAnimations", "NavFullscreen", "NavPerformance", "NavPdf", "NavTools", "NavStats" };
+            var list = new List<Button>();
+            foreach (var n in names)
             {
-                NavSummary,
-                NavAppearance,
-                NavHomeBackgrounds,
-                NavReading,
-                NavAnimations,
-                NavFullscreen,
-                NavPerformance,
-                NavPdf,
-                NavTools,
-                NavStats
-            };
+                var btn = this.FindName(n) as Button;
+                if (btn != null) list.Add(btn);
+            }
+            return list.ToArray();
         }
 
         private void UpdateSectionTitle(int sectionIndex)
         {
-            // Título manejado dinámicamente
+            try
+            {
+                var titleBlock = this.FindName("HeaderTitle") as TextBlock;
+                var descBlock = this.FindName("HeaderDescription") as TextBlock;
+                if (sectionIndex >= 0 && sectionIndex < _sectionTitles.Length)
+                {
+                    if (titleBlock != null) titleBlock.Text = _sectionTitles[sectionIndex];
+                    if (descBlock != null) descBlock.Text = _sectionDescriptions[sectionIndex];
+                }
+            }
+            catch (Exception ex)
+            {
+                try { Logger.LogException("Error updating section title", ex); } catch { }
+            }
         }
 
         private void ClearContent()
         {
-            ContentContainer.Children.Clear();
+            var container = this.FindName("ContentContainer") as Panel;
+            if (container != null)
+            {
+                container.Children.Clear();
+            }
         }
 
         private void AddToContent(UIElement element)
         {
-            ContentContainer.Children.Add(element);
+            var container = this.FindName("ContentContainer") as Panel;
+            if (container != null)
+            {
+                container.Children.Add(element);
+            }
+        }
+
+        // Helper to get action buttons safely
+        private Button? GetActionButton(string name)
+        {
+            return this.FindName(name) as Button;
         }
 
         #endregion

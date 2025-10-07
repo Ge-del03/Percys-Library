@@ -330,6 +330,21 @@
                                     HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <TextBlock Text="Continuar" Foreground="#FFFFFF" FontWeight="SemiBold"/>
                             </Button>
+                            <!-- Quick action: mark as read / restart -->
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8">
+                                <Border Width="36" Height="36" CornerRadius="18" Background="#22000000" HorizontalAlignment="Left">
+                                    <Grid>
+                                        <Button Style="{StaticResource GhostIconButton}" Width="32" Height="32" Background="Transparent" BorderBrush="Transparent"
+                                                Click="MarkOrRestart_Click" ToolTip="Marcar como leído / Reiniciar progreso">
+                                            <TextBlock Text="★" FontSize="14" Foreground="#FACC15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                            <!-- Progress badge -->
+                            <Border HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8" Background="#DD111827" CornerRadius="10" Padding="6,2" Opacity="0.95">
+                                <TextBlock Text="{Binding ProgressSummary}" Foreground="#FFFFFF" FontSize="11" FontWeight="SemiBold"/>
+                            </Border>
                         </Grid>
                         <StackPanel Grid.Row="1" Margin="8,8,8,10">
                             <TextBlock Text="{Binding DisplayName}" Foreground="#FFFFFF" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
