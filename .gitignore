@@ -1,3 +1,33 @@
+# Build folders
+bin/
+obj/
+
+# Visual Studio / Rider
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# Logs
+*.log
+
+# NuGet
+packages/
+*.nupkg
+
+# OS files
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+
+# Visual Studio Code
+.vscode/
 # Seguridad: nunca versionar certificados privados
 *.pfx
 *.p12
