@@ -307,6 +307,20 @@ namespace ComicReader.Views
             {
                 var items = ComicReader.Services.ContinueReadingService.Instance.CompletedItems;
                 CompletedComics = new ObservableCollection<ContinueItem>(items ?? new ObservableCollection<ContinueItem>());
+                // Asegurar que las portadas de los items completados estén siempre cargadas.
+                // Si la propiedad CoverThumbnail es null, arrancamos la carga asíncrona.
+                foreach (var ci in CompletedComics)
+                {
+                    try
+                    {
+                        if (ci.CoverThumbnail == null)
+                        {
+                            // No esperar: lanzamos la tarea de carga en segundo plano
+                            _ = LoadRecentCoverAsync(ci);
+                        }
+                    }
+                    catch { }
+                }
                 OnPropertyChanged(nameof(CompletedCount));
                 OnPropertyChanged(nameof(HasAnyContinueItems));
             }
