@@ -428,6 +428,35 @@ namespace ComicReader.Views
             catch { }
         }
 
+        // Navegación del carrusel de Completados
+        private void CompletedCarouselPrev_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var sv = this.FindName("CompletedScrollViewer") as System.Windows.Controls.ScrollViewer;
+                if (sv == null) return;
+                // Mover hacia la izquierda por el ancho aproximado de una tarjeta
+                double offset = sv.ViewportWidth * 0.7;
+                double target = Math.Max(0, sv.HorizontalOffset - offset);
+                sv.ScrollToHorizontalOffset(target);
+            }
+            catch { }
+        }
+
+        private void CompletedCarouselNext_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var sv2 = this.FindName("CompletedScrollViewer") as System.Windows.Controls.ScrollViewer;
+                if (sv2 == null) return;
+                double offset2 = sv2.ViewportWidth * 0.7;
+                double max = sv2.ExtentWidth - sv2.ViewportWidth;
+                double target = Math.Min(max, sv2.HorizontalOffset + offset2);
+                sv2.ScrollToHorizontalOffset(target);
+            }
+            catch { }
+        }
+
         private void OpenFile_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             var openFileDialog = new Microsoft.Win32.OpenFileDialog

@@ -1,0 +1,74 @@
+2025-09-29 16:09:27.293 [Info] Logger inicializado
+2025-09-29 16:09:27.864 [Info] Applied theme: Dark
+2025-09-29 16:09:27.872 [Info] Initializing ComicPageLoader (empty constructor)
+2025-09-29 16:09:28.139 [Info] Initializing ComicPageLoader (empty constructor)
+2025-09-29 16:09:30.087 [Info] Settings saved successfully.
+2025-09-29 16:09:43.715 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Absolute Superman 11 [HDM].cbr with 26 pages.
+2025-09-29 16:09:44.863 [Info] Settings saved successfully.
+2025-09-29 16:10:08.682 [Error] Failed to load comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr: Operation is not valid due to the current state of the object.
+   at SharpCompress.Common.SevenZip.ArchiveReader.ReadDatabase(IPasswordProvider pass)
+   at SharpCompress.Archives.SevenZip.SevenZipArchive.LoadFactory(Stream stream)
+   at SharpCompress.Archives.SevenZip.SevenZipArchive.LoadEntries(IEnumerable`1 volumes)
+   at SharpCompress.Archives.AbstractArchive`2..ctor(ArchiveType type, SourceStream srcStream)
+   at SharpCompress.Archives.SevenZip.SevenZipArchive..ctor(SourceStream srcStream)
+   at SharpCompress.Archives.SevenZip.SevenZipArchive.Open(FileInfo fileInfo, ReaderOptions readerOptions)
+   at SharpCompress.Archives.SevenZip.SevenZipArchive.Open(String filePath, ReaderOptions readerOptions)
+   at ComicReader.Services.ComicPageLoader.<LoadCB7Async>b__30_0() in C:\Users\O11CE\OneDrive\Desktop\ComicReader\ComicPageLoader.cs:line 316
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.<>c.<.cctor>b__272_0(Object obj)
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at ComicReader.Services.ComicPageLoader.LoadCB7Async() in C:\Users\O11CE\OneDrive\Desktop\ComicReader\ComicPageLoader.cs:line 313
+   at ComicReader.Services.ComicPageLoader.LoadArchiveByKindAsync(ArchiveKind kind) in C:\Users\O11CE\OneDrive\Desktop\ComicReader\ComicPageLoader.cs:line 1433
+   at ComicReader.Services.ComicPageLoader.LoadComicAsync(String filePath) in C:\Users\O11CE\OneDrive\Desktop\ComicReader\ComicPageLoader.cs:line 190
+2025-09-29 16:10:08.904 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr with 30 pages.
+2025-09-29 16:10:09.369 [Info] Settings saved successfully.
+2025-09-29 16:10:13.377 [Info] Settings saved successfully.
+2025-09-29 16:10:14.011 [Info] Settings saved successfully.
+2025-09-29 16:10:14.203 [Info] Settings saved successfully.
+2025-09-29 16:10:14.393 [Info] Settings saved successfully.
+2025-09-29 16:10:14.606 [Info] Settings saved successfully.
+2025-09-29 16:10:14.784 [Info] Settings saved successfully.
+2025-09-29 16:10:15.215 [Info] Settings saved successfully.
+2025-09-29 16:10:22.228 [Info] Settings saved successfully.
+2025-09-29 16:10:22.477 [Info] Settings saved successfully.
+2025-09-29 16:10:22.660 [Info] Settings saved successfully.
+2025-09-29 16:12:39.351 [Info] Logger inicializado
+2025-09-29 16:12:39.753 [Info] Applied theme: Dark
+2025-09-29 16:12:39.779 [Info] Initializing ComicPageLoader (empty constructor)
+2025-09-29 16:12:39.990 [Info] Initializing ComicPageLoader (empty constructor)
+2025-09-29 16:12:41.369 [Info] Settings saved successfully.
+2025-09-29 16:12:49.332 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\The Vigil #3 (2023) HDM.cbr with 24 pages.
+2025-09-29 16:12:50.155 [Info] Settings saved successfully.
+2025-09-29 16:12:52.126 [Info] Settings saved successfully.
+2025-09-29 16:12:52.799 [Info] Settings saved successfully.
+2025-09-29 16:12:53.648 [Info] Settings saved successfully.
+2025-09-29 16:12:54.370 [Info] Settings saved successfully.
+2025-09-29 16:12:54.841 [Info] Settings saved successfully.
+2025-09-29 16:12:55.267 [Info] Settings saved successfully.
+2025-09-29 16:12:55.718 [Info] Settings saved successfully.
+2025-09-29 16:12:56.121 [Info] Settings saved successfully.
+2025-09-29 16:12:56.527 [Info] Settings saved successfully.
+2025-09-29 16:12:56.840 [Info] Settings saved successfully.
+2025-09-29 16:12:58.662 [Info] Settings saved successfully.
+2025-09-29 16:13:00.974 [Info] Settings saved successfully.
+2025-09-29 16:13:01.273 [Info] Settings saved successfully.
+2025-09-29 16:13:01.591 [Info] Settings saved successfully.
+2025-09-29 16:13:01.949 [Info] Settings saved successfully.
+2025-09-29 16:13:02.312 [Info] Settings saved successfully.
+2025-09-29 16:13:02.636 [Info] Settings saved successfully.
+2025-09-29 16:13:02.970 [Info] Settings saved successfully.
+2025-09-29 16:13:03.286 [Info] Settings saved successfully.
+2025-09-29 16:13:03.602 [Info] Settings saved successfully.
+2025-09-29 16:13:03.925 [Info] Settings saved successfully.
+2025-09-29 16:13:04.213 [Info] Settings saved successfully.
+2025-09-29 16:13:04.587 [Info] Settings saved successfully.
+2025-09-29 16:13:11.379 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\The Vigil #3 (2023) HDM.cbr with 24 pages.
+2025-09-29 16:13:11.653 [Info] Settings saved successfully.
+2025-09-29 16:13:12.204 [Info] Settings saved successfully.
+2025-09-29 16:13:19.516 [Info] Settings saved successfully.
+2025-09-29 16:13:19.599 [Info] Settings saved successfully.
+2025-09-29 16:13:19.702 [Info] Settings saved successfully.
