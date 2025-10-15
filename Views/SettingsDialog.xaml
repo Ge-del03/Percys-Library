@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window x:Class="ComicReader.Views.SettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Configuración" Width="800" Height="560" WindowStartupLocation="CenterOwner"
+    Icon="/icono.ico"
+        ResizeMode="NoResize" Background="{DynamicResource WindowBackgroundBrush}">
+
+    <Grid Margin="12">
+        <Grid.Resources>
+            <!-- Estilo de navegación lateral -->
+            <Style TargetType="ListBoxItem">
+                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Padding" Value="10,8"/>
+                <Setter Property="Margin" Value="0,2"/>
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="6">
+                                <ContentPresenter Margin="8,4"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="{DynamicResource ComboBoxItemHoverBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="bd" Property="Background" Value="{DynamicResource HighlightBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource HighlightTextBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.6"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Ocultar cabecera de pestañas (solo se usa el contenido) -->
+            <Style x:Key="NoHeaderTabControlStyle" TargetType="TabControl">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TabControl">
+                            <ContentPresenter ContentSource="SelectedContent"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Panel de secciones -->
+        <Border Background="{DynamicResource HeaderBackgroundBrush}" CornerRadius="8" Padding="12" Margin="0,0,12,0">
+            <StackPanel>
+                <TextBlock Text="Secciones" FontWeight="Bold" Foreground="White" Margin="0,0,0,8" FontSize="16"/>
+                <ListBox x:Name="SectionsList" BorderThickness="0" Background="Transparent"
+                         SelectedIndex="{Binding ElementName=Tabs, Path=SelectedIndex, Mode=TwoWay}">
+                    <ListBoxItem Content="General"/>
+                    <ListBoxItem Content="Lectura"/>
+                    <ListBoxItem Content="Apariencia"/>
+                    <ListBoxItem Content="Rendimiento"/>
+                    <ListBoxItem Content="Archivos"/>
+                    <ListBoxItem Content="Avanzado"/>
+                </ListBox>
+            </StackPanel>
+        </Border>
+
+        <!-- Contenido -->
+        <Border Grid.Column="1" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="8" Padding="18">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TabControl x:Name="Tabs" Style="{StaticResource NoHeaderTabControlStyle}">
+                    <!-- General -->
+                    <TabItem Header="General">
+                        <StackPanel Margin="8" >
+                            <TextBlock Text="General" FontWeight="Bold" FontSize="18" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,12"/>
+                            <CheckBox Content="Recordar última sesión" IsChecked="{Binding RememberLastSession}"/>
+                            <CheckBox Content="Mostrar superposición con número de página" IsChecked="{Binding ShowPageNumberOverlay}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <TextBlock Text="Ajuste inicial al abrir:" VerticalAlignment="Center" Width="180"/>
+                                <ComboBox Width="180" SelectedValue="{Binding DefaultFitMode}" SelectedValuePath="Content">
+                                    <ComboBoxItem Content="Width"/>
+                                    <ComboBoxItem Content="Height"/>
+                                    <ComboBoxItem Content="Screen"/>
+                                </ComboBox>
+                            </StackPanel>
+                            <CheckBox Content="Mostrar indicadores de carga" IsChecked="{Binding ShowLoadingIndicators}"/>
+                            <!-- Eliminado: Opción de UI para pantalla completa estándar -->
+                        </StackPanel>
+                    </TabItem>
+
+                    <!-- Lectura -->
+                    <TabItem Header="Lectura">
+                        <StackPanel Margin="8">
+                            <TextBlock Text="Lectura" FontWeight="Bold" FontSize="18" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,12"/>
+                            <CheckBox Content="Habilitar modo lectura sin distracciones" IsChecked="{Binding IsReadingMode}"/>
+                            <CheckBox Content="Modo nocturno" IsChecked="{Binding IsNightMode}"/>
+                            <CheckBox Content="Avance automático de páginas" IsChecked="{Binding AutoAdvancePages}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <TextBlock Text="Intervalo de avance (segundos):" VerticalAlignment="Center" Width="220"/>
+                                <TextBox Width="80" Text="{Binding AutoAdvanceInterval}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <TextBlock Text="Dirección de lectura:" VerticalAlignment="Center" Width="180"/>
+                                <ComboBox Width="160" SelectedValue="{Binding CurrentReadingDirection}" SelectedValuePath="Content">
+                                    <ComboBoxItem Content="LeftToRight"/>
+                                    <ComboBoxItem Content="RightToLeft"/>
+                                </ComboBox>
+                            </StackPanel>
+                            <CheckBox Content="Barra espaciadora pasa de página" IsChecked="{Binding SpacebarNextPage}"/>
+                            <CheckBox Content="Scroll continuo (vertical)" IsChecked="{Binding EnableContinuousScroll}"/>
+                            <CheckBox Content="Habilitar arrastre al hacer zoom" IsChecked="{Binding EnableZoomPan}"/>
+                            <CheckBox Content="Bucle de avance automático (reiniciar al final)" IsChecked="{Binding AutoAdvanceLoop}"/>
+                        </StackPanel>
+                    </TabItem>
+
+                    <!-- Apariencia -->
+                    <TabItem Header="Apariencia">
+                        <StackPanel Margin="8">
+                            <TextBlock Text="Apariencia" FontWeight="Bold" FontSize="18" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,12"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Tema:" VerticalAlignment="Center" Width="120"/>
+                                <ComboBox Width="180" SelectedValue="{Binding Theme}" SelectedValuePath="Content">
+                                    <ComboBoxItem Content="Dark"/>
+                                    <ComboBoxItem Content="Light"/>
+                                    <ComboBoxItem Content="Comic"/>
+                                    <ComboBoxItem Content="Sepia"/>
+                                    <ComboBoxItem Content="HighContrast"/>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <TextBlock Text="Brillo:" VerticalAlignment="Center" Width="120"/>
+                                <Slider Width="200" Minimum="0" Maximum="2" Value="{Binding Brightness}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <TextBlock Text="Contraste:" VerticalAlignment="Center" Width="120"/>
+                                <Slider Width="200" Minimum="0" Maximum="2" Value="{Binding Contrast}"/>
+                            </StackPanel>
+                            <GroupBox Header="Pantalla completa e inmersivo" Margin="0,16,0,0">
+                                <StackPanel>
+                                    <CheckBox Content="Entrar en modo inmersivo al abrir" IsChecked="{Binding AutoEnterImmersiveOnOpen}"/>
+                                    <CheckBox Content="Usar fundido al entrar/salir de pantalla completa" IsChecked="{Binding FadeOnFullscreenTransitions}"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                        <TextBlock Text="Ocultar cursor tras (seg):" VerticalAlignment="Center" Width="180"/>
+                                        <TextBox Width="80" Text="{Binding HideCursorDelaySeconds}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                    </TabItem>
+
+                    <!-- Rendimiento -->
+                    <TabItem Header="Rendimiento">
+                        <StackPanel Margin="8">
+                            <TextBlock Text="Rendimiento" FontWeight="Bold" FontSize="18" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,12"/>
+                            <CheckBox Content="Optimización de memoria" IsChecked="{Binding EnableMemoryOptimization}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <TextBlock Text="Caché de páginas (LRU):" VerticalAlignment="Center" Width="200"/>
+                                <TextBox Width="80" Text="{Binding PageCacheLimit}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <TextBlock Text="Ventana de prefetch:" VerticalAlignment="Center" Width="200"/>
+                                <TextBox Width="80" Text="{Binding PrefetchWindow}"/>
+                            </StackPanel>
+                            <CheckBox Content="Scroll suave" IsChecked="{Binding SmoothScrolling}"/>
+                        </StackPanel>
+                    </TabItem>
+
+                    <!-- Archivos -->
+                    <TabItem Header="Archivos">
+                        <StackPanel Margin="8">
+                            <TextBlock Text="Archivos" FontWeight="Bold" FontSize="18" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,12"/>
+                            <TextBlock Text="Historial de lectura" FontWeight="Bold" Margin="0,0,0,6"/>
+                            <Button Content="Limpiar historial" Width="160" Click="ClearHistory_Click" Style="{StaticResource DangerButtonStyle}"/>
+                            <Separator Margin="0,10,0,10"/>
+                            <TextBlock Text="Restablecer ajustes" FontWeight="Bold" Margin="0,0,0,6"/>
+                            <Button Content="Restaurar valores por defecto" Width="220" Click="ResetDefaults_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+                            <Separator Margin="0,10,0,10"/>
+                            <TextBlock Text="Exportar/Importar" FontWeight="Bold" Margin="0,0,0,6"/>
+                            <StackPanel Orientation="Horizontal" >
+                                <Button Content="Exportar configuración" Width="180" Margin="0,0,10,0" Click="ExportSettings_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+                                <Button Content="Importar configuración" Width="180" Click="ImportSettings_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </TabItem>
+
+                    <!-- Avanzado -->
+                    <TabItem Header="Avanzado">
+                        <StackPanel Margin="8">
+                            <TextBlock Text="Avanzado" FontWeight="Bold" FontSize="18" Foreground="{DynamicResource TextBrush}" Margin="0,0,0,12"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="Retraso para ocultar overlay (seg):" VerticalAlignment="Center" Width="240"/>
+                                <TextBox Width="80" Text="{Binding HideOverlayDelaySeconds}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="Paso de scroll por tecla (0.1-1.0 viewport):" VerticalAlignment="Center" Width="240"/>
+                                <TextBox Width="80" Text="{Binding PageScrollStepRatio}"/>
+                            </StackPanel>
+                            <CheckBox Content="Invertir rueda del mouse para navegar" IsChecked="{Binding InvertScrollWheel}"/>
+                            <TextBlock Text="Cambiar estos ajustes puede requerir reiniciar la vista de lectura." Foreground="DarkOrange" Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
+
+                <!-- Acciones -->
+                <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right" Margin="0,10,0,0">
+                    <Button x:Name="ApplyButton" Content="Aplicar" Width="110" Margin="6,0" Click="Apply_Click" Style="{StaticResource PrimaryButtonStyle}"/>
+                    <Button x:Name="CancelButton" Content="Cancelar" Width="110" Margin="6,0" Click="Cancel_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+                    <Button x:Name="OkButton" Content="Aceptar" Width="110" Margin="6,0" Click="Ok_Click" Style="{StaticResource PrimaryButtonStyle}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

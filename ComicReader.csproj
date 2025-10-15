@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+  <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>ComicReader</RootNamespace>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <AssemblyTitle>Percy's Library</AssemblyTitle>
+    <Product>Percy's Library</Product>
+    <Company>Percy's Library</Company>
+  <ApplicationIcon>icono.ico</ApplicationIcon>
+    <AssemblyName>PercysLibrary</AssemblyName>
+    <DefineConstants>$(DefineConstants);SUPPORT_PDF</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="MainWindow.ZoomCompat.g.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="icono.ico" />
+  </ItemGroup>
+  
+  <!-- Copiar el icono de portada de archivos al directorio de salida para usarlo como DefaultIcon y placeholder -->
+  <ItemGroup>
+    <Content Include="logo de archivo.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
+  
+  
+  <ItemGroup>
+    <PackageReference Include="SharpCompress" Version="0.32.2" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+  <PackageReference Include="VersOne.Epub" Version="3.3.4" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+    <PackageReference Include="Docnet.Core" Version="2.6.0" />
+  </ItemGroup>
+
+  <!-- Evitar generar el .exe (apphost) en Debug para que no se bloquee por procesos externos -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <UseAppHost>false</UseAppHost>
+  </PropertyGroup>
+</Project>
+

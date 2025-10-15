@@ -1,0 +1,48 @@
+# .gitignore para proyecto .NET / WPF
+
+# Seguridad: nunca versionar certificados privados
+*.pfx
+*.p12
+
+# Binarios y resultados de compilación
+bin/
+obj/
+**/bin/
+**/obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+
+# Logs y temporales
+*.log
+*.tmp
+*.cache
+
+# OS generated
+Thumbs.db
+.DS_Store
+
+# IDE specific
+.vscode/
+
+# User data / settings
+continue_reading.json
+AppData/
+
+# Ignore publish output
+publish/
+
+# Ignore built assets
+bundles/

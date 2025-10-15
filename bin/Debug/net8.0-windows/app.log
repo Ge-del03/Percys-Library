@@ -1,0 +1,388 @@
+2025-10-15 11:16:26.109 [Info] Logger inicializado
+2025-10-15 11:16:26.447 [Error] Failed to apply theme: Sepia. Attempting to load fallback theme.: No se encuentra el recurso 'themes/sepiatheme.xaml'.
+   at MS.Internal.AppModel.ResourcePart.GetStreamCore(FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackagePart.GetStream(FileMode mode, FileAccess access)
+   at MS.Internal.IO.Packaging.PackagePartExtensions.GetSeekableStream(PackagePart packPart, FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackWebResponse.CachedResponse.GetResponseStream()
+   at System.IO.Packaging.PackWebResponse.get_ContentType()
+   at MS.Internal.WpfWebRequestHelper.GetContentType(WebResponse response)
+   at MS.Internal.WpfWebRequestHelper.GetResponseStream(WebRequest request, ContentType& contentType)
+   at System.Windows.ResourceDictionary.set_Source(Uri value)
+   at ComicReader.App.ApplyTheme(String themeName) in C:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 146
+2025-10-15 11:16:26.647 [Info] Loaded fallback theme: DarkTheme.
+2025-10-15 11:16:26.656 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:16:26.853 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:16:28.592 [Info] Settings saved successfully.
+2025-10-15 11:16:34.235 [Info] Settings saved successfully.
+2025-10-15 11:16:34.382 [Info] Settings saved successfully.
+2025-10-15 11:16:34.512 [Info] Settings saved successfully.
+2025-10-15 11:22:40.255 [Info] Logger inicializado
+2025-10-15 11:22:40.625 [Error] Failed to apply theme: Sepia. Attempting to load fallback theme.: No se encuentra el recurso 'themes/sepiatheme.xaml'.
+   at MS.Internal.AppModel.ResourcePart.GetStreamCore(FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackagePart.GetStream(FileMode mode, FileAccess access)
+   at MS.Internal.IO.Packaging.PackagePartExtensions.GetSeekableStream(PackagePart packPart, FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackWebResponse.CachedResponse.GetResponseStream()
+   at System.IO.Packaging.PackWebResponse.get_ContentType()
+   at MS.Internal.WpfWebRequestHelper.GetContentType(WebResponse response)
+   at MS.Internal.WpfWebRequestHelper.GetResponseStream(WebRequest request, ContentType& contentType)
+   at System.Windows.ResourceDictionary.set_Source(Uri value)
+   at ComicReader.App.ApplyTheme(String themeName) in C:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 146
+2025-10-15 11:22:40.826 [Info] Loaded fallback theme: DarkTheme.
+2025-10-15 11:22:40.833 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:22:41.024 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:22:42.840 [Info] Settings saved successfully.
+2025-10-15 11:22:46.138 [Info] Settings saved successfully.
+2025-10-15 11:22:46.539 [Info] Settings saved successfully.
+2025-10-15 11:22:46.577 [Info] Settings saved successfully.
+2025-10-15 11:23:05.854 [Info] Logger inicializado
+2025-10-15 11:23:06.094 [Error] Failed to apply theme: Sepia. Attempting to load fallback theme.: No se encuentra el recurso 'themes/sepiatheme.xaml'.
+   at MS.Internal.AppModel.ResourcePart.GetStreamCore(FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackagePart.GetStream(FileMode mode, FileAccess access)
+   at MS.Internal.IO.Packaging.PackagePartExtensions.GetSeekableStream(PackagePart packPart, FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackWebResponse.CachedResponse.GetResponseStream()
+   at System.IO.Packaging.PackWebResponse.get_ContentType()
+   at MS.Internal.WpfWebRequestHelper.GetContentType(WebResponse response)
+   at MS.Internal.WpfWebRequestHelper.GetResponseStream(WebRequest request, ContentType& contentType)
+   at System.Windows.ResourceDictionary.set_Source(Uri value)
+   at ComicReader.App.ApplyTheme(String themeName) in C:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 146
+2025-10-15 11:23:06.193 [Info] Loaded fallback theme: DarkTheme.
+2025-10-15 11:23:06.203 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:23:06.368 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:23:08.045 [Info] Settings saved successfully.
+2025-10-15 11:23:20.075 [Info] Settings saved successfully.
+2025-10-15 11:23:20.256 [Info] Settings saved successfully.
+2025-10-15 11:23:20.300 [Info] Settings saved successfully.
+2025-10-15 11:41:50.554 [Info] Logger inicializado
+2025-10-15 11:41:50.877 [Error] Failed to apply theme: Sepia. Attempting to load fallback theme.: No se encuentra el recurso 'themes/sepiatheme.xaml'.
+   at MS.Internal.AppModel.ResourcePart.GetStreamCore(FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackagePart.GetStream(FileMode mode, FileAccess access)
+   at MS.Internal.IO.Packaging.PackagePartExtensions.GetSeekableStream(PackagePart packPart, FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackWebResponse.CachedResponse.GetResponseStream()
+   at System.IO.Packaging.PackWebResponse.get_ContentType()
+   at MS.Internal.WpfWebRequestHelper.GetContentType(WebResponse response)
+   at MS.Internal.WpfWebRequestHelper.GetResponseStream(WebRequest request, ContentType& contentType)
+   at System.Windows.ResourceDictionary.set_Source(Uri value)
+   at ComicReader.App.ApplyTheme(String themeName) in C:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 146
+2025-10-15 11:41:51.106 [Info] Loaded fallback theme: DarkTheme.
+2025-10-15 11:41:51.113 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:41:51.319 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:41:52.149 [Error] Unhandled exception caught by App_DispatcherUnhandledException.: 'Se produjo una excepción al establecer la propiedad 'System.Windows.FrameworkElement.Style'.' (número de línea: '720'; posición de línea: '68').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.Load(XamlReader xamlReader, IXamlObjectWriterFactory writerFactory, Boolean skipJournaledProperties, Object rootObject, XamlObjectWriterSettings settings, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.LoadBaml(XamlReader xamlReader, Boolean skipJournaledProperties, Object rootObject, XamlAccessLevel accessLevel, Uri baseUri)
+   at System.Windows.Markup.XamlReader.LoadBaml(Stream stream, ParserContext parserContext, Object parent, Boolean closeStream)
+   at System.Windows.Application.LoadComponent(Object component, Uri resourceLocator)
+   at ComicReader.Views.HomeView.InitializeComponent() in C:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\HomeView.xaml:line 1
+   at ComicReader.Views.HomeView..ctor() in C:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\HomeView.xaml.cs:line 199
+   at ComicReader.MainWindow.InitializeComponents() in C:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.cs:line 282
+   at ComicReader.MainWindow..ctor() in C:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.cs:line 121
+   at ComicReader.App.OnStartup(StartupEventArgs e) in C:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 18
+   at System.Windows.Application.<.ctor>b__1_0(Object unused)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+2025-10-15 11:47:59.632 [Info] Logger inicializado
+2025-10-15 11:47:59.992 [Error] Failed to apply theme: Sepia. Attempting to load fallback theme.: No se encuentra el recurso 'themes/sepiatheme.xaml'.
+   at MS.Internal.AppModel.ResourcePart.GetStreamCore(FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackagePart.GetStream(FileMode mode, FileAccess access)
+   at MS.Internal.IO.Packaging.PackagePartExtensions.GetSeekableStream(PackagePart packPart, FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackWebResponse.CachedResponse.GetResponseStream()
+   at System.IO.Packaging.PackWebResponse.get_ContentType()
+   at MS.Internal.WpfWebRequestHelper.GetContentType(WebResponse response)
+   at MS.Internal.WpfWebRequestHelper.GetResponseStream(WebRequest request, ContentType& contentType)
+   at System.Windows.ResourceDictionary.set_Source(Uri value)
+   at ComicReader.App.ApplyTheme(String themeName) in C:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 146
+2025-10-15 11:48:00.099 [Info] Loaded fallback theme: DarkTheme.
+2025-10-15 11:48:00.127 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:48:00.558 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:48:02.936 [Info] Settings saved successfully.
+2025-10-15 11:48:35.324 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr with 30 pages.
+2025-10-15 11:48:35.459 [Info] Settings saved successfully.
+2025-10-15 11:48:37.726 [Info] Settings saved successfully.
+2025-10-15 11:48:38.779 [Info] Settings saved successfully.
+2025-10-15 11:48:39.408 [Info] Settings saved successfully.
+2025-10-15 11:48:53.545 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr with 30 pages.
+2025-10-15 11:48:53.598 [Info] Settings saved successfully.
+2025-10-15 11:48:54.006 [Info] Settings saved successfully.
+2025-10-15 11:48:56.923 [Info] Settings saved successfully.
+2025-10-15 11:48:56.956 [Info] Settings saved successfully.
+2025-10-15 11:48:57.177 [Info] Settings saved successfully.
+2025-10-15 11:48:57.382 [Info] Settings saved successfully.
+2025-10-15 11:48:57.454 [Info] Settings saved successfully.
+2025-10-15 11:48:57.560 [Info] Settings saved successfully.
+2025-10-15 11:48:58.944 [Info] Settings saved successfully.
+2025-10-15 11:48:59.234 [Info] Settings saved successfully.
+2025-10-15 11:49:03.190 [Info] Settings saved successfully.
+2025-10-15 11:49:03.389 [Info] Settings saved successfully.
+2025-10-15 11:49:03.476 [Info] Settings saved successfully.
+2025-10-15 11:53:00.019 [Info] Logger inicializado
+2025-10-15 11:53:00.402 [Error] Failed to apply theme: Sepia. Attempting to load fallback theme.: No se encuentra el recurso 'themes/sepiatheme.xaml'.
+   at MS.Internal.AppModel.ResourcePart.GetStreamCore(FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackagePart.GetStream(FileMode mode, FileAccess access)
+   at MS.Internal.IO.Packaging.PackagePartExtensions.GetSeekableStream(PackagePart packPart, FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackWebResponse.CachedResponse.GetResponseStream()
+   at System.IO.Packaging.PackWebResponse.get_ContentType()
+   at MS.Internal.WpfWebRequestHelper.GetContentType(WebResponse response)
+   at MS.Internal.WpfWebRequestHelper.GetResponseStream(WebRequest request, ContentType& contentType)
+   at System.Windows.ResourceDictionary.set_Source(Uri value)
+   at ComicReader.App.ApplyTheme(String themeName) in C:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 146
+2025-10-15 11:53:00.656 [Info] Loaded fallback theme: DarkTheme.
+2025-10-15 11:53:00.667 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:53:00.970 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:53:02.445 [Info] Settings saved successfully.
+2025-10-15 11:53:07.810 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Resurrection Man - Quantum Karma #003(HijosdelaMedianoche).cbr with 27 pages.
+2025-10-15 11:53:07.910 [Info] Settings saved successfully.
+2025-10-15 11:53:10.056 [Info] Settings saved successfully.
+2025-10-15 11:53:12.872 [Info] Settings saved successfully.
+2025-10-15 11:53:16.052 [Info] Settings saved successfully.
+2025-10-15 11:53:27.831 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Resurrection Man - Quantum Karma #003(HijosdelaMedianoche).cbr with 27 pages.
+2025-10-15 11:53:28.661 [Info] Settings saved successfully.
+2025-10-15 11:53:29.291 [Info] Settings saved successfully.
+2025-10-15 11:53:33.365 [Info] Settings saved successfully.
+2025-10-15 11:53:33.503 [Info] Settings saved successfully.
+2025-10-15 11:53:33.624 [Info] Settings saved successfully.
+2025-10-15 11:53:44.711 [Info] Logger inicializado
+2025-10-15 11:53:45.041 [Error] Failed to apply theme: Sepia. Attempting to load fallback theme.: No se encuentra el recurso 'themes/sepiatheme.xaml'.
+   at MS.Internal.AppModel.ResourcePart.GetStreamCore(FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackagePart.GetStream(FileMode mode, FileAccess access)
+   at MS.Internal.IO.Packaging.PackagePartExtensions.GetSeekableStream(PackagePart packPart, FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackWebResponse.CachedResponse.GetResponseStream()
+   at System.IO.Packaging.PackWebResponse.get_ContentType()
+   at MS.Internal.WpfWebRequestHelper.GetContentType(WebResponse response)
+   at MS.Internal.WpfWebRequestHelper.GetResponseStream(WebRequest request, ContentType& contentType)
+   at System.Windows.ResourceDictionary.set_Source(Uri value)
+   at ComicReader.App.ApplyTheme(String themeName) in C:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 146
+2025-10-15 11:53:45.123 [Info] Loaded fallback theme: DarkTheme.
+2025-10-15 11:53:45.130 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:53:45.242 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:53:46.443 [Info] Settings saved successfully.
+2025-10-15 11:53:52.658 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Resurrection Man - Quantum Karma #003(HijosdelaMedianoche).cbr with 27 pages.
+2025-10-15 11:53:52.741 [Info] Settings saved successfully.
+2025-10-15 11:53:54.670 [Info] Settings saved successfully.
+2025-10-15 11:53:59.196 [Info] Settings saved successfully.
+2025-10-15 11:54:00.979 [Info] Settings saved successfully.
+2025-10-15 11:54:03.574 [Info] Settings saved successfully.
+2025-10-15 11:54:11.068 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Resurrection Man - Quantum Karma #003(HijosdelaMedianoche).cbr with 27 pages.
+2025-10-15 11:54:11.149 [Info] Settings saved successfully.
+2025-10-15 11:54:11.598 [Info] Settings saved successfully.
+2025-10-15 11:54:12.869 [Info] Settings saved successfully.
+2025-10-15 11:54:12.919 [Info] Settings saved successfully.
+2025-10-15 11:54:12.983 [Info] Settings saved successfully.
+2025-10-15 11:54:14.794 [Info] Settings saved successfully.
+2025-10-15 11:54:17.001 [Info] Settings saved successfully.
+2025-10-15 11:54:17.109 [Info] Settings saved successfully.
+2025-10-15 11:54:17.192 [Info] Settings saved successfully.
+2025-10-15 11:57:08.456 [Info] Logger inicializado
+2025-10-15 11:57:09.003 [Error] Failed to apply theme: Sepia. Attempting to load fallback theme.: No se encuentra el recurso 'themes/sepiatheme.xaml'.
+   at MS.Internal.AppModel.ResourcePart.GetStreamCore(FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackagePart.GetStream(FileMode mode, FileAccess access)
+   at MS.Internal.IO.Packaging.PackagePartExtensions.GetSeekableStream(PackagePart packPart, FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackWebResponse.CachedResponse.GetResponseStream()
+   at System.IO.Packaging.PackWebResponse.get_ContentType()
+   at MS.Internal.WpfWebRequestHelper.GetContentType(WebResponse response)
+   at MS.Internal.WpfWebRequestHelper.GetResponseStream(WebRequest request, ContentType& contentType)
+   at System.Windows.ResourceDictionary.set_Source(Uri value)
+   at ComicReader.App.ApplyTheme(String themeName) in C:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 146
+2025-10-15 11:57:09.214 [Info] Loaded fallback theme: DarkTheme.
+2025-10-15 11:57:09.222 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:57:09.560 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 11:57:11.663 [Info] Settings saved successfully.
+2025-10-15 11:57:18.709 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr with 30 pages.
+2025-10-15 11:57:18.852 [Info] Settings saved successfully.
+2025-10-15 11:57:20.588 [Info] Settings saved successfully.
+2025-10-15 11:57:21.376 [Info] Settings saved successfully.
+2025-10-15 11:57:21.999 [Info] Settings saved successfully.
+2025-10-15 11:57:22.502 [Info] Settings saved successfully.
+2025-10-15 11:57:23.024 [Info] Settings saved successfully.
+2025-10-15 11:57:23.533 [Info] Settings saved successfully.
+2025-10-15 11:57:24.015 [Info] Settings saved successfully.
+2025-10-15 11:57:24.528 [Info] Settings saved successfully.
+2025-10-15 11:57:25.035 [Info] Settings saved successfully.
+2025-10-15 11:57:25.546 [Info] Settings saved successfully.
+2025-10-15 11:57:26.043 [Info] Settings saved successfully.
+2025-10-15 11:57:26.517 [Info] Settings saved successfully.
+2025-10-15 11:57:27.016 [Info] Settings saved successfully.
+2025-10-15 11:57:27.457 [Info] Settings saved successfully.
+2025-10-15 11:57:27.974 [Info] Settings saved successfully.
+2025-10-15 11:57:28.442 [Info] Settings saved successfully.
+2025-10-15 11:57:28.918 [Info] Settings saved successfully.
+2025-10-15 11:57:29.205 [Info] Settings saved successfully.
+2025-10-15 11:57:29.504 [Info] Settings saved successfully.
+2025-10-15 11:57:29.797 [Info] Settings saved successfully.
+2025-10-15 11:57:30.076 [Info] Settings saved successfully.
+2025-10-15 11:57:30.408 [Info] Settings saved successfully.
+2025-10-15 11:57:30.717 [Info] Settings saved successfully.
+2025-10-15 11:57:31.038 [Info] Settings saved successfully.
+2025-10-15 11:57:31.371 [Info] Settings saved successfully.
+2025-10-15 11:57:31.756 [Info] Settings saved successfully.
+2025-10-15 11:57:32.087 [Info] Settings saved successfully.
+2025-10-15 11:57:32.746 [Info] Settings saved successfully.
+2025-10-15 11:57:33.681 [Info] Settings saved successfully.
+2025-10-15 11:57:42.508 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr with 30 pages.
+2025-10-15 11:57:42.562 [Info] Settings saved successfully.
+2025-10-15 11:57:42.946 [Info] Settings saved successfully.
+2025-10-15 11:57:44.310 [Info] Settings saved successfully.
+2025-10-15 11:57:51.325 [Info] Settings saved successfully.
+2025-10-15 11:57:51.454 [Info] Settings saved successfully.
+2025-10-15 11:57:51.629 [Info] Settings saved successfully.
+2025-10-15 12:02:12.276 [Info] Logger inicializado
+2025-10-15 12:02:12.978 [Error] Failed to apply theme: Sepia. Attempting to load fallback theme.: No se encuentra el recurso 'themes/sepiatheme.xaml'.
+   at MS.Internal.AppModel.ResourcePart.GetStreamCore(FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackagePart.GetStream(FileMode mode, FileAccess access)
+   at MS.Internal.IO.Packaging.PackagePartExtensions.GetSeekableStream(PackagePart packPart, FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackWebResponse.CachedResponse.GetResponseStream()
+   at System.IO.Packaging.PackWebResponse.get_ContentType()
+   at MS.Internal.WpfWebRequestHelper.GetContentType(WebResponse response)
+   at MS.Internal.WpfWebRequestHelper.GetResponseStream(WebRequest request, ContentType& contentType)
+   at System.Windows.ResourceDictionary.set_Source(Uri value)
+   at ComicReader.App.ApplyTheme(String themeName) in C:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 146
+2025-10-15 12:02:13.109 [Info] Loaded fallback theme: DarkTheme.
+2025-10-15 12:02:13.115 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 12:02:13.269 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 12:02:14.830 [Info] Settings saved successfully.
+2025-10-15 12:02:20.361 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr with 30 pages.
+2025-10-15 12:02:20.479 [Info] Settings saved successfully.
+2025-10-15 12:02:22.402 [Info] Settings saved successfully.
+2025-10-15 12:02:23.057 [Info] Settings saved successfully.
+2025-10-15 12:02:23.570 [Info] Settings saved successfully.
+2025-10-15 12:02:24.048 [Info] Settings saved successfully.
+2025-10-15 12:02:24.476 [Info] Settings saved successfully.
+2025-10-15 12:02:24.923 [Info] Settings saved successfully.
+2025-10-15 12:02:25.339 [Info] Settings saved successfully.
+2025-10-15 12:02:25.620 [Info] Settings saved successfully.
+2025-10-15 12:02:25.940 [Info] Settings saved successfully.
+2025-10-15 12:02:26.241 [Info] Settings saved successfully.
+2025-10-15 12:02:26.561 [Info] Settings saved successfully.
+2025-10-15 12:02:26.912 [Info] Settings saved successfully.
+2025-10-15 12:02:27.260 [Info] Settings saved successfully.
+2025-10-15 12:02:27.535 [Info] Settings saved successfully.
+2025-10-15 12:02:27.875 [Info] Settings saved successfully.
+2025-10-15 12:02:28.179 [Info] Settings saved successfully.
+2025-10-15 12:02:28.578 [Info] Settings saved successfully.
+2025-10-15 12:02:28.897 [Info] Settings saved successfully.
+2025-10-15 12:02:29.234 [Info] Settings saved successfully.
+2025-10-15 12:02:29.553 [Info] Settings saved successfully.
+2025-10-15 12:02:29.866 [Info] Settings saved successfully.
+2025-10-15 12:02:30.150 [Info] Settings saved successfully.
+2025-10-15 12:02:30.454 [Info] Settings saved successfully.
+2025-10-15 12:02:30.708 [Info] Settings saved successfully.
+2025-10-15 12:02:31.042 [Info] Settings saved successfully.
+2025-10-15 12:02:31.516 [Info] Settings saved successfully.
+2025-10-15 12:02:32.012 [Info] Settings saved successfully.
+2025-10-15 12:02:32.494 [Info] Settings saved successfully.
+2025-10-15 12:02:33.649 [Info] Settings saved successfully.
+2025-10-15 12:02:49.529 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr with 30 pages.
+2025-10-15 12:02:49.607 [Info] Settings saved successfully.
+2025-10-15 12:02:49.951 [Info] Settings saved successfully.
+2025-10-15 12:02:55.005 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr with 30 pages.
+2025-10-15 12:02:55.064 [Info] Settings saved successfully.
+2025-10-15 12:02:55.498 [Info] Settings saved successfully.
+2025-10-15 12:02:56.832 [Info] Settings saved successfully.
+2025-10-15 12:03:01.090 [Info] Settings saved successfully.
+2025-10-15 12:03:01.296 [Info] Settings saved successfully.
+2025-10-15 12:03:01.349 [Info] Settings saved successfully.
+2025-10-15 12:04:17.504 [Info] Logger inicializado
+2025-10-15 12:04:17.739 [Error] Failed to apply theme: Sepia. Attempting to load fallback theme.: No se encuentra el recurso 'themes/sepiatheme.xaml'.
+   at MS.Internal.AppModel.ResourcePart.GetStreamCore(FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackagePart.GetStream(FileMode mode, FileAccess access)
+   at MS.Internal.IO.Packaging.PackagePartExtensions.GetSeekableStream(PackagePart packPart, FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackWebResponse.CachedResponse.GetResponseStream()
+   at System.IO.Packaging.PackWebResponse.get_ContentType()
+   at MS.Internal.WpfWebRequestHelper.GetContentType(WebResponse response)
+   at MS.Internal.WpfWebRequestHelper.GetResponseStream(WebRequest request, ContentType& contentType)
+   at System.Windows.ResourceDictionary.set_Source(Uri value)
+   at ComicReader.App.ApplyTheme(String themeName) in C:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 146
+2025-10-15 12:04:17.824 [Info] Loaded fallback theme: DarkTheme.
+2025-10-15 12:04:17.830 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 12:04:18.066 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 12:04:19.163 [Info] Settings saved successfully.
+2025-10-15 12:04:35.696 [Info] Settings saved successfully.
+2025-10-15 12:04:35.955 [Info] Settings saved successfully.
+2025-10-15 12:04:36.143 [Info] Settings saved successfully.
+2025-10-15 12:12:02.337 [Info] Logger inicializado
+2025-10-15 12:12:02.712 [Error] Failed to apply theme: Sepia. Attempting to load fallback theme.: No se encuentra el recurso 'themes/sepiatheme.xaml'.
+   at MS.Internal.AppModel.ResourcePart.GetStreamCore(FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackagePart.GetStream(FileMode mode, FileAccess access)
+   at MS.Internal.IO.Packaging.PackagePartExtensions.GetSeekableStream(PackagePart packPart, FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackWebResponse.CachedResponse.GetResponseStream()
+   at System.IO.Packaging.PackWebResponse.get_ContentType()
+   at MS.Internal.WpfWebRequestHelper.GetContentType(WebResponse response)
+   at MS.Internal.WpfWebRequestHelper.GetResponseStream(WebRequest request, ContentType& contentType)
+   at System.Windows.ResourceDictionary.set_Source(Uri value)
+   at ComicReader.App.ApplyTheme(String themeName) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 146
+2025-10-15 12:12:02.821 [Info] Loaded fallback theme: DarkTheme.
+2025-10-15 12:12:02.830 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 12:12:02.995 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 12:12:04.437 [Info] Settings saved successfully.
+2025-10-15 12:12:26.698 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr with 30 pages.
+2025-10-15 12:12:26.793 [Info] Settings saved successfully.
+2025-10-15 12:12:28.119 [Info] Settings saved successfully.
+2025-10-15 12:12:53.867 [Error] Unhandled exception caught by App_DispatcherUnhandledException.: 'Se produjo una excepción al proporcionar un valor en 'System.Windows.StaticResourceExtension'.' (número de línea: '26'; posición de línea: '33').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.Load(XamlReader xamlReader, IXamlObjectWriterFactory writerFactory, Boolean skipJournaledProperties, Object rootObject, XamlObjectWriterSettings settings, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.LoadBaml(XamlReader xamlReader, Boolean skipJournaledProperties, Object rootObject, XamlAccessLevel accessLevel, Uri baseUri)
+   at System.Windows.Markup.XamlReader.LoadBaml(Stream stream, ParserContext parserContext, Object parent, Boolean closeStream)
+   at System.Windows.Application.LoadComponent(Object component, Uri resourceLocator)
+   at ComicReader.Views.RatingWindow.InitializeComponent() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\RatingWindow.xaml:line 1
+   at ComicReader.Views.RatingWindow..ctor() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\RatingWindow.xaml.cs:line 12
+   at ComicReader.Views.HomeView.<>c__DisplayClass109_0.<CompletedMenu_Click>b__1(Object s, RoutedEventArgs _) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\HomeView.xaml.cs:line 681
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.MenuItem.InvokeClickAfterRender(Object arg)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+2025-10-15 12:13:04.197 [Info] Settings saved successfully.
+2025-10-15 12:13:04.241 [Info] Settings saved successfully.
+2025-10-15 12:14:57.129 [Info] Logger inicializado
+2025-10-15 12:14:57.426 [Error] Failed to apply theme: Sepia. Attempting to load fallback theme.: No se encuentra el recurso 'themes/sepiatheme.xaml'.
+   at MS.Internal.AppModel.ResourcePart.GetStreamCore(FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackagePart.GetStream(FileMode mode, FileAccess access)
+   at MS.Internal.IO.Packaging.PackagePartExtensions.GetSeekableStream(PackagePart packPart, FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackWebResponse.CachedResponse.GetResponseStream()
+   at System.IO.Packaging.PackWebResponse.get_ContentType()
+   at MS.Internal.WpfWebRequestHelper.GetContentType(WebResponse response)
+   at MS.Internal.WpfWebRequestHelper.GetResponseStream(WebRequest request, ContentType& contentType)
+   at System.Windows.ResourceDictionary.set_Source(Uri value)
+   at ComicReader.App.ApplyTheme(String themeName) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 146
+2025-10-15 12:14:57.524 [Info] Loaded fallback theme: DarkTheme.
+2025-10-15 12:14:57.531 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 12:14:57.686 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 12:14:58.767 [Info] Settings saved successfully.
+2025-10-15 12:15:07.869 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\The Vigil #3 (2023) HDM.cbr with 24 pages.
+2025-10-15 12:15:08.018 [Info] Settings saved successfully.
+2025-10-15 12:15:09.313 [Info] Settings saved successfully.
+2025-10-15 12:15:10.357 [Info] Settings saved successfully.
+2025-10-15 12:15:20.746 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\The Vigil #3 (2023) HDM.cbr with 24 pages.
+2025-10-15 12:15:20.814 [Info] Settings saved successfully.
+2025-10-15 12:15:21.739 [Info] Settings saved successfully.
+2025-10-15 12:15:23.778 [Info] Settings saved successfully.
+2025-10-15 12:15:23.830 [Info] Settings saved successfully.
+2025-10-15 12:15:24.461 [Info] Settings saved successfully.
+2025-10-15 12:15:26.391 [Info] Settings saved successfully.
+2025-10-15 12:16:00.020 [Info] Settings saved successfully.
+2025-10-15 12:16:00.223 [Info] Settings saved successfully.
+2025-10-15 12:16:00.326 [Info] Settings saved successfully.
+2025-10-15 12:18:20.765 [Info] Logger inicializado
+2025-10-15 12:18:21.079 [Error] Failed to apply theme: Sepia. Attempting to load fallback theme.: No se encuentra el recurso 'themes/sepiatheme.xaml'.
+   at MS.Internal.AppModel.ResourcePart.GetStreamCore(FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackagePart.GetStream(FileMode mode, FileAccess access)
+   at MS.Internal.IO.Packaging.PackagePartExtensions.GetSeekableStream(PackagePart packPart, FileMode mode, FileAccess access)
+   at System.IO.Packaging.PackWebResponse.CachedResponse.GetResponseStream()
+   at System.IO.Packaging.PackWebResponse.get_ContentType()
+   at MS.Internal.WpfWebRequestHelper.GetContentType(WebResponse response)
+   at MS.Internal.WpfWebRequestHelper.GetResponseStream(WebRequest request, ContentType& contentType)
+   at System.Windows.ResourceDictionary.set_Source(Uri value)
+   at ComicReader.App.ApplyTheme(String themeName) in C:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 146
+2025-10-15 12:18:21.166 [Info] Loaded fallback theme: DarkTheme.
+2025-10-15 12:18:21.178 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 12:18:21.332 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-15 12:18:22.761 [Info] Settings saved successfully.
+2025-10-15 12:18:32.061 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr with 30 pages.
+2025-10-15 12:18:32.167 [Info] Settings saved successfully.
+2025-10-15 12:18:33.670 [Info] Settings saved successfully.
+2025-10-15 12:18:34.563 [Info] Settings saved successfully.
+2025-10-15 12:18:35.094 [Info] Settings saved successfully.
+2025-10-15 12:18:35.514 [Info] Settings saved successfully.
+2025-10-15 12:18:35.884 [Info] Settings saved successfully.
+2025-10-15 12:19:02.586 [Info] Settings saved successfully.
+2025-10-15 12:19:02.996 [Info] Settings saved successfully.
+2025-10-15 12:19:03.321 [Info] Settings saved successfully.

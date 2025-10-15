@@ -1,0 +1,139 @@
+{
+	"$schema": "vscode://schemas/tasks",
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Kill PercysLibrary",
+			"type": "shell",
+			"command": "pwsh",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"Get-Process PercysLibrary -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue; exit 0"
+			],
+			"problemMatcher": []
+		},
+		{
+			"label": "Build ComicReader",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"${workspaceFolder}\\ComicReader.sln",
+				"-c",
+				"Debug"
+			],
+			"group": "build",
+			"dependsOn": [
+				"Kill PercysLibrary"
+			],
+			"problemMatcher": [
+				"$msCompile"
+			]
+		},
+		{
+			"label": "Run ComicReader",
+			"type": "shell",
+			"command": "${workspaceFolder}\\bin\\Debug\\net6.0-windows\\PercysLibrary.exe",
+			"group": "none",
+			"dependsOn": [
+				"Build ComicReader"
+			],
+			"problemMatcher": []
+		},
+		{
+			"label": "Run ComicReader (fixed)",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"--project",
+				"c:\\Users\\O11CE\\OneDrive\\Desktop\\ComicReader\\ComicReader.csproj",
+				"-c",
+				"Debug"
+			],
+			"isBackground": false,
+			"group": "none",
+			"dependsOn": [
+				"Kill PercysLibrary"
+			]
+		},
+		{
+			"label": "Run ComicReader (no-build)",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"--no-build",
+				"--project",
+				"c:\\Users\\O11CE\\OneDrive\\Desktop\\ComicReader\\ComicReader.csproj",
+				"-c",
+				"Debug"
+			],
+			"isBackground": false,
+			"group": "none",
+			"dependsOn": [
+				"Kill PercysLibrary"
+			]
+		},
+		{
+			"label": "Clean + Build ComicReader",
+			"type": "shell",
+			"command": "pwsh",
+			"args": [
+				"-NoProfile",
+				"-File",
+				"${workspaceFolder}\\tools\\clean-build.ps1",
+				"-Configuration",
+				"Debug"
+			],
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build ComicReader",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"${workspaceFolder}\\ComicReader.sln",
+				"-c",
+				"Debug"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build ComicReader (temp)",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"c:\\Users\\O11CE\\OneDrive\\Desktop\\ComicReader\\ComicReader.sln",
+				"-c",
+				"Debug"
+			],
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+
+		{
+			"label": "Build ComicReader (after ComboBox style)",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"c:\\Users\\O11CE\\OneDrive\\Desktop\\ComicReader\\ComicReader.sln",
+				"-c",
+				"Debug"
+			],
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		}
+	]
+}

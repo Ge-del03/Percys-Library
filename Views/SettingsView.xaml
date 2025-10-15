@@ -1,0 +1,84 @@
+<UserControl x:Class="ComicReader.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:svc="clr-namespace:ComicReader.Services"
+             Height="400" Width="600">
+    <Grid Margin="20" Background="#F5F5F5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+    <TextBlock Text="Configuración y Estadísticas" FontFamily="Comic Sans MS" FontSize="28" FontWeight="Bold" Foreground="#222" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+    <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center" Width="420" Background="#FFF">
+            <!-- Opciones clave -->
+            <CheckBox Content="Modo Lectura sin Distracciones" IsChecked="{Binding IsReadingMode, Mode=TwoWay}"/>
+            <CheckBox Content="Modo Nocturno" IsChecked="{Binding IsNightMode, Mode=TwoWay}"/>
+            <CheckBox Content="Mostrar Miniaturas" IsChecked="{Binding ThumbnailsVisible, Mode=TwoWay}"/>
+            <CheckBox Content="Avance Automático de Páginas" IsChecked="{Binding AutoAdvancePages, Mode=TwoWay}"/>
+            <CheckBox Content="Barra espaciadora pasa de página" IsChecked="{Binding SpacebarNextPage, Mode=TwoWay}"/>
+            <CheckBox Content="Ocultar Overlay solo en modo inmersivo" IsChecked="{Binding HideOverlayOnlyInImmersive, Mode=TwoWay}"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="Intervalo de Avance (seg):" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBox Name="AutoAdvanceIntervalBox" Width="60" Text="{Binding AutoAdvanceInterval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="SV_NumericOnly_PreviewTextInput" DataObject.Pasting="SV_NumericOnly_Pasting"/>
+            </StackPanel>
+            <Separator/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Ocultar Overlay tras (seg):" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBox Name="HideOverlayDelayBox" Width="60" Text="{Binding HideOverlayDelaySeconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="SV_NumericOnly_PreviewTextInput" DataObject.Pasting="SV_NumericOnly_Pasting"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Ocultar Cursor tras (seg):" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBox Name="HideCursorDelayBox" Width="60" Text="{Binding HideCursorDelaySeconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="SV_NumericOnly_PreviewTextInput" DataObject.Pasting="SV_NumericOnly_Pasting"/>
+            </StackPanel>
+            <!-- Pantalla completa e inmersivo -->
+            <GroupBox Header="Pantalla completa e inmersivo" Margin="0,20,0,0">
+                <StackPanel>
+                    <CheckBox Content="Entrar en modo inmersivo al abrir"
+                              ToolTip="Al abrir un cómic, entra directamente al modo inmersivo (cubre todo el monitor, oculta la UI y auto-oculta el cursor)."
+                              IsChecked="{Binding AutoEnterImmersiveOnOpen, Mode=TwoWay}"/>
+                    <!-- Eliminado: fullscreen estándar -->
+                    <CheckBox Content="Usar fundido al entrar/salir de pantalla completa"
+                              ToolTip="Aplica una animación de fundido al entrar o salir de pantalla completa y modo inmersivo."
+                              IsChecked="{Binding FadeOnFullscreenTransitions, Mode=TwoWay}"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                        <Button Content="Restablecer valores recomendados" Click="ResetFullscreenSettings_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Estadísticas -->
+            <GroupBox Header="Estadísticas de Lectura" Margin="0,20,0,0">
+                <StackPanel>
+                    <TextBlock Text="Tiempo total de lectura:" FontWeight="Bold"/>
+                    <TextBlock Text="00:00:00"/>
+                    <TextBlock Text="Páginas leídas:" FontWeight="Bold" Margin="0,10,0,0"/>
+                    <TextBlock Text="0"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- PDF -->
+            <GroupBox Header="PDF" Margin="0,20,0,0">
+                <StackPanel>
+                    <TextBlock Text="Resolución de render (afecta calidad y memoria):" Margin="0,0,0,8"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                        <TextBlock Text="Ancho:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBox Width="80" Text="{Binding PdfRenderWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 PreviewTextInput="SV_NumericOnly_PreviewTextInput" DataObject.Pasting="SV_NumericOnly_Pasting"/>
+                        <TextBlock Text="px" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                        <TextBlock Text="  Alto:" VerticalAlignment="Center" Margin="12,0,8,0"/>
+                        <TextBox Width="80" Text="{Binding PdfRenderHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 PreviewTextInput="SV_NumericOnly_PreviewTextInput" DataObject.Pasting="SV_NumericOnly_Pasting"/>
+                        <TextBlock Text="px" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                    </StackPanel>
+                    <TextBlock Text="DPI (legacy, puede afectar algunos motores):" Margin="0,0,0,8"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock Text="DPI:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBox Width="80" Text="{Binding PdfRenderDpi, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 PreviewTextInput="SV_NumericOnly_PreviewTextInput" DataObject.Pasting="SV_NumericOnly_Pasting"/>
+                    </StackPanel>
+                    <Button Content="Aplicar y re-renderizar PDF actual" Click="ApplyPdfRender_Click"/>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+    </Grid>
+</UserControl>

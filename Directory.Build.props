@@ -1,0 +1,15 @@
+<Project>
+  <!-- Excluir siempre archivos huérfanos/duplicados. Esto aplica a builds normales y temporales (wpftmp). -->
+  <ItemGroup>
+    <!-- Excluir archivos huérfanos que puedan quedar en cache o ser recogidos por builds temporales -->
+    <Compile Remove="MainWindow.ZoomCompat.g.cs" />
+  </ItemGroup>
+
+  <!-- Solo para IntelliSense/DesignTime: definir símbolo y añadir stubs para evitar falsos "rojos" de InitializeComponent -->
+  <PropertyGroup Condition="'$(DesignTimeBuild)' == 'true'">
+    <DefineConstants>$(DefineConstants);DESIGN_TIME</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(DesignTimeBuild)' == 'true'">
+    <Compile Include="Views\DesignTimeStubs.g.cs" />
+  </ItemGroup>
+</Project>
