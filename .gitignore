@@ -3,3 +3,16 @@
 *.p12
 
 # Salidas locales (vacío por ahora)
+
+# Build artifacts
+bin/
+obj/
+
+# VSCode
+.vscode/
+
+# Visual Studio
+.vs/
+
+# Logs
+*.log

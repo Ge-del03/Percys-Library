@@ -16,6 +16,44 @@
 - Compatibilidad básica con EPUB y PDF
 - Ordenamiento natural inteligente de páginas
 - Gestión avanzada de memoria y caché
+# Changelog - Percy's Library
+
+## [v1.0.0] - 2025-10-15
+### Added
+- Nueva pestaña "Completados" en la sección "Seguir leyendo" con carrusel de portadas.
+- Insignia "Completado ✅" y progreso al 100% en tarjetas de completados.
+- Botón "Releer" en cada tarjeta de Completados.
+- Opciones por tarjeta: Eliminar, Valorar, Compartir.
+- Migración automática de items a "Completados" cuando el progreso alcanza 100%.
+- Persistencia de completados en archivo JSON (wrapper `ContinueStorage`).
+- Notificaciones toast para confirmaciones y depuración.
+
+### Fixed
+- Correcciones de estilos XAML y recursos rotos en `RatingWindow`.
+- Reajustes en `HomeView` para mostrar correctamente estado vacío y listas.
+
+### Notes
+- Se añadió instrumentación (Debug + Toast) en `ContinueReadingService.UpsertProgress` para verificar la migración automática.
+- Recomendado: limpiar artifacts (`bin/`, `obj/`) del repo si se desea un historial más limpio.
+
+---
+
+## [Versión 2.0.0] - 2024-09-17
+
+### ✨ Nuevas Características
+
+#### 🎨 **Sistema de Temas Avanzado**
+- Agregado ThemeManager con 5 temas profesionales
+- Temas incluidos: Claro, Oscuro, Cómic, Sepia, Alto Contraste
+- Cambio dinámico de temas sin reinicio
+- Persistencia automática de preferencias de tema
+
+#### 📚 **Soporte Extendido de Formatos**
+- EnhancedComicPageLoader con optimizaciones de rendimiento
+- Soporte mejorado para CBZ, CBR, CBT, CB7
+- Compatibilidad básica con EPUB y PDF
+- Ordenamiento natural inteligente de páginas
+- Gestión avanzada de memoria y caché
 
 #### 🔍 **Controles de Visualización Mejorados**
 - AdvancedImageViewer con zoom profesional
