@@ -511,7 +511,7 @@
         </Canvas>
         
     <!-- Contenido Principal (ahora desplazable verticalmente) -->
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly" Margin="56,0,56,0">
     <Grid Margin="40">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -930,18 +930,17 @@
                                         </ItemsControl>
                                     </ScrollViewer>
                                     <!-- Flechas de navegación del carrusel -->
-                                    <!-- Usar márgenes y comportamiento igual que el carrusel de Completados: centrar verticalmente y que solo los botones sean hit-testables -->
-                                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" IsHitTestVisible="False">
+                                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <Button Grid.Column="0" Style="{StaticResource CarouselNavButton}" Click="ContinueCarouselPrev_Click" Margin="-48,0,6,0" VerticalAlignment="Center" IsHitTestVisible="True" Width="48" Height="48">
-                                            <TextBlock Text="◀" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <Button Grid.Column="0" Style="{StaticResource CarouselNavButton}" Click="ContinueCarouselPrev_Click" Margin="4,0" VerticalAlignment="Center">
+                                            <TextBlock Text="◀" FontSize="16"/>
                                         </Button>
-                                        <Button Grid.Column="2" Style="{StaticResource CarouselNavButton}" Click="ContinueCarouselNext_Click" Margin="6,0,-48,0" VerticalAlignment="Center" IsHitTestVisible="True" Width="48" Height="48">
-                                            <TextBlock Text="▶" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <Button Grid.Column="2" Style="{StaticResource CarouselNavButton}" Click="ContinueCarouselNext_Click" Margin="4,0" VerticalAlignment="Center">
+                                            <TextBlock Text="▶" FontSize="16"/>
                                         </Button>
                                     </Grid>
                                 </Grid>
