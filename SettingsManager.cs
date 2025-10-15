@@ -113,6 +113,14 @@ namespace ComicReader.Services
         private bool _enableContinuousScroll = false; // Modo de lectura continua (scroll vertical)
         public bool EnableContinuousScroll { get => _enableContinuousScroll; set { _enableContinuousScroll = value; OnPropertyChanged(nameof(EnableContinuousScroll)); } }
 
+    // Espaciado entre páginas en vista de lectura (en píxeles)
+    private int _readingSpacing = 8;
+    public int ReadingSpacing { get => _readingSpacing; set { _readingSpacing = Math.Max(0, value); OnPropertyChanged(nameof(ReadingSpacing)); } }
+
+    // Mostrar panel rápido de lectura al entrar al modo lector
+    private bool _showReadingQuickPanel = false;
+    public bool ShowReadingQuickPanel { get => _showReadingQuickPanel; set { _showReadingQuickPanel = value; OnPropertyChanged(nameof(ShowReadingQuickPanel)); } }
+
     // Límite de caché de páginas (LRU)
     private int _pageCacheLimit = 60;
     public int PageCacheLimit { get => _pageCacheLimit; set { _pageCacheLimit = value; OnPropertyChanged(nameof(PageCacheLimit)); } }

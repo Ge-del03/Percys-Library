@@ -511,7 +511,7 @@
         </Canvas>
         
     <!-- Contenido Principal (ahora desplazable verticalmente) -->
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly" Margin="56,0,56,0">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly">
     <Grid Margin="40">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -829,7 +829,18 @@
                             <!-- Carrusel horizontal tipo Netflix -->
                             <Grid Name="ContinueCarouselRoot" Visibility="{Binding IsRecentListView, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                                 <Grid>
-                                    <ScrollViewer x:Name="ContinueCarouselScroll" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" CanContentScroll="True">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Flecha izquierda -->
+                                    <Button Grid.Column="0" Style="{StaticResource CarouselNavButton}" Click="ContinueCarouselPrev_Click" Margin="6,0" VerticalAlignment="Center">
+                                        <TextBlock Text="◀" FontSize="16"/>
+                                    </Button>
+
+                                    <ScrollViewer x:Name="ContinueCarouselScroll" Grid.Column="1" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" CanContentScroll="True">
                                         <ItemsControl ItemsSource="{Binding RecentComics}">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
@@ -929,20 +940,11 @@
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
                                     </ScrollViewer>
-                                    <!-- Flechas de navegación del carrusel -->
-                                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Button Grid.Column="0" Style="{StaticResource CarouselNavButton}" Click="ContinueCarouselPrev_Click" Margin="4,0" VerticalAlignment="Center">
-                                            <TextBlock Text="◀" FontSize="16"/>
-                                        </Button>
-                                        <Button Grid.Column="2" Style="{StaticResource CarouselNavButton}" Click="ContinueCarouselNext_Click" Margin="4,0" VerticalAlignment="Center">
-                                            <TextBlock Text="▶" FontSize="16"/>
-                                        </Button>
-                                    </Grid>
+
+                                    <!-- Flecha derecha -->
+                                    <Button Grid.Column="2" Style="{StaticResource CarouselNavButton}" Click="ContinueCarouselNext_Click" Margin="6,0" VerticalAlignment="Center">
+                                        <TextBlock Text="▶" FontSize="16"/>
+                                    </Button>
                                 </Grid>
                             </Grid>
                             <!-- Panel de Completados (carrusel horizontal, portadas completas) -->

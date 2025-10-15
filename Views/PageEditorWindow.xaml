@@ -1,0 +1,10 @@
+<Window x:Class="ComicReader.Views.PageEditorWindow"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		Title="Editor de Páginas" Height="480" Width="640">
+
+	<Grid>
+		<TextBlock Text="Editor de páginas (temporal)" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+	</Grid>
+
+</Window>

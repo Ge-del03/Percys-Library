@@ -14,6 +14,19 @@ namespace ComicReader.Views
 {
 	public partial class ContinuousComicView : UserControl
 	{
+		private int _itemSpacing = 8;
+		// Espaciado entre items (en px). Cuando se establece, re-aplica a los ListBoxItems visibles.
+		public int ItemSpacing
+		{
+			get => _itemSpacing;
+			set
+			{
+				_itemSpacing = Math.Max(0, value);
+				try { ApplyItemSpacing(); } catch { }
+			}
+		}
+
+
 		public ContinuousComicViewModel ViewModel { get; }
 
 		public ContinuousComicView()
@@ -213,6 +226,22 @@ namespace ComicReader.Views
 				if (res != null) return res;
 			}
 			return null;
+		}
+
+		private void ApplyItemSpacing()
+		{
+			try
+			{
+				var list = this.FindName("PagesList") as ListBox;
+				if (list == null) return;
+				foreach (var item in list.Items)
+				{
+					var container = list.ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
+					if (container == null) continue;
+					container.Margin = new Thickness(0, 0, 0, ItemSpacing);
+				}
+			}
+			catch { }
 		}
 	}
 }

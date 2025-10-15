@@ -45,6 +45,8 @@ namespace ComicReader
     private IReadingStatsService _stats => ComicReader.Core.Services.ServiceLocator.TryGet<IReadingStatsService>();
         // Vista de lectura continua (scroll)
         private Views.ContinuousComicView _continuousView;
+            // Control de configuración rápida del modo lectura (panel flotante)
+            private ComicReader.Views.ReadingCoreControl _readingCoreControl;
     // Secuencia para cancelar cargas obsoletas
     private long _pageLoadSeq = 0;
     // Secuencia independiente para miniaturas (no se invalida al cambiar de página)
@@ -118,6 +120,67 @@ namespace ComicReader
             InitializeComponent();
 
             // Inicialización adicional específica de la app
+            try
+            {
+                _readingCoreControl = new ComicReader.Views.ReadingCoreControl();
+                _readingCoreControl.ViewModeChanged += (mode) =>
+                {
+                    // Persistir la preferencia y aplicar de forma mínima
+                    try
+                    {
+                        if (SettingsManager.Settings != null)
+                        {
+                            SettingsManager.Settings.EnableContinuousScroll = mode == "ContinuousScroll";
+                            SettingsManager.SaveSettings();
+                        }
+                    }
+                    catch { }
+                    // Forzar reconstrucción del scaffold de lector
+                    try { EnsureReaderScaffold(); } catch { }
+                };
+                _readingCoreControl.SpacingChanged += (px) =>
+                {
+                    try
+                    {
+                        if (SettingsManager.Settings != null)
+                        {
+                            SettingsManager.Settings.ReadingSpacing = px;
+                            SettingsManager.SaveSettings();
+                        }
+                    }
+                    catch { }
+                    // Aplicar separación si estamos en vista continua
+                    try
+                    {
+                        if (_continuousView != null)
+                            _continuousView.ItemSpacing = px;
+                    }
+                    catch { }
+                };
+                _readingCoreControl.CloseRequested += () =>
+                {
+                    try
+                    {
+                        // Cerrar el panel: restaurar el content principal
+                        if (this.FindName("MainContentArea") is ContentControl cc)
+                        {
+                            // Si hay un reader activo, mantenerlo; solo ocultamos el panel overlay
+                            if (cc.Content == _readingCoreControl) cc.Content = CurrentView;
+                        }
+                    }
+                    catch { }
+
+                    // Registrar atajo Ctrl+L para alternar panel de lectura
+                    try
+                    {
+                        var toggle = new RoutedCommand();
+                        toggle.InputGestures.Add(new KeyGesture(Key.L, ModifierKeys.Control));
+                        this.CommandBindings.Add(new CommandBinding(toggle, (s, e) => ShowReadingQuickPanel()));
+                    }
+                    catch { }
+                };
+            }
+            catch { }
             InitializeComponents();
             DataContext = this;
             // Suscribir eventos removidos del XAML
@@ -626,8 +689,20 @@ namespace ComicReader
             if (useContinuous)
             {
                 _continuousView.ComicLoader = _comicLoader;
+                // Aplicar espaciado configurado
+                try { _continuousView.ItemSpacing = SettingsManager.Settings?.ReadingSpacing ?? 8; } catch { }
                 if (this.FindName("MainContentArea") is ContentControl content)
-                    content.Content = _continuousView;
+                {
+                    // Si el panel de lectura rápida está activo, mantenerlo como overlay en su ContentHost
+                    if (content.Content == _readingCoreControl)
+                    {
+                        // No sustituir el control de overlay
+                    }
+                    else
+                    {
+                        content.Content = _continuousView;
+                    }
+                }
                 CurrentView = _continuousView;
             }
             else
@@ -672,7 +747,16 @@ namespace ComicReader
                     };
                 }
                 if (this.FindName("MainContentArea") is ContentControl content)
-                    content.Content = _readerScrollViewer;
+                {
+                    if (content.Content == _readingCoreControl)
+                    {
+                        // dejar el overlay si está abierto
+                    }
+                    else
+                    {
+                        content.Content = _readerScrollViewer;
+                    }
+                }
                 CurrentView = _readerScrollViewer;
             }
         }
@@ -719,6 +803,15 @@ namespace ComicReader
             }
             catch { }
             SetReaderTopBarVisible(true);
+            // Mostrar el panel de ajustes rápidos si se desea
+            try
+            {
+                if (SettingsManager.Settings?.ShowReadingQuickPanel == true)
+                {
+                    ShowReadingQuickPanel();
+                }
+            }
+            catch { }
             // Limpiar indicador/slider para que no muestre la última página del cómic anterior
             try { UpdatePageIndicator(); } catch { }
             OnPropertyChanged(nameof(IsComicViewActive));
@@ -735,6 +828,37 @@ namespace ComicReader
                 {
                     var existing = _readerCenterGrid.Children.OfType<TextBlock>().FirstOrDefault(tb => tb.Tag as string == "ReaderPlaceholder");
                     if (existing != null) _readerCenterGrid.Children.Remove(existing);
+                }
+            }
+            catch { }
+        }
+
+        private void ToggleReadingQuickPanel_Click(object sender, RoutedEventArgs e)
+        {
+            try { ShowReadingQuickPanel(); } catch { }
+        }
+
+        // Mostrar/ocultar el panel flotante de configuración rápida del lector
+        public void ShowReadingQuickPanel()
+        {
+            try
+            {
+                if (_readingCoreControl == null) return;
+                // Asegurar que los valores actuales se reflejan
+                try { _readingCoreControl.SetViewMode(SettingsManager.Settings?.EnableContinuousScroll == true ? "ContinuousScroll" : "SinglePage"); } catch { }
+                try { _readingCoreControl.SetSpacing(SettingsManager.Settings?.ReadingSpacing ?? 8); } catch { }
+
+                var host = this.FindName("ReadingQuickOverlayHost") as ContentControl;
+                if (host != null)
+                {
+                    if (host.Content == _readingCoreControl)
+                    {
+                        host.Content = null;
+                        host.Visibility = Visibility.Collapsed;
+                        return;
+                    }
+                    host.Content = _readingCoreControl;
+                    host.Visibility = Visibility.Visible;
                 }
             }
             catch { }
