@@ -1,0 +1,24 @@
+<Window x:Class="ComicReader.Views.Prototypes.MainWindowPrototype"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow Prototype" Height="720" Width="1200" Background="{StaticResource ComicBackgroundBrush}">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <Border Background="{StaticResource RibbonHeaderDrawing}" Height="96" Grid.Row="0"/>
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="260"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+      <StackPanel Grid.Column="0" Background="{StaticResource ComicPanelBrush}">
+        <TextBlock Text="Library" Margin="12" FontFamily="{StaticResource ComicDisplayFont}" FontSize="18"/>
+      </StackPanel>
+      <Border Grid.Column="1" Style="{StaticResource ComicPanelStyle}" Margin="12">
+        <TextBlock Text="Contenido principal (prototipo)" FontFamily="{StaticResource ComicPrimaryFont}"/>
+      </Border>
+    </Grid>
+  </Grid>
+</Window>
