@@ -194,3 +194,8 @@ C:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\tests\UiU
 C:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\tests\UiUxTests\bin\Debug\net8.0-windows7.0\Themes\SettingsTheme.baml
 C:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\tests\UiUxTests\bin\Debug\net8.0-windows7.0\Themes\SettingsTokens.baml
 C:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\tests\UiUxTests\bin\Debug\net8.0-windows7.0\Themes\ThemeTokens.baml
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\bin\Debug\net8.0-windows\Styles\ComicRedesignControls.xaml
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\bin\Debug\net8.0-windows\Styles\ComicRedesignTheme.xaml
+C:\Users\O11CE\OneDrive\Desktop\Percy Library\bin\Debug\net8.0-windows\Styles\ComicRedesignComponents.xaml
+C:\Users\O11CE\OneDrive\Desktop\Percy Library\bin\Debug\net8.0-windows\Styles\Drawings\ben_day_tile_drawing.xaml
+C:\Users\O11CE\OneDrive\Desktop\Percy Library\bin\Debug\net8.0-windows\Styles\Drawings\pow_drawing.xaml

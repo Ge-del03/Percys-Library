@@ -1,6 +1,5 @@
 using System.Windows;
 using System.Windows.Controls;
-using ComicReader.ViewModels;
 
 namespace ComicReader.Views
 {
@@ -9,7 +8,6 @@ namespace ComicReader.Views
         public SettingsView()
         {
             InitializeComponent();
-            this.DataContext = new SettingsViewModel();
         }
     }
 }

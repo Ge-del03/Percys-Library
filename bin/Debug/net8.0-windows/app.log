@@ -1019,3 +1019,9 @@
 2025-10-23 14:11:49.954 [Info] [Perf] 2025-10-23T18:11:49.9544951Z - Prefetch page 26 took 772ms
 2025-10-23 14:11:50.616 [Info] [Perf] 2025-10-23T18:11:50.6163617Z - Decode_CreateBitmapImage took 145ms
 2025-10-23 14:11:50.617 [Info] [Perf] 2025-10-23T18:11:50.6178413Z - FullLoad page 26 took 662ms
+2025-10-23 17:48:40.394 [Info] Logger inicializado
+2025-10-23 17:48:40.921 [Info] Applied theme: ComicClassic
+2025-10-23 17:48:41.362 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-23 17:48:41.502 [Info] Decode concurrency cap set to 3
+2025-10-23 17:48:41.504 [Info] Prefetch window set to 4
+2025-10-23 17:49:22.826 [Info] Applied theme: ComicClassic

@@ -19,11 +19,6 @@
                 <ResourceDictionary Source="Resources/ReaderStyles.xaml"/>
                 <!-- Comic controls & styles (fallbacks and comic-themed controls) -->
                 <ResourceDictionary Source="Styles/Controls.Comic.xaml" />
-                <!-- Comic theme resources: tokens y controles específicos de estilo cómic -->
-                <ResourceDictionary Source="Styles/ComicTheme.xaml" />
-                <ResourceDictionary Source="Styles/ComicControls.xaml" />
-                <ResourceDictionary Source="Styles/Textures.xaml" />
-                <ResourceDictionary Source="Styles/ComicComponents.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <!-- Global rendering and UI tokens -->
             <sys:Boolean x:Key="UseBitmapScalingModeHighQuality">True</sys:Boolean>

@@ -29,7 +29,6 @@ namespace ComicReader.ViewModels
         public ICommand RestoreDefaultsCommand { get; }
         public ICommand ClearCacheCommand { get; }
         public ICommand PreviewCommand { get; }
-    public ICommand ChangeTabCommand { get; }
         public ICommand ExportCommand { get; }
         public ICommand ImportCommand { get; }
 
@@ -194,20 +193,6 @@ namespace ComicReader.ViewModels
                         }
                     }
                 } catch (Exception ex) { try { var log = ComicReader.Core.Services.ServiceLocator.TryGet<ComicReader.Core.Abstractions.ILogService>(); log?.LogException("Import failed", ex); } catch { } }
-            });
-
-            // Command used by the SettingsView and unit tests to change the current section/tab.
-            ChangeTabCommand = new RelayCommand(param => {
-                try
-                {
-                    if (param is string s && !string.IsNullOrWhiteSpace(s))
-                    {
-                        // If the section exists in our known list, use it; otherwise set raw string
-                        if (Sections.Contains(s)) SelectedSection = s;
-                        else SelectedSection = s;
-                    }
-                }
-                catch { }
             });
 
             // Export command - default writes to Desktop path; tests can call ExportTo(path) directly
