@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <style>text{font-family:Bangers, Impact, Arial; font-weight:700; fill:#000;}</style>
+  </defs>
+  <g transform="translate(120,120)">
+    <path d="M0,-100 L28,-10 L100,-4 L40,34 L56,100 L0,60 L-56,100 L-40,34 L-100,-4 L-28,-10 Z" fill="#FFCC00" stroke="#000" stroke-width="6" stroke-linejoin="round"/>
+    <text x="0" y="18" font-size="40" text-anchor="middle">POW!</text>
+  </g>
+</svg>

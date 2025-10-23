@@ -75,13 +75,11 @@ namespace ComicReader.Services
 
         private static BitmapImage LoadImage(string path)
         {
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.UriSource = new Uri(path);
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.EndInit();
-            bitmap.Freeze();
-            return bitmap;
+            // Open the file as stream and delegate to the stream-based loader to control disposal and ensure OnLoad
+            using (var fs = File.OpenRead(path))
+            {
+                return LoadImage(fs);
+            }
         }
         private static BitmapImage LoadImage(Stream stream)
         {

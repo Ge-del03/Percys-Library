@@ -84,7 +84,7 @@ namespace ComicReader {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/PercysLibrary;component/gotopagedialog.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/ComicReader;component/gotopagedialog.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\GoToPageDialog.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

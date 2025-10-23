@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 120">
+  <rect width="800" height="120" rx="8" fill="#FFCC66" stroke="#000" stroke-width="6"/>
+  <circle cx="40" cy="60" r="10" fill="#FFF" stroke="#000" stroke-width="3"/>
+  <circle cx="760" cy="60" r="10" fill="#FFF" stroke="#000" stroke-width="3"/>
+  <text x="400" y="72" font-family="Bangers, Arial" font-size="46" text-anchor="middle" fill="#000">CONFIGURACIÓN</text>
+</svg>

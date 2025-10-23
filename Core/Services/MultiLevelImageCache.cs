@@ -4,17 +4,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Media.Imaging;
 using ComicReader.Core.Abstractions;
 
 namespace ComicReader.Core.Services
 {
-    public class MultiLevelImageCache : IImageCache
+    public class MultiLevelImageCache : IImageCache, IDisposable
     {
         private readonly ConcurrentDictionary<string, (BitmapImage image, DateTime ts)> _memory = new();
         private readonly int _memoryLimit;
         private readonly string _diskPath;
         private readonly object _diskLock = new();
+        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+        private readonly ConcurrentBag<Task> _backgroundTasks = new ConcurrentBag<Task>();
 
         public MultiLevelImageCache(int memoryLimit = 200, string diskFolder = null)
         {
@@ -23,32 +26,45 @@ namespace ComicReader.Core.Services
             Directory.CreateDirectory(_diskPath);
         }
 
-        public Task<BitmapImage> Get(string key)
+        public async Task<BitmapImage> Get(string key)
         {
             if (_memory.TryGetValue(key, out var entry))
             {
                 _memory[key] = (entry.image, DateTime.UtcNow);
-                return Task.FromResult(entry.image);
+                return entry.image;
             }
             var file = Path.Combine(_diskPath, SafeFileName(key) + ".png");
             if (File.Exists(file))
             {
                 try
                 {
-                    var bmp = new BitmapImage();
-                    using var fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    bmp.BeginInit();
-                    bmp.CacheOption = BitmapCacheOption.OnLoad;
-                    bmp.StreamSource = fs;
-                    bmp.EndInit();
-                    bmp.Freeze();
-                    _memory[key] = (bmp, DateTime.UtcNow);
-                    EnforceMemoryLimit();
-                    return Task.FromResult(bmp);
+                    // Load from disk on a background thread to avoid blocking UI callers
+                    var bmp = await Task.Run(() =>
+                    {
+                        try
+                        {
+                            var local = new BitmapImage();
+                            using var fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read);
+                            local.BeginInit();
+                            local.CacheOption = BitmapCacheOption.OnLoad;
+                            local.StreamSource = fs;
+                            local.EndInit();
+                            local.Freeze();
+                            return local;
+                        }
+                        catch { return null; }
+                    }).ConfigureAwait(false);
+
+                    if (bmp != null)
+                    {
+                        _memory[key] = (bmp, DateTime.UtcNow);
+                        EnforceMemoryLimit();
+                        return bmp;
+                    }
                 }
                 catch { }
             }
-            return Task.FromResult<BitmapImage>(null);
+            return null;
         }
 
         public Task Set(string key, BitmapImage image)
@@ -56,7 +72,12 @@ namespace ComicReader.Core.Services
             if (image == null) return Task.CompletedTask;
             _memory[key] = (image, DateTime.UtcNow);
             EnforceMemoryLimit();
-            Task.Run(() => PersistToDisk(key, image));
+            try
+            {
+                var t = Task.Run(() => PersistToDisk(key, image), _cts.Token);
+                _backgroundTasks.Add(t);
+            }
+            catch { }
             return Task.CompletedTask;
         }
 
@@ -87,6 +108,13 @@ namespace ComicReader.Core.Services
                 }
             }
             catch { }
+        }
+
+        public void Dispose()
+        {
+            try { _cts.Cancel(); } catch { }
+            try { Task.WaitAll(_backgroundTasks.ToArray(), 1000); } catch { }
+            try { _cts.Dispose(); } catch { }
         }
 
         private string SafeFileName(string key)

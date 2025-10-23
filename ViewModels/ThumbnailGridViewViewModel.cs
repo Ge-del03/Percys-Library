@@ -20,8 +20,8 @@ namespace ComicReader.ViewModels
     public class ThumbnailGridViewViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        public event Action<int> PageSelected;
-        public event Action<int> PageDoubleClicked;
+    public event System.Action<int> PageSelected;
+    public event System.Action<int> PageDoubleClicked;
 
         private ObservableCollection<ThumbnailItem> _thumbnails = new();
     private IComicPageLoader _comicLoader;
@@ -115,12 +115,13 @@ namespace ComicReader.ViewModels
             _bookmarkService = ServiceLocator.Get<IBookmarkService>();
             _log = ServiceLocator.TryGet<ILogService>() ?? new LogServiceAdapter();
             _multiLevelCache = ServiceLocator.TryGet<IImageCache>();
-            IncreaseThumbSizeCommand = new RelayCommand(_ => ThumbnailSize += 25);
-            DecreaseThumbSizeCommand = new RelayCommand(_ => ThumbnailSize -= 25);
-            RefreshCommand = new RelayCommand(_ => StartThumbnailLoad(true));
-            ThumbnailClickCommand = new RelayCommand(t => { if (t is ThumbnailItem ti) ThumbnailClicked(ti); });
-            ThumbnailDoubleClickCommand = new RelayCommand(t => { if (t is ThumbnailItem ti) ThumbnailDoubleClicked(ti); });
-            AddBookmarkCommand = new RelayCommand(_ => AddBookmarkToCurrentPage());
+            // Usar overloads explícitos para evitar ambigüedad con System.Action
+            IncreaseThumbSizeCommand = new RelayCommand((Action)(() => ThumbnailSize += 25));
+            DecreaseThumbSizeCommand = new RelayCommand((Action)(() => ThumbnailSize -= 25));
+            RefreshCommand = new RelayCommand((Action)(() => StartThumbnailLoad(true)));
+            ThumbnailClickCommand = new RelayCommand((object t) => { if (t is ThumbnailItem ti) ThumbnailClicked(ti); });
+            ThumbnailDoubleClickCommand = new RelayCommand((object t) => { if (t is ThumbnailItem ti) ThumbnailDoubleClicked(ti); });
+            AddBookmarkCommand = new RelayCommand((Action)(() => AddBookmarkToCurrentPage()));
         }
 
         private void StartThumbnailLoad(bool force = false)
@@ -198,7 +199,12 @@ namespace ComicReader.ViewModels
 
                 if (!_fullImageCache.TryGetValue(pageIndex, out var fullImage))
                 {
-                    fullImage = await ((ComicPageLoader)ComicLoader).GetPageImageAsync(pageIndex);
+                    // Request the full image decoded to a reasonable width to reduce CPU and memory
+                    if (ComicLoader is ComicPageLoader cpl)
+                        fullImage = await cpl.GetPageImageAsync(pageIndex, 1200, ct).ConfigureAwait(false);
+                    else
+                        fullImage = await ((IComicPageLoader)ComicLoader).GetPageImageAsync(pageIndex, 1200).ConfigureAwait(false);
+
                     if (fullImage == null) return null;
                     _fullImageCache[pageIndex] = fullImage;
                 }
@@ -229,15 +235,26 @@ namespace ComicReader.ViewModels
                 var scale = Math.Min(scaleX, scaleY);
                 var width = (int)(source.PixelWidth * scale);
                 var height = (int)(source.PixelHeight * scale);
-                var thumbnail = new BitmapImage();
-                thumbnail.BeginInit();
-                thumbnail.UriSource = source.UriSource;
-                thumbnail.DecodePixelWidth = width;
-                thumbnail.DecodePixelHeight = height;
-                thumbnail.CacheOption = BitmapCacheOption.OnLoad;
-                thumbnail.EndInit();
-                thumbnail.Freeze();
-                return thumbnail;
+                // Create a scaled bitmap from the already-loaded source. Use TransformedBitmap which can be frozen.
+                var frame = BitmapFrame.Create(source);
+                var scaleTransform = new System.Windows.Media.ScaleTransform(scale, scale);
+                var tb = new TransformedBitmap(frame, scaleTransform);
+                tb.Freeze();
+                // Convert to BitmapImage by encoding to PNG in-memory
+                using (var ms = new System.IO.MemoryStream())
+                {
+                    var encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(tb));
+                    encoder.Save(ms);
+                    ms.Position = 0;
+                    var bmp = new BitmapImage();
+                    bmp.BeginInit();
+                    bmp.CacheOption = BitmapCacheOption.OnLoad;
+                    bmp.StreamSource = ms;
+                    bmp.EndInit();
+                    bmp.Freeze();
+                    return bmp;
+                }
             }
             catch { return CreateErrorThumbnail(); }
         }

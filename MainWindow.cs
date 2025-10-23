@@ -6,6 +6,7 @@ using System.Windows;
 // using System.Windows.Input; // ya está incluido arriba
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using System.Windows.Media;
 using System.ComponentModel;
 using Microsoft.Win32;
 using ComicReader.Views;
@@ -27,7 +28,7 @@ namespace ComicReader
     private ComicPageLoader _comicLoader = new ComicPageLoader();
     private int _currentPageIndex;
     private HomeView _homeView; // Se inicializa tras cargar Settings
-    private SettingsView _settingsView; // Se inicializa tras cargar Settings
+    private SettingsView _settingsView = null; // Se inicializa tras cargar Settings
         private Image _currentComicImage;
     private ScrollViewer _readerScrollViewer;
     private Grid _readerCenterGrid;
@@ -49,6 +50,51 @@ namespace ComicReader
     private long _pageLoadSeq = 0;
     // Secuencia independiente para miniaturas (no se invalida al cambiar de página)
     private long _thumbLoadSeq = 0;
+    // Cancellation token source for background tasks launched by the window
+    private readonly CancellationTokenSource _ctsWindow = new CancellationTokenSource();
+    // Track background tasks launched by the window so we can wait for them on close
+    private readonly System.Collections.Generic.List<Task> _backgroundTasks = new System.Collections.Generic.List<Task>();
+    private readonly object _bgLock = new object();
+    // Guard para evitar reentrada en el flujo de cierre
+    private bool _isShuttingDown = false;
+    // Placeholder ligero y congelado para reacción inmediata
+    private static System.Windows.Media.Imaging.BitmapImage _frozen1x1Placeholder;
+
+    private static System.Windows.Media.Imaging.BitmapImage GetFrozen1x1Placeholder()
+    {
+        if (_frozen1x1Placeholder != null) return _frozen1x1Placeholder;
+        try
+        {
+            // Crear un RenderTargetBitmap 1x1 transparente y convertirlo a BitmapImage
+            var rtb = new RenderTargetBitmap(1, 1, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+            var dv = new DrawingVisual();
+            using (var dc = dv.RenderOpen())
+            {
+                // Transparent background: no draw needed, but ensure the RenderTargetBitmap has alpha
+            }
+            rtb.Render(dv);
+
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(rtb));
+            using (var ms = new MemoryStream())
+            {
+                encoder.Save(ms);
+                ms.Position = 0;
+                var bi = new System.Windows.Media.Imaging.BitmapImage();
+                bi.BeginInit();
+                bi.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+                bi.StreamSource = ms;
+                bi.EndInit();
+                bi.Freeze();
+                _frozen1x1Placeholder = bi;
+                return _frozen1x1Placeholder;
+            }
+        }
+        catch
+        {
+            return null;
+        }
+    }
     // Estado de pantalla completa inmersiva y overlay
     private bool _isImmersive = false;
     // Guardado de estado de ventana para inmersivo
@@ -73,6 +119,7 @@ namespace ComicReader
     private System.Windows.Media.BitmapScalingMode _savedImageScalingMode = System.Windows.Media.BitmapScalingMode.Unspecified;
     private bool _immersiveTransitionBusy = false;
     private bool _savedThumbColWidthSet = false;
+    // loader metrics HUD removed
     // Evitar recursión al sincronizar selección del panel de miniaturas
     private bool _suppressThumbListSelectionChange = false;
     // Dirección de la última navegación: -1=prev, 1=next, 0=neutra
@@ -144,8 +191,7 @@ namespace ComicReader
                     ComicReader.Services.ContinueReadingService.Instance.UpsertProgress(_comicLoader?.FilePath, oneBased, pageCount);
                     if (pageCount > 0 && oneBased >= pageCount)
                     {
-                        // UpsertProgress now moves items to CompletedItems when progress >= pageCount.
-                        // No debemos eliminar aquí (antes se borraba). Solo refrescar la vista para que muestre el cambio.
+                        // UpsertProgress moves the item to Completed; refresh UI but do not remove it explicitly here.
                         _homeView?.RefreshRecent();
                     }
                 }
@@ -162,7 +208,189 @@ namespace ComicReader
             
             // Configurar ventana inicial
             ConfigureInitialWindowState();
+            this.Closing += MainWindow_Closing;
+            // Loader HUD removed; no timer initialized.
         }
+
+        private async void MainWindow_Closing(object sender, CancelEventArgs e)
+        {
+            // If shutdown already in progress, allow the close to continue.
+            if (_isShuttingDown) return;
+
+            // Cancel the close for now and perform graceful shutdown work.
+            e.Cancel = true;
+            _isShuttingDown = true;
+
+            try
+            {
+                await HandleWindowClosingAsync().ConfigureAwait(false);
+            }
+            catch { }
+
+            // After cleanup, invoke Close again on UI thread to finish shutdown.
+            try
+            {
+                this.Dispatcher.Invoke(() => {
+                    try { this.Close(); } catch { System.Windows.Application.Current?.Shutdown(); }
+                });
+            }
+            catch { }
+        }
+
+        private async System.Threading.Tasks.Task HandleWindowClosingAsync()
+        {
+            try { _ctsWindow?.Cancel(); } catch { }
+
+            // Request a save (this schedules the debounced save and records the task)
+            try { SettingsManager.SaveSettings(); } catch { }
+
+            try
+            {
+                // Wait for pending settings save (bounded)
+                try
+                {
+                    var cts = new CancellationTokenSource(3000);
+                    await SettingsManager.FlushPendingSavesAsync(cts.Token).ConfigureAwait(false);
+                }
+                catch { /* timeout or failure — proceed */ }
+
+                // Wait for window-tracked background tasks with a timeout
+                Task[] tasksCopy;
+                lock (_bgLock) { tasksCopy = _backgroundTasks.ToArray(); }
+                if (tasksCopy != null && tasksCopy.Length > 0)
+                {
+                    try
+                    {
+                        var timeout = System.Threading.Tasks.Task.Delay(3000);
+                        var all = System.Threading.Tasks.Task.WhenAll(tasksCopy);
+                        var finished = await System.Threading.Tasks.Task.WhenAny(all, timeout).ConfigureAwait(false);
+                        try { await all.ConfigureAwait(false); } catch { }
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+        }
+
+        private void TrackBackgroundTask(Task t)
+        {
+            if (t == null) return;
+            lock (_bgLock) { _backgroundTasks.Add(t); }
+            t.ContinueWith(_ => { try { lock (_bgLock) { _backgroundTasks.Remove(t); } } catch { } }, System.Threading.Tasks.TaskScheduler.Default);
+        }
+
+        // Actualiza los contenidos (texto/icono) de los botones de navegación según el modo continuo
+        private void UpdateNavButtonsForContinuousMode(bool continuous)
+        {
+            try
+            {
+                var pb = this.FindName("PrevButton") as System.Windows.Controls.Button;
+                var nb = this.FindName("NextButton") as System.Windows.Controls.Button;
+                if (pb != null && nb != null)
+                {
+                    if (continuous)
+                    {
+                        // Colocar Paths vectoriales para flecha arriba/abajo
+                        var up = new System.Windows.Shapes.Path
+                        {
+                            Data = System.Windows.Media.Geometry.Parse("M6,14 L12,8 L18,14"),
+                            Stroke = System.Windows.Media.Brushes.White,
+                            StrokeThickness = 2,
+                            StrokeStartLineCap = System.Windows.Media.PenLineCap.Round,
+                            StrokeEndLineCap = System.Windows.Media.PenLineCap.Round,
+                            Width = 14,
+                            Height = 14,
+                            Stretch = System.Windows.Media.Stretch.Uniform
+                        };
+                        var down = new System.Windows.Shapes.Path
+                        {
+                            Data = System.Windows.Media.Geometry.Parse("M6,10 L12,16 L18,10"),
+                            Stroke = System.Windows.Media.Brushes.White,
+                            StrokeThickness = 2,
+                            StrokeStartLineCap = System.Windows.Media.PenLineCap.Round,
+                            StrokeEndLineCap = System.Windows.Media.PenLineCap.Round,
+                            Width = 14,
+                            Height = 14,
+                            Stretch = System.Windows.Media.Stretch.Uniform
+                        };
+                        pb.Content = up;
+                        pb.ToolTip = "Subir";
+                        nb.Content = down;
+                        nb.ToolTip = "Bajar";
+                    }
+                    else
+                    {
+                        // Restaurar Paths laterales
+                        var left = new System.Windows.Shapes.Path
+                        {
+                            Data = System.Windows.Media.Geometry.Parse("M12,3 L4,12 L12,21"),
+                            Stroke = System.Windows.Media.Brushes.White,
+                            StrokeThickness = 2,
+                            StrokeStartLineCap = System.Windows.Media.PenLineCap.Round,
+                            StrokeEndLineCap = System.Windows.Media.PenLineCap.Round,
+                            Width = 14,
+                            Height = 14,
+                            Stretch = System.Windows.Media.Stretch.Uniform
+                        };
+                        var right = new System.Windows.Shapes.Path
+                        {
+                            Data = System.Windows.Media.Geometry.Parse("M4,3 L12,12 L4,21"),
+                            Stroke = System.Windows.Media.Brushes.White,
+                            StrokeThickness = 2,
+                            StrokeStartLineCap = System.Windows.Media.PenLineCap.Round,
+                            StrokeEndLineCap = System.Windows.Media.PenLineCap.Round,
+                            Width = 14,
+                            Height = 14,
+                            Stretch = System.Windows.Media.Stretch.Uniform
+                        };
+                        pb.Content = left;
+                        pb.ToolTip = "Anterior";
+                        nb.Content = right;
+                        nb.ToolTip = "Siguiente";
+                    }
+                }
+            }
+            catch { }
+        }
+
+        // Animación suave hacia un offset vertical objetivo en un ScrollViewer
+        private void SmoothScrollTo(System.Windows.Controls.ScrollViewer sv, double targetOffset)
+        {
+            try
+            {
+                if (sv == null) return;
+                // Usar DoubleAnimation para animar un DependencyProperty proxy
+                var anim = new System.Windows.Media.Animation.DoubleAnimation
+                {
+                    From = sv.VerticalOffset,
+                    To = targetOffset,
+                    Duration = new Duration(TimeSpan.FromMilliseconds(240)),
+                    EasingFunction = new System.Windows.Media.Animation.QuadraticEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut }
+                };
+
+                var storyboard = new System.Windows.Media.Animation.Storyboard();
+                storyboard.Children.Add(anim);
+
+                // Crear un DependencyObject temporal para enlazar la animación
+                var proxy = new DependencyObject();
+                var prop = System.Windows.DependencyProperty.RegisterAttached("ScrollAnim", typeof(double), typeof(MainWindow), new PropertyMetadata(0.0, (d, e) =>
+                {
+                    try
+                    {
+                        var value = (double)e.NewValue;
+                        sv.ScrollToVerticalOffset(value);
+                    }
+                    catch { }
+                }));
+
+                System.Windows.Media.Animation.Storyboard.SetTarget(anim, proxy);
+                System.Windows.Media.Animation.Storyboard.SetTargetProperty(anim, new PropertyPath(prop));
+                storyboard.Begin();
+            }
+            catch { }
+        }
+
+        // Prefetch and Clear caches UI handlers removed (buttons deleted from XAML).
 
         protected override void OnSourceInitialized(EventArgs e)
         {
@@ -281,7 +509,7 @@ namespace ComicReader
 
             // Crear vistas DESPUÉS de cargar Settings para que se suscriban a la instancia correcta
             _homeView = new HomeView();
-            _settingsView = new SettingsView();
+            // Nuevo: no crear _settingsView aquí; usamos una ventana separada para la configuración
 
             Title = "Percy's Library";
             CurrentView = _homeView;
@@ -409,7 +637,8 @@ namespace ComicReader
                 // Cargar en segundo plano las miniaturas del cómic activo con guardas de secuencia
                 long startSeq = Interlocked.Increment(ref _thumbLoadSeq);
                 var loaderRef = _comicLoader;
-                _ = Task.Run(async () =>
+                var token = _ctsWindow.Token;
+                var _thumbLoadTask = Task.Run(async () =>
                 {
                     try
                     {
@@ -418,25 +647,29 @@ namespace ComicReader
                         using var gate = new System.Threading.SemaphoreSlim(maxDegree);
                         var tasks = Enumerable.Range(0, count).Select(async i =>
                         {
-                            await gate.WaitAsync();
+                            if (token.IsCancellationRequested) return;
+                            await gate.WaitAsync(token).ConfigureAwait(false);
                             try
                             {
-                                var thumb = await loaderRef.GetPageThumbnailAsync(i, 180, 240);
+                                if (token.IsCancellationRequested) return;
+                                var thumb = await loaderRef.GetPageThumbnailAsync(i, 180, 240, token).ConfigureAwait(false);
                                 var idx = i;
                                 this.Dispatcher.Invoke(() =>
                                 {
+                                    if (token.IsCancellationRequested) return;
                                     if (!ReferenceEquals(_comicLoader, loaderRef)) return;
                                     if (Interlocked.Read(ref _thumbLoadSeq) != startSeq) return;
                                     if (idx >= 0 && idx < _comicLoader.Pages.Count)
                                         _comicLoader.Pages[idx].Thumbnail = thumb;
                                 });
                             }
-                            finally { gate.Release(); }
+                            finally { try { gate.Release(); } catch { } }
                         }).ToArray();
-                        await Task.WhenAll(tasks);
+                        try { await Task.WhenAll(tasks).ConfigureAwait(false); } catch { }
                     }
                     catch { }
-                });
+                }, token);
+                TrackBackgroundTask(_thumbLoadTask);
             }
             catch { }
         }
@@ -473,9 +706,9 @@ namespace ComicReader
         {
             try
             {
-                var dlg = new SettingsDialog();
-                dlg.Owner = this;
-                dlg.ShowDialog();
+                var win = new Views.SettingsWindow();
+                win.Owner = this;
+                win.ShowDialog();
             }
             catch (Exception ex)
             {
@@ -492,6 +725,10 @@ namespace ComicReader
                 if (this.FindName("MainContentArea") is ContentControl content)
                     content.Content = _continuousView;
                 CurrentView = _continuousView;
+                // Actualizar aspecto de los botones de navegación (seguir habilitados para actuar como subir/bajar)
+                UpdateNavButtonsForContinuousMode(true);
+                try { if (this.FindName("PrevButton") is System.Windows.Controls.Button pb) pb.IsEnabled = true; } catch { }
+                try { if (this.FindName("NextButton") is System.Windows.Controls.Button nb) nb.IsEnabled = true; } catch { }
             }
             else
             {
@@ -551,6 +788,10 @@ namespace ComicReader
                 if (this.FindName("MainContentArea") is ContentControl content)
                     content.Content = _readerScrollViewer;
                 CurrentView = _readerScrollViewer;
+                // Actualizar aspecto y estado de los botones de navegación
+                UpdateNavButtonsForContinuousMode(false);
+                try { if (this.FindName("PrevButton") is System.Windows.Controls.Button pb) pb.IsEnabled = true; } catch { }
+                try { if (this.FindName("NextButton") is System.Windows.Controls.Button nb) nb.IsEnabled = true; } catch { }
             }
             // Mostrar barra del lector en modo lectura
             SetReaderTopBarVisible(true);
@@ -740,14 +981,12 @@ namespace ComicReader
             catch { }
         }
 
-    private async void LoadCurrentPage()
+    private void LoadCurrentPage()
         {
             // En modo continuo, la materialización la gestiona ContinuousComicView
             if (SettingsManager.Settings?.EnableContinuousScroll == true) return;
-            if (_comicLoader.Pages.Count > 0 && _currentPageIndex >= 0 && _currentPageIndex < _comicLoader.Pages.Count)
+            try
             {
-                try
-                {
                     if (_currentComicImage != null)
                     {
                         if (SettingsManager.Settings?.ShowLoadingIndicators == true)
@@ -756,127 +995,194 @@ namespace ComicReader
                         }
                         // Id de petición para descartar resultados obsoletos
                         var requestId = Interlocked.Increment(ref _pageLoadSeq);
-                        // Suavizar el cambio: escalado LowQuality temporal
+                        // Calcular ancho deseado: preferir el ancho del contenedor, fallback a viewport del ScrollViewer
+                        int desiredWidth = 0;
+                        try { desiredWidth = (int?)((this.FindName("MainContentArea") as FrameworkElement)?.ActualWidth) ?? (int)(_currentComicImage?.ActualWidth ?? 1200); } catch { desiredWidth = 1200; }
                         var prevScaling = System.Windows.Media.RenderOptions.GetBitmapScalingMode(_currentComicImage);
                         System.Windows.Media.RenderOptions.SetBitmapScalingMode(_currentComicImage, System.Windows.Media.BitmapScalingMode.LowQuality);
-                        var bmp = await _comicLoader.GetPageImageAsync(_currentPageIndex);
-                        // Si cambió la página durante la carga, descartar
-                        if (requestId != Volatile.Read(ref _pageLoadSeq))
-                        {
-                            System.Windows.Media.RenderOptions.SetBitmapScalingMode(_currentComicImage, prevScaling);
-                            return;
-                        }
-                        // Mantener el modelo actualizado
-                        var page = _comicLoader.Pages[_currentPageIndex];
-                        // Aplicar brillo/contraste si procede
-                        var s = SettingsManager.Settings;
-                        if (s != null && (Math.Abs(s.Brightness - 1.0) > 0.001 || Math.Abs(s.Contrast - 1.0) > 0.001))
-                        {
-                            try
-                            {
-                                var adjusted = ImageAdjuster.ApplyBrightnessContrast(bmp, s.Brightness, s.Contrast);
-                                page.Image = adjusted as BitmapImage ?? bmp;
-                                // Si no es BitmapImage, al menos mostrarla en el control
-                                _currentComicImage.Source = adjusted;
-                            }
-                            catch { page.Image = bmp; }
-                        }
-                        else
-                        {
-                            page.Image = bmp;
-                        }
-                        // Transición suave: crear una superposición con la imagen anterior y desvanecerla
-                        Image overlay = null;
                         try
                         {
-                            if (_readerCenterGrid != null && _currentComicImage.Source != null)
+                            var sv = _readerScrollViewer as ScrollViewer;
+                            if (sv != null)
                             {
-                                overlay = new Image
-                                {
-                                    Source = _currentComicImage.Source,
-                                    HorizontalAlignment = HorizontalAlignment.Center,
-                                    VerticalAlignment = VerticalAlignment.Center,
-                                    Stretch = _currentComicImage.Stretch,
-                                    Opacity = 1.0
-                                };
-                                Panel.SetZIndex(overlay, 10);
-                                _readerCenterGrid.Children.Add(overlay);
+                                desiredWidth = Math.Max(800, (int)sv.ViewportWidth);
                             }
                         }
                         catch { }
 
-                        // Cambiar a la nueva imagen (si no se cambió ya por ajuste)
-                        if (_currentComicImage.Source == null || ReferenceEquals(_currentComicImage.Source, overlay?.Source))
-                        {
-                            _currentComicImage.Source = page.Image ?? bmp;
-                        }
-                        System.Windows.Media.RenderOptions.SetBitmapScalingMode(_currentComicImage, prevScaling);
-                        
-                        // Añadir un deslizamiento sutil según dirección de navegación
+                        // Reacción inmediata: mostrar placeholder congelado
                         try
                         {
-                            int dir = _lastNavDirection;
-                            if (dir != 0)
+                            var ph = GetFrozen1x1Placeholder();
+                            _currentComicImage.Source = ph;
+                        }
+                        catch { }
+
+                        // Lanzar carga de miniatura en background y asignarla cuando est e9 lista (fire-and-forget)
+                        try
+                        {
+                            var thumbToken = _ctsWindow.Token;
+                            async Task HandleThumbAsync(long reqId, int pageIndex)
                             {
-                                // Ajustar por dirección de lectura
-                                var readingDirRtl = SettingsManager.Settings?.CurrentReadingDirection == ReadingDirection.RightToLeft;
-                                int visualDir = readingDirRtl ? -dir : dir; // en RTL, next va a la izquierda
-                                var tt = new System.Windows.Media.TranslateTransform();
-                                _currentComicImage.RenderTransform = new System.Windows.Media.TransformGroup
+                                try
                                 {
-                                    Children = new System.Windows.Media.TransformCollection
+                                    var thumb = await _comicLoader.GetPageThumbnailAsync(pageIndex, 600, 0, thumbToken).ConfigureAwait(false);
+                                    if (Volatile.Read(ref _pageLoadSeq) != reqId) return;
+                                    var page = _comicLoader.Pages[pageIndex];
+                                    page.Image = thumb;
+                                    await this.Dispatcher.InvokeAsync(new Action(() =>
                                     {
-                                        new System.Windows.Media.ScaleTransform(_zoomFactor, _zoomFactor),
-                                        tt
-                                    }
-                                };
-                                _currentComicImage.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
-                                double fromX = visualDir > 0 ? 24 : -24;
-                                tt.X = fromX;
-                                var slide = new System.Windows.Media.Animation.DoubleAnimation
-                                {
-                                    From = fromX,
-                                    To = 0,
-                                    Duration = new Duration(TimeSpan.FromMilliseconds(160)),
-                                    EasingFunction = new System.Windows.Media.Animation.QuadraticEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut }
-                                };
-                                tt.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty, slide);
+                                        try { _currentComicImage.Source = thumb; } catch { }
+                                    }), System.Windows.Threading.DispatcherPriority.Render).Task.ConfigureAwait(false);
+                                }
+                                catch { }
                             }
+                            var _thumbHandler = HandleThumbAsync(requestId, _currentPageIndex);
+                            TrackBackgroundTask(_thumbHandler);
                         }
                         catch { }
 
-                        // Iniciar fundido de la superposición (si existe)
-                        if (overlay != null)
+                        // Lanzar carga completa en background; cuando termine, aplicar transición y efectos en UI thread
+                        var token = _ctsWindow.Token;
+                        var _fullLoad = Task.Run(async () =>
                         {
+                            var sw = System.Diagnostics.Stopwatch.StartNew();
+                            BitmapImage bmp = null;
                             try
                             {
-                                var fade = new System.Windows.Media.Animation.DoubleAnimation
-                                {
-                                    From = 1.0,
-                                    To = 0.0,
-                                    Duration = new Duration(TimeSpan.FromMilliseconds(160)),
-                                    EasingFunction = new System.Windows.Media.Animation.QuadraticEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseInOut }
-                                };
-                                fade.Completed += (_, __) =>
-                                {
-                                    try { _readerCenterGrid.Children.Remove(overlay); } catch { }
-                                };
-                                overlay.BeginAnimation(UIElement.OpacityProperty, fade);
+                                if (token.IsCancellationRequested) return;
+                                bmp = await _comicLoader.GetPageImageAsync(_currentPageIndex, desiredWidth, token).ConfigureAwait(false);
                             }
-                            catch { try { _readerCenterGrid.Children.Remove(overlay); } catch { } }
-                        }
-                        UpdatePageIndicator();
-                        ApplyZoomToImage();
-                        ApplyReadingModeEffects();
-                        // Registrar página vista (1-based) en estadísticas
-                        _stats?.RecordPageViewed(_currentPageIndex + 1);
-                        // Guardar progreso
-                        SettingsManager.Settings.LastOpenedFilePath = _comicLoader.FilePath;
-                        SettingsManager.Settings.LastOpenedPage = _currentPageIndex;
-                        SettingsManager.SaveSettings();
-                        
-                        // Precargar páginas adyacentes para navegación más fluida
-                        await PreloadAdjacentPages();
+                            catch { }
+                            sw.Stop();
+
+                            // Si la petición fue invalidada por un cambio de página, o cancelada, abandonar
+                            if (Volatile.Read(ref _pageLoadSeq) != requestId || token.IsCancellationRequested) return;
+
+                            // Asegurar valor no nulo
+                            if (bmp == null) bmp = GetFrozen1x1Placeholder();
+
+                            // Ejecutar cambios en UI
+                            try
+                            {
+                                await this.Dispatcher.InvokeAsync(new Action(() =>
+                                {
+                                    try
+                                    {
+                                        var page = _comicLoader.Pages[_currentPageIndex];
+                                        // Aplicar brillo/contraste si procede
+                                        var s = SettingsManager.Settings;
+                                        if (s != null && (Math.Abs(s.Brightness - 1.0) > 0.001 || Math.Abs(s.Contrast - 1.0) > 0.001))
+                                        {
+                                            try
+                                            {
+                                                var adjusted = ImageAdjuster.ApplyBrightnessContrast(bmp, s.Brightness, s.Contrast);
+                                                page.Image = adjusted as BitmapImage ?? bmp;
+                                                _currentComicImage.Source = adjusted;
+                                            }
+                                            catch { page.Image = bmp; _currentComicImage.Source = bmp; }
+                                        }
+                                        else
+                                        {
+                                            page.Image = bmp;
+                                            _currentComicImage.Source = page.Image ?? bmp;
+                                        }
+
+                                        // Forzar escalado de alta calidad cuando la imagen completa está lista
+                                        System.Windows.Media.RenderOptions.SetBitmapScalingMode(_currentComicImage, System.Windows.Media.BitmapScalingMode.HighQuality);
+
+                                        // Transición suave: crear una superposición con la imagen anterior y desvanecerla
+                                        Image overlay = null;
+                                        try
+                                        {
+                                            if (_readerCenterGrid != null && _currentComicImage.Source != null)
+                                            {
+                                                overlay = new Image
+                                                {
+                                                    Source = _currentComicImage.Source,
+                                                    HorizontalAlignment = HorizontalAlignment.Center,
+                                                    VerticalAlignment = VerticalAlignment.Center,
+                                                    Stretch = _currentComicImage.Stretch,
+                                                    Opacity = 1.0
+                                                };
+                                                Panel.SetZIndex(overlay, 10);
+                                                _readerCenterGrid.Children.Add(overlay);
+                                            }
+                                        }
+                                        catch { }
+
+                                        // Añadir un deslizamiento sutil según dirección de navegación
+                                        try
+                                        {
+                                            int dir = _lastNavDirection;
+                                            if (dir != 0)
+                                            {
+                                                var readingDirRtl = SettingsManager.Settings?.CurrentReadingDirection == ReadingDirection.RightToLeft;
+                                                int visualDir = readingDirRtl ? -dir : dir;
+                                                var tt = new System.Windows.Media.TranslateTransform();
+                                                _currentComicImage.RenderTransform = new System.Windows.Media.TransformGroup
+                                                {
+                                                    Children = new System.Windows.Media.TransformCollection
+                                                    {
+                                                        new System.Windows.Media.ScaleTransform(_zoomFactor, _zoomFactor),
+                                                        tt
+                                                    }
+                                                };
+                                                _currentComicImage.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
+                                                double fromX = visualDir > 0 ? 24 : -24;
+                                                tt.X = fromX;
+                                                var slide = new System.Windows.Media.Animation.DoubleAnimation
+                                                {
+                                                    From = fromX,
+                                                    To = 0,
+                                                    Duration = new Duration(TimeSpan.FromMilliseconds(160)),
+                                                    EasingFunction = new System.Windows.Media.Animation.QuadraticEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut }
+                                                };
+                                                tt.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty, slide);
+                                            }
+                                        }
+                                        catch { }
+
+                                        // Iniciar fundido de la superposición (si existe)
+                                        if (overlay != null)
+                                        {
+                                            try
+                                            {
+                                                var fade = new System.Windows.Media.Animation.DoubleAnimation
+                                                {
+                                                    From = 1.0,
+                                                    To = 0.0,
+                                                    Duration = new Duration(TimeSpan.FromMilliseconds(160)),
+                                                    EasingFunction = new System.Windows.Media.Animation.QuadraticEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseInOut }
+                                                };
+                                                fade.Completed += (_, __) =>
+                                                {
+                                                    try { _readerCenterGrid.Children.Remove(overlay); } catch { }
+                                                };
+                                                overlay.BeginAnimation(UIElement.OpacityProperty, fade);
+                                            }
+                                            catch { try { _readerCenterGrid.Children.Remove(overlay); } catch { } }
+                                        }
+
+                                        UpdatePageIndicator();
+                                        ApplyZoomToImage();
+                                        ApplyReadingModeEffects();
+                                        // Registrar página vista (1-based) en estadísticas
+                                        _stats?.RecordPageViewed(_currentPageIndex + 1);
+                                        // Guardar progreso
+                                        SettingsManager.Settings.LastOpenedFilePath = _comicLoader.FilePath;
+                                        SettingsManager.Settings.LastOpenedPage = _currentPageIndex;
+                                        SettingsManager.SaveSettings();
+                                    }
+                                    catch { }
+                                }), System.Windows.Threading.DispatcherPriority.Render);
+
+                                // Precargar páginas adyacentes para navegación más fluida (fuera del dispatcher)
+                                try { await PreloadAdjacentPages().ConfigureAwait(false); } catch { }
+                            }
+                            catch { }
+                        }, token);
+                        TrackBackgroundTask(_fullLoad);
                     }
                 }
                 catch (Exception ex)
@@ -884,7 +1190,6 @@ namespace ComicReader
                     MessageBox.Show($"Error al cargar la página: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-        }
 
         private async Task PreloadAdjacentPages()
         {
@@ -927,6 +1232,128 @@ namespace ComicReader
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             ShowSettingsView();
+        }
+
+        private async void ToggleContinuous_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                bool enable = !(SettingsManager.Settings?.EnableContinuousScroll == true);
+                SettingsManager.Settings.EnableContinuousScroll = enable;
+                SettingsManager.SaveSettings();
+
+                // Mostrar notificación animada breve
+                ShowModeToast(enable ? "📖 Modo continuo activado" : "📄 Modo paginado activado");
+
+                // Mantener progreso: si estamos en paginado, la página actual es _currentPageIndex;
+                // en continuo, la vista maneja índices 0-based también.
+                if (enable)
+                {
+                    // Cambiar a la vista continua
+                    // asegurar que cualquier estado previo no bloquee reactividad
+                    try { _continuousView?.ViewModel?.EndProgrammaticScroll(); } catch { }
+                    _continuousView.ComicLoader = _comicLoader;
+                    if (this.FindName("MainContentArea") is ContentControl content)
+                        content.Content = _continuousView;
+                    CurrentView = _continuousView;
+                    // Asegurar sincronización: desplazar a la página actual
+                    await System.Threading.Tasks.Task.Delay(80);
+                    try
+                    {
+                        // Sincronizar índice: establecer en el ViewModel y desplazar
+                        if (_continuousView?.ViewModel != null)
+                        {
+                            _continuousView.ViewModel.BeginProgrammaticScroll();
+                            _continuousView.ViewModel.CurrentPage = Math.Max(0, Math.Min(_comicLoader.PageCount - 1, _currentPageIndex));
+                            _continuousView.ViewModel.EndProgrammaticScroll();
+                        }
+                        _continuousView.ScrollToPage(_currentPageIndex);
+                        // Forzar materialización visible
+                        try { _continuousView?.ViewModel?.RequestVisiblePagesMaterialization(); } catch { }
+                    }
+                    catch { }
+                    // Actualizar botón y navegación
+                    if (this.FindName("ToggleContinuousButton") is Button tb) tb.Content = "📜";
+                    UpdateNavButtonsForContinuousMode(true);
+                    try { if (this.FindName("PrevButton") is System.Windows.Controls.Button pb) pb.IsEnabled = false; } catch { }
+                    try { if (this.FindName("NextButton") is System.Windows.Controls.Button nb) nb.IsEnabled = false; } catch { }
+                }
+                else
+                {
+                    // Cambiar a paginado
+                    try
+                    {
+                        // Si la vista continua existe, obtener el índice visible más reciente
+                        if (_continuousView?.ViewModel != null)
+                        {
+                            // Asegurar que el ViewModel no está en modo programático
+                            _continuousView.ViewModel.EndProgrammaticScroll();
+                            var idx = _continuousView.ViewModel.CurrentPage;
+                            if (idx >= 0 && idx < (_comicLoader?.PageCount ?? int.MaxValue))
+                                _currentPageIndex = idx;
+                        }
+                    }
+                    catch { }
+                    EnsureReaderScaffold();
+                    // Restaurar página actual en la imagen
+                    LoadCurrentPage();
+                    if (this.FindName("ToggleContinuousButton") is Button tb) tb.Content = "📄";
+                    UpdateNavButtonsForContinuousMode(false);
+                    try { if (this.FindName("PrevButton") is System.Windows.Controls.Button pb) pb.IsEnabled = true; } catch { }
+                    try { if (this.FindName("NextButton") is System.Windows.Controls.Button nb) nb.IsEnabled = true; } catch { }
+                }
+            }
+            catch { }
+        }
+
+        private void ShowModeToast(string text)
+        {
+            try
+            {
+                // Crear un borde temporal en la ventana para mostrar el mensaje
+                var toast = new System.Windows.Controls.Border
+                {
+                    Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(230, 30, 30, 30)),
+                    CornerRadius = new System.Windows.CornerRadius(8),
+                    Padding = new System.Windows.Thickness(12),
+                    Opacity = 0,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    Margin = new System.Windows.Thickness(0, 56, 0, 0)
+                };
+                var tb = new System.Windows.Controls.TextBlock
+                {
+                    Text = text,
+                    Foreground = System.Windows.Media.Brushes.White,
+                    FontSize = 14,
+                    FontWeight = FontWeights.SemiBold
+                };
+                toast.Child = tb;
+                var root = this.Content as FrameworkElement;
+                if (root == null) return;
+                if (root is Panel panel)
+                {
+                    panel.Children.Add(toast);
+                }
+                else if (this.FindName("CustomTitleBar") is FrameworkElement)
+                {
+                    // Fallback: añadir al grid principal
+                    var grid = this.Content as Grid;
+                    grid?.Children.Add(toast);
+                }
+
+                var fadeIn = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(220));
+                var stay = new System.Windows.Media.Animation.DoubleAnimation(1, 1, TimeSpan.FromMilliseconds(1100)) { BeginTime = TimeSpan.FromMilliseconds(220) };
+                var fadeOut = new System.Windows.Media.Animation.DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(300)) { BeginTime = TimeSpan.FromMilliseconds(1320) };
+                var sb = new System.Windows.Media.Animation.Storyboard();
+                sb.Children.Add(fadeIn); sb.Children.Add(stay); sb.Children.Add(fadeOut);
+                System.Windows.Media.Animation.Storyboard.SetTarget(fadeIn, toast); System.Windows.Media.Animation.Storyboard.SetTargetProperty(fadeIn, new PropertyPath(Border.OpacityProperty));
+                System.Windows.Media.Animation.Storyboard.SetTarget(stay, toast); System.Windows.Media.Animation.Storyboard.SetTargetProperty(stay, new PropertyPath(Border.OpacityProperty));
+                System.Windows.Media.Animation.Storyboard.SetTarget(fadeOut, toast); System.Windows.Media.Animation.Storyboard.SetTargetProperty(fadeOut, new PropertyPath(Border.OpacityProperty));
+                sb.Completed += (_, __) => { try { if (root is Panel p) p.Children.Remove(toast); else (this.Content as Grid)?.Children.Remove(toast); } catch { } };
+                sb.Begin();
+            }
+            catch { }
         }
 
     private async void OpenComicFile(string filePath)
@@ -984,19 +1411,64 @@ namespace ComicReader
                     {
                         _readerScrollViewer.Content = _readerCenterGrid;
                     }
-                    // Determinar página inicial por progreso previo (servicio nuevo)
-                    int startIndex = 0;
-                    try
-                    {
-                        var existing = ComicReader.Services.ContinueReadingService.Instance.Items
-                            .FirstOrDefault(x => string.Equals(x.FilePath, filePath, StringComparison.OrdinalIgnoreCase));
-                        if (existing != null)
+                        // Determinar página inicial por progreso previo o si está en completados
+                        int startIndex = 0;
+                        try
                         {
-                            int last1 = Math.Max(1, existing.LastPage);
-                            startIndex = Math.Min(_comicLoader.Pages.Count - 1, last1 - 1);
+                            var svc = ComicReader.Services.ContinueReadingService.Instance;
+                            var existing = svc.Items.FirstOrDefault(x => string.Equals(x.FilePath, filePath, StringComparison.OrdinalIgnoreCase));
+                            var completed = svc.CompletedItems.FirstOrDefault(x => string.Equals(x.FilePath, filePath, StringComparison.OrdinalIgnoreCase));
+
+                            // Si está en completados y no hay un item en Items, mostrar diálogo creativo
+                            if (completed != null && existing == null)
+                            {
+                                try
+                                {
+                                    var dlg = new ReopenCompletedDialog();
+                                    // preparar portada y metadatos
+                                    BitmapImage cover = null;
+                                    try { cover = completed.CoverThumbnail; } catch { }
+                                    dlg.SetInfo(completed.DisplayName ?? Path.GetFileNameWithoutExtension(filePath), completed.DateCompleted?.ToString("dd/MM/yyyy"), cover);
+                                    dlg.Owner = this;
+                                    if (dlg.ShowDialog() == true)
+                                    {
+                                        var choice = dlg.Choice;
+                                        if (choice == ReopenCompletedDialog.OpenChoice.Start)
+                                        {
+                                            startIndex = 0;
+                                        }
+                                        else if (choice == ReopenCompletedDialog.OpenChoice.Continue)
+                                        {
+                                            startIndex = Math.Max(0, Math.Min(_comicLoader.Pages.Count - 1, (completed.LastPage > 0 ? completed.LastPage - 1 : 0)));
+                                        }
+                                        else // Unmark
+                                        {
+                                            try { svc.Remove(filePath); } catch { }
+                                            startIndex = 0;
+                                            // Refresh home view lists
+                                            try { _homeView?.RefreshRecent(); } catch { }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // Usuario canceló: abrir igual pero mantener posición de inicio 0
+                                        startIndex = 0;
+                                    }
+                                }
+                                catch { startIndex = 0; }
+                            }
+                            else if (existing != null)
+                            {
+                                int last1 = Math.Max(1, existing.LastPage);
+                                startIndex = Math.Min(_comicLoader.Pages.Count - 1, last1 - 1);
+                            }
+                            else if (completed != null)
+                            {
+                                // fallback: if completed but an item existed earlier, continue from end
+                                startIndex = 0;
+                            }
                         }
-                    }
-                    catch { }
+                        catch { }
                     _currentPageIndex = Math.Max(0, Math.Min(_comicLoader.Pages.Count - 1, startIndex));
                     // Iniciar sesión de lectura
                     _stats?.StartSession(filePath, _comicLoader.ComicTitle, _comicLoader.Pages.Count);
@@ -1022,6 +1494,41 @@ namespace ComicReader
                     {
                         _continuousView.ScrollToPage(_currentPageIndex);
                     }
+                    // Si el usuario activó precarga completa, lanzar la precarga con ventana de progreso
+                    try
+                    {
+                        if (SettingsManager.Settings?.EnableEagerPreload == true)
+                        {
+                            var loaderSvc = ComicReader.Core.Services.ServiceLocator.TryGet<ComicReader.Core.Abstractions.IComicPageLoader>();
+                            if (loaderSvc is ComicReader.Services.ProgressivePageLoader ploader)
+                            {
+                                var win = new Views.PreloadProgressWindow();
+                                win.Owner = this;
+                                win.Show();
+                                var progress = new Progress<(int done, int total)>(t =>
+                                {
+                                    try { win.Report(t.done, t.total); } catch { }
+                                });
+                                using var linked = CancellationTokenSource.CreateLinkedTokenSource(win.Token, _ctsWindow.Token);
+                                var cts = linked; // alias
+                                // Run preload in background but track the task so window can wait/cancel on close
+                                var preloadTask = Task.Run(async () =>
+                                {
+                                    try
+                                    {
+                                        await ploader.EagerPreloadAllAsync(_currentPageIndex, SettingsManager.Settings?.EagerPreloadConcurrency ?? 3, cts.Token, progress).ConfigureAwait(false);
+                                    }
+                                    catch { }
+                                    finally
+                                    {
+                                        try { this.Dispatcher.Invoke(() => { try { win.Report(ploader.Pages.Count, ploader.Pages.Count); win.Close(); } catch { } }); } catch { }
+                                    }
+                                }, cts.Token);
+                                TrackBackgroundTask(preloadTask);
+                            }
+                        }
+                    }
+                    catch { }
                     EnsureAutoAdvanceBehavior();
                 }
                 else
@@ -1037,54 +1544,52 @@ namespace ComicReader
 
         public void PrevPage_Click(object sender, RoutedEventArgs e)
         {
+            try { ComicReader.Utils.DevLogger.Debug($"PrevPage_Click invoked. EnableContinuous={SettingsManager.Settings?.EnableContinuousScroll}"); } catch { }
+            // En modo continuo, el botón Prev debe desplazar hacia arriba en el viewport
+            if (SettingsManager.Settings?.EnableContinuousScroll == true && _continuousView != null)
+            {
+                try { var moved = ScrollContinuousWithinView(down: false); ComicReader.Utils.DevLogger.Debug($"PrevPage_Click -> ScrollContinuousWithinView returned {moved}"); if (moved) UpdatePageIndicator(); } catch (Exception ex) { ComicReader.Utils.DevLogger.Debug($"PrevPage_Click exception: {ex}"); }
+                return;
+            }
+            // Modo paginado (comportamiento original)
             if (_currentPageIndex > 0)
             {
                 int target = _currentPageIndex - 1;
                 _currentPageIndex = target;
                 _lastNavDirection = -1;
-                if (SettingsManager.Settings?.EnableContinuousScroll == true && _continuousView != null)
-                {
-                    _continuousView.ScrollToPage(target);
-                    UpdatePageIndicator();
-                }
-                else
-                {
-                    // Cancelar carga anterior y cargar nueva
-                    Interlocked.Increment(ref _pageLoadSeq);
-                    LoadCurrentPage();
-                    UpdatePageIndicator();
-                    // Prefetch adicional direccional (dos páginas más atrás)
-                    try
+                // Cancelar carga anterior y cargar nueva
+                Interlocked.Increment(ref _pageLoadSeq);
+                LoadCurrentPage();
+                UpdatePageIndicator();
+                // Prefetch adicional direccional (dos páginas más atrás)
+                        try
                     {
                         int p2 = _currentPageIndex - 1; // ya se precarga -1 en LoadCurrentPage
                         int p3 = _currentPageIndex - 2;
-                        if (p3 >= 0) _ = _comicLoader.GetPageImageAsync(p3);
-                        // si hay hueco, también una más (p4)
+                        if (p3 >= 0) TrackBackgroundTask(_comicLoader.GetPageImageAsync(p3, 1200, _ctsWindow.Token));
                         int p4 = _currentPageIndex - 3;
-                        if (p4 >= 0) _ = _comicLoader.GetPageImageAsync(p4);
+                        if (p4 >= 0) TrackBackgroundTask(_comicLoader.GetPageImageAsync(p4, 1200, _ctsWindow.Token));
+                    }
+                catch { }
+                // Si el panel de miniaturas está visible, solo sincronizar selección
+                if (_thumbnailsVisible)
+                {
+                    try
+                    {
+                        var list = this.FindName("ThumbList") as System.Windows.Controls.ListBox;
+                        if (list != null)
+                        {
+                            _suppressThumbListSelectionChange = true;
+                            try
+                            {
+                                list.ItemsSource = _comicLoader.Pages;
+                                list.SelectedIndex = _currentPageIndex;
+                                list.ScrollIntoView(list.SelectedItem);
+                            }
+                            finally { _suppressThumbListSelectionChange = false; }
+                        }
                     }
                     catch { }
-                    // Si el panel de miniaturas está visible, solo sincronizar selección; evitar recarga masiva
-                    if (_thumbnailsVisible)
-                    {
-                        try
-                        {
-                            var list = this.FindName("ThumbList") as System.Windows.Controls.ListBox;
-                            if (list != null)
-                            {
-                                _suppressThumbListSelectionChange = true;
-                                try
-                                {
-                                    list.ItemsSource = _comicLoader.Pages;
-                                    list.SelectedIndex = _currentPageIndex;
-                                    // Desplazar la miniatura actual a la vista
-                                    list.ScrollIntoView(list.SelectedItem);
-                                }
-                                finally { _suppressThumbListSelectionChange = false; }
-                            }
-                        }
-                        catch { }
-                    }
                 }
                 // Actualizar progreso en servicio
                 try { if (_isComicOpen) ComicReader.Services.ContinueReadingService.Instance.UpsertProgress(_comicLoader.FilePath, _currentPageIndex + 1, _comicLoader.PageCount); } catch { }
@@ -1093,34 +1598,34 @@ namespace ComicReader
 
         public void NextPage_Click(object sender, RoutedEventArgs e)
         {
+            try { ComicReader.Utils.DevLogger.Debug($"NextPage_Click invoked. EnableContinuous={SettingsManager.Settings?.EnableContinuousScroll}"); } catch { }
+            // En modo continuo, el botón Next debe desplazar hacia abajo en el viewport
+            if (SettingsManager.Settings?.EnableContinuousScroll == true && _continuousView != null)
+            {
+                try { var moved = ScrollContinuousWithinView(down: true); ComicReader.Utils.DevLogger.Debug($"NextPage_Click -> ScrollContinuousWithinView returned {moved}"); if (moved) UpdatePageIndicator(); } catch (Exception ex) { ComicReader.Utils.DevLogger.Debug($"NextPage_Click exception: {ex}"); }
+                return;
+            }
+            // Modo paginado (comportamiento original)
             if (_currentPageIndex < _comicLoader.Pages.Count - 1)
             {
                 int target = _currentPageIndex + 1;
                 _currentPageIndex = target;
                 _lastNavDirection = 1;
-                if (SettingsManager.Settings?.EnableContinuousScroll == true && _continuousView != null)
+                // Cancelar carga anterior y cargar nueva
+                Interlocked.Increment(ref _pageLoadSeq);
+                LoadCurrentPage();
+                UpdatePageIndicator();
+                // Prefetch adicional direccional
+                try
                 {
-                    _continuousView.ScrollToPage(target);
-                    UpdatePageIndicator();
+                    int n2 = _currentPageIndex + 1;
+                    int n3 = _currentPageIndex + 2;
+                    if (n3 < _comicLoader.Pages.Count) TrackBackgroundTask(_comicLoader.GetPageImageAsync(n3, 1200, _ctsWindow.Token));
+                    int n4 = _currentPageIndex + 3;
+                    if (n4 < _comicLoader.Pages.Count) TrackBackgroundTask(_comicLoader.GetPageImageAsync(n4, 1200, _ctsWindow.Token));
                 }
-                else
-                {
-                    // Cancelar carga anterior y cargar nueva
-                    Interlocked.Increment(ref _pageLoadSeq);
-                    LoadCurrentPage();
-                    UpdatePageIndicator();
-                    // Prefetch adicional direccional (dos/tres páginas más adelante)
-                    try
-                    {
-                        int n2 = _currentPageIndex + 1; // ya se precarga +1 en LoadCurrentPage
-                        int n3 = _currentPageIndex + 2;
-                        if (n3 < _comicLoader.Pages.Count) _ = _comicLoader.GetPageImageAsync(n3);
-                        int n4 = _currentPageIndex + 3;
-                        if (n4 < _comicLoader.Pages.Count) _ = _comicLoader.GetPageImageAsync(n4);
-                    }
-                    catch { }
-                }
-                // Actualizar progreso en servicio y, si estamos en última página, eliminar de "Seguir leyendo"
+                catch { }
+                // Actualizar progreso
                 try
                 {
                     if (_isComicOpen)
@@ -1129,8 +1634,6 @@ namespace ComicReader
                         ComicReader.Services.ContinueReadingService.Instance.UpsertProgress(_comicLoader.FilePath, oneBased, _comicLoader.PageCount);
                         if (oneBased >= _comicLoader.PageCount)
                         {
-                            // UpsertProgress moves the item to CompletedItems when at 100%.
-                            // No eliminar aquí (antes borrábamos). Solo refrescar la vista para mostrar el cambio.
                             _homeView?.RefreshRecent();
                         }
                     }
@@ -1169,7 +1672,7 @@ namespace ComicReader
                         ComicReader.Services.ContinueReadingService.Instance.UpsertProgress(_comicLoader.FilePath, oneBased, _comicLoader.PageCount);
                         if (oneBased >= _comicLoader.PageCount)
                         {
-                            // UpsertProgress handles completed state. Solo refrescar vista.
+                            // See note: don't call Remove() — UpsertProgress handles moving to completed.
                             _homeView?.RefreshRecent();
                         }
                     }
@@ -1261,7 +1764,7 @@ namespace ComicReader
                         ComicReader.Services.ContinueReadingService.Instance.UpsertProgress(_comicLoader.FilePath, oneBased, _comicLoader.PageCount);
                         if (oneBased >= _comicLoader.PageCount)
                         {
-                            // UpsertProgress moves to completed; solo refrescar la vista.
+                            // Avoid removing the item entirely. Refresh home view to reflect Completed state.
                             _homeView?.RefreshRecent();
                         }
                     }
@@ -1436,21 +1939,36 @@ namespace ComicReader
             try
             {
                 if (_continuousView == null) return false;
-                // El ScrollViewer de la vista continua se llama "ContentScroll"
+
+                // Primero delegamos a la vista continua que conoce su propio ScrollViewer
+                // y puede manejar virtualización (ScrollIntoView + deferred animation).
+                try
+                {
+                    var handled = _continuousView?.ScrollOnePage(down) ?? false;
+                    ComicReader.Utils.DevLogger.Debug($"Delegated ScrollOnePage -> {handled}");
+                    if (handled) return true;
+                }
+                catch { }
+
+                // Si la vista no manejó el scroll, intentar usar el ScrollViewer expuesto (si existe)
                 var svObj = _continuousView.FindName("ContentScroll") as ScrollViewer;
-                if (svObj == null) return false;
+                if (svObj == null)
+                {
+                    // No hay ScrollViewer accesible y la vista ya intentó manejarlo -> nada que hacer
+                    return false;
+                }
 
                 double maxOffset = Math.Max(0, svObj.ScrollableHeight);
                 double cur = svObj.VerticalOffset;
-                if (maxOffset < 0.5)
-                {
-                    return false;
-                }
+                try { ComicReader.Utils.DevLogger.Debug($"ScrollContinuousWithinView called. down={down}, cur={cur}, max={maxOffset}, viewport={svObj.ViewportHeight}"); } catch { }
+
+                // Fallback: usar step basado en viewport (como antes)
                 double ratio = SettingsManager.Settings?.PageScrollStepRatio > 0 ? SettingsManager.Settings.PageScrollStepRatio : 0.9;
                 double step = Math.Max(24, svObj.ViewportHeight * ratio);
                 double target = down ? Math.Min(maxOffset, cur + step) : Math.Max(0, cur - step);
+                try { ComicReader.Utils.DevLogger.Debug($"Fallback step. step={step}, target={target}"); } catch { }
                 if (Math.Abs(target - cur) < 0.5) return false;
-                svObj.ScrollToVerticalOffset(target);
+                SmoothScrollTo(svObj, target);
                 return true;
             }
             catch { return false; }
@@ -1544,10 +2062,11 @@ namespace ComicReader
             switch (e.Key)
             {
                 case Key.Up:
+                    try { ComicReader.Utils.DevLogger.Debug("Key.Up pressed"); } catch { }
                     if (SettingsManager.Settings?.EnableContinuousScroll == true)
                     {
                         // En modo continuo: forzar scroll del visor aunque el foco no esté dentro
-                        if (ScrollContinuousWithinView(down: false)) { e.Handled = true; return; }
+                        try { var moved = ScrollContinuousWithinView(down: false); ComicReader.Utils.DevLogger.Debug($"Key.Up -> moved={moved}"); if (moved) { e.Handled = true; return; } } catch (Exception ex) { ComicReader.Utils.DevLogger.Debug($"Key.Up exception: {ex}"); }
                         // si no hay desplazamiento posible, dejamos seguir para otras teclas
                     }
                     if (!ScrollWithinPage(down: false))
@@ -1570,10 +2089,11 @@ namespace ComicReader
                     e.Handled = true;
                     break;
                 case Key.Down:
+                    try { ComicReader.Utils.DevLogger.Debug("Key.Down pressed"); } catch { }
                     if (SettingsManager.Settings?.EnableContinuousScroll == true)
                     {
                         // En modo continuo: forzar scroll del visor aunque el foco no esté dentro
-                        if (ScrollContinuousWithinView(down: true)) { e.Handled = true; return; }
+                        try { var moved = ScrollContinuousWithinView(down: true); ComicReader.Utils.DevLogger.Debug($"Key.Down -> moved={moved}"); if (moved) { e.Handled = true; return; } } catch (Exception ex) { ComicReader.Utils.DevLogger.Debug($"Key.Down exception: {ex}"); }
                         // si no hay desplazamiento posible, dejamos seguir para otras teclas
                     }
                     if (!ScrollWithinPage(down: true))
@@ -1591,6 +2111,13 @@ namespace ComicReader
                 case Key.PageUp:
                 case Key.A:
                 case Key.K:
+                    // En modo continuo: no navegar horizontalmente. Interpretar como scroll vertical hacia arriba si es posible.
+                    if (SettingsManager.Settings?.EnableContinuousScroll == true)
+                    {
+                        try { var moved = ScrollContinuousWithinView(down: false); ComicReader.Utils.DevLogger.Debug($"Key.Left/PageUp -> moved={moved}"); if (moved) { e.Handled = true; break; } } catch (Exception ex) { ComicReader.Utils.DevLogger.Debug($"Key.Left/PageUp exception: {ex}"); }
+                        // si no se pudo desplazar verticalmente, no realizar navegación horizontal
+                        e.Handled = true; break;
+                    }
                     if (SettingsManager.Settings?.CurrentReadingDirection == ReadingDirection.RightToLeft) NextPage_Click(null, null); else PrevPage_Click(null, null);
                     e.Handled = true;
                     break;
@@ -1599,6 +2126,12 @@ namespace ComicReader
                 case Key.Space:
                 case Key.D:
                 case Key.J:
+                    // En modo continuo: no navegar horizontalmente. Interpretar como scroll vertical hacia abajo si es posible.
+                    if (SettingsManager.Settings?.EnableContinuousScroll == true)
+                    {
+                        try { var moved = ScrollContinuousWithinView(down: true); ComicReader.Utils.DevLogger.Debug($"Key.Right/PageDown/Space -> moved={moved}"); if (moved) { e.Handled = true; break; } } catch (Exception ex) { ComicReader.Utils.DevLogger.Debug($"Key.Right/PageDown/Space exception: {ex}"); }
+                        e.Handled = true; break;
+                    }
                     // Respetar preferencia de usar barra espaciadora para avanzar
                     if (e.Key != Key.Space || SettingsManager.Settings?.SpacebarNextPage != false)
                     {
@@ -1637,7 +2170,7 @@ namespace ComicReader
                         ComicReader.Services.ContinueReadingService.Instance.UpsertProgress(_comicLoader.FilePath, oneBased, _comicLoader.PageCount);
                         if (oneBased >= _comicLoader.PageCount)
                         {
-                            // UpsertProgress migrará a completados; solo refrescar la vista
+                            // UpsertProgress will move it to completed; just refresh UI.
                             _homeView?.RefreshRecent();
                         }
                     }
@@ -1985,6 +2518,7 @@ namespace ComicReader
 
         private void OpenFolder_Click(object sender, RoutedEventArgs e)
         {
+            #pragma warning disable CA1416 // WinForms APIs used here (Windows-only)
             using var dialog = new System.Windows.Forms.FolderBrowserDialog();
             dialog.Description = "Seleccionar carpeta con imágenes de cómic";
             dialog.UseDescriptionForTitle = true;
@@ -1993,6 +2527,7 @@ namespace ComicReader
             {
                 OpenComicFile(dialog.SelectedPath);
             }
+            #pragma warning restore CA1416
         }
 
         
@@ -2180,7 +2715,8 @@ namespace ComicReader
                     // Cargar miniaturas en segundo plano para no bloquear la apertura del panel
                     long startSeq = Interlocked.Increment(ref _thumbLoadSeq);
                     var loaderRef = _comicLoader;
-                    _ = Task.Run(async () =>
+                    var token = _ctsWindow.Token;
+                    var _thumbsTask = Task.Run(async () =>
                     {
                         try
                         {
@@ -2189,26 +2725,30 @@ namespace ComicReader
                             using var gate = new System.Threading.SemaphoreSlim(maxDegree);
                             var tasks = Enumerable.Range(0, count).Select(async i =>
                             {
-                                await gate.WaitAsync();
+                                if (token.IsCancellationRequested) return;
+                                await gate.WaitAsync(token).ConfigureAwait(false);
                                 try
                                 {
-                                    var thumb = await loaderRef.GetPageThumbnailAsync(i, 180, 240);
+                                    if (token.IsCancellationRequested) return;
+                                    var thumb = await loaderRef.GetPageThumbnailAsync(i, 180, 240, token).ConfigureAwait(false);
                                     var idx = i;
                                     this.Dispatcher.Invoke(() =>
                                     {
                                         // Evitar escribir si cambió el cómic o la secuencia
+                                        if (token.IsCancellationRequested) return;
                                         if (!ReferenceEquals(_comicLoader, loaderRef)) return;
                                         if (Interlocked.Read(ref _thumbLoadSeq) != startSeq) return;
                                         if (idx >= 0 && idx < _comicLoader.Pages.Count)
                                             _comicLoader.Pages[idx].Thumbnail = thumb;
                                     });
                                 }
-                                finally { gate.Release(); }
+                                finally { try { gate.Release(); } catch { } }
                             }).ToArray();
-                            await Task.WhenAll(tasks);
+                            try { await Task.WhenAll(tasks).ConfigureAwait(false); } catch { }
                         }
                         catch { }
-                    });
+                    }, token);
+                    TrackBackgroundTask(_thumbsTask);
                 }
                 try { SettingsManager.Settings.ThumbnailsVisible = true; SettingsManager.SaveSettings(); } catch { }
             }
@@ -2240,10 +2780,7 @@ namespace ComicReader
             }
         }
 
-        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            SettingsManager.SaveSettings();
-        }
+        
 
         // Métodos públicos para acceso desde otras vistas
         public void OpenComicAsync(string filePath, int initialPage = 0)
@@ -2507,8 +3044,10 @@ namespace ComicReader
                 this.WindowStyle = WindowStyle.None;
                 this.ResizeMode = ResizeMode.NoResize;
                 var hwnd = new WindowInteropHelper(this).Handle;
+                #pragma warning disable CA1416 // WinForms Screen API (Windows-only)
                 var screen = WinForms.Screen.FromHandle(hwnd);
                 var bounds = screen.Bounds;
+                #pragma warning restore CA1416
                 this.Topmost = true;
                 this.WindowState = WindowState.Normal; // necesario para aplicar tamaño exacto
                 // Convertir de píxeles a DIPs para WPF (DPI-aware)

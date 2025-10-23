@@ -10,6 +10,8 @@ namespace ComicReader.Core.Abstractions
         string FilePath { get; }
         string ComicTitle { get; }
         Task LoadComicAsync(string filePath = null);
-        System.Threading.Tasks.Task<System.Windows.Media.Imaging.BitmapImage> GetPageImageAsync(int pageNumber);
+    System.Threading.Tasks.Task<System.Windows.Media.Imaging.BitmapImage> GetPageImageAsync(int pageNumber, int targetWidth = 0);
+        // Event: se dispara cuando la versión full de una página ya está disponible
+        event System.Action<int, System.Windows.Media.Imaging.BitmapImage> FullImageReady;
     }
 }

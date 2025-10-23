@@ -40,10 +40,10 @@ namespace ComicReader
         {
             try
             {
-                Console.WriteLine("Iniciando aplicación...");
+                ComicReader.Utils.DevLogger.Info("Iniciando aplicación...");
                 
                 Logger.Initialize();
-                Console.WriteLine("Logger inicializado correctamente");
+                ComicReader.Utils.DevLogger.Info("Logger inicializado correctamente");
                 
                 this.DispatcherUnhandledException += App_DispatcherUnhandledException;
                 AppDomain.CurrentDomain.UnhandledException += (s, e) =>
@@ -64,29 +64,30 @@ namespace ComicReader
                     }
                     catch { }
                 };
-                Console.WriteLine("Manejador de excepciones configurado");
+                ComicReader.Utils.DevLogger.Info("Manejador de excepciones configurado");
                 
                 SettingsManager.LoadSettings();
-                Console.WriteLine("Configuraciones cargadas correctamente");
+                ComicReader.Utils.DevLogger.Info("Configuraciones cargadas correctamente");
                 
                 ApplyTheme(SettingsManager.Settings.Theme);
-                Console.WriteLine("Tema aplicado correctamente");
+                ComicReader.Utils.DevLogger.Info("Tema aplicado correctamente");
 
                 // Registro de servicios básicos (fase inicial DI ligera)
-                ServiceLocator.RegisterSingleton<IComicPageLoader>(new ComicPageLoader());
+                // Registrar el loader progresivo por defecto para mejorar la experiencia de carga
+                ServiceLocator.RegisterSingleton<IComicPageLoader>(new ComicReader.Services.ProgressivePageLoader());
                 ServiceLocator.RegisterSingleton<IBookmarkService>(new BookmarkServiceAdapter());
                 ServiceLocator.RegisterSingleton<ISettingsService>(new SettingsServiceAdapter());
                 ServiceLocator.RegisterSingleton<ILogService>(new LogServiceAdapter());
                 ServiceLocator.RegisterSingleton<IImageCache>(new MultiLevelImageCache());
                 ServiceLocator.RegisterSingleton<ComicReader.Core.Abstractions.IReadingStatsService>(new ReadingStatsService());
-                Console.WriteLine("Servicios registrados en ServiceLocator");
+                ComicReader.Utils.DevLogger.Info("Servicios registrados en ServiceLocator");
                 
-                Console.WriteLine("Aplicación iniciada exitosamente");
+                ComicReader.Utils.DevLogger.Info("Aplicación iniciada exitosamente");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error crítico durante la inicialización: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                ComicReader.Utils.DevLogger.Error($"Error crítico durante la inicialización: {ex.Message}");
+                ComicReader.Utils.DevLogger.Error($"Stack trace: {ex.StackTrace}");
                 
                 try { Logger.LogException("Fatal init error", ex); } catch { }
 
@@ -108,8 +109,8 @@ namespace ComicReader
         {
             try
             {
-                Console.WriteLine($"Excepción no controlada: {e.Exception.Message}");
-                Console.WriteLine($"Stack trace: {e.Exception.StackTrace}");
+                ComicReader.Utils.DevLogger.Error($"Excepción no controlada: {e.Exception.Message}");
+                ComicReader.Utils.DevLogger.Error($"Stack trace: {e.Exception.StackTrace}");
                 
                 Logger.LogException("Unhandled exception caught by App_DispatcherUnhandledException.", e.Exception);
                 MessageBox.Show($"Error inesperado:\n{e.Exception.Message}\n\n{e.Exception.StackTrace}", "Error Crítico", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -117,7 +118,7 @@ namespace ComicReader
             }
             catch (Exception logEx)
             {
-                Console.WriteLine($"Error en el manejador de excepciones: {logEx.Message}");
+                ComicReader.Utils.DevLogger.Error($"Error en el manejador de excepciones: {logEx.Message}");
                 e.Handled = true;
                 Environment.Exit(1);
             }

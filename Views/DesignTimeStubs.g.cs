@@ -27,6 +27,12 @@ namespace ComicReader.Views
     public partial class LibraryManagerWindow : Window { public void InitializeComponent() { } }
 }
 
+// Stub para ThumbnailPanelWindow (no está bajo namespace Views)
+namespace ComicReader
+{
+    public partial class ThumbnailPanelWindow : Window { public void InitializeComponent() { } }
+}
+
 namespace ComicReader
 {
     public partial class MainWindow : Window { public void InitializeComponent() { } }

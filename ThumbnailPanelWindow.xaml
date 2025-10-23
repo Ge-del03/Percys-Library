@@ -40,9 +40,23 @@
                       HorizontalScrollBarVisibility="Disabled"
                       VerticalScrollBarVisibility="Auto"
                       Padding="10">
-            <Grid x:Name="ThumbnailsGrid">
-                <!-- Las miniaturas se añaden dinámicamente -->
-            </Grid>
+                <ItemsControl x:Name="ThumbnailsItemsControl" ItemsSource="{Binding Pages}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="6" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="6" Padding="6">
+                                <StackPanel>
+                                    <Image Source="{Binding Thumbnail}" Width="140" Height="180" Stretch="Uniform" Cursor="Hand"/>
+                                    <TextBlock Text="{Binding PageNumber}" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
         </ScrollViewer>
         
         <!-- Barra inferior -->

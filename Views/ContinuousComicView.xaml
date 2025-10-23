@@ -3,9 +3,11 @@
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:local="clr-namespace:ComicReader.Views"
 			 mc:Ignorable="d"
 			 d:DesignHeight="500" d:DesignWidth="800">
 	<UserControl.Resources>
+		<local:ZoomedWidthConverter x:Key="ZoomedWidthConverter" />
 		<Style x:Key="MiniThumbButtonStyle" TargetType="Button">
 			<Setter Property="Template">
 				<Setter.Value>
@@ -37,49 +39,17 @@
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
-		<!-- Panel flotante compacto (sin efecto para máxima compatibilidad) -->
-		<Border x:Name="ControlPanel" Panel.ZIndex="20" CornerRadius="8" Background="#DD1b1b1b" BorderBrush="#444" BorderThickness="1" Padding="4" Margin="8" HorizontalAlignment="Left" VerticalAlignment="Top" Opacity="0.95" MouseEnter="ControlPanel_MouseEnter" MouseLeave="ControlPanel_MouseLeave">
-			<StackPanel Orientation="Horizontal" VerticalAlignment="Center" >
-				<Button Content="←" Width="26" Height="26" Margin="2,0" Command="{Binding MoveLeftCommand}" ToolTip="Mover a la izquierda"/>
-				<Button Content="→" Width="26" Height="26" Margin="2,0" Command="{Binding MoveRightCommand}" ToolTip="Mover a la derecha"/>
-				<StackPanel Orientation="Horizontal" Margin="8,0,4,0" VerticalAlignment="Center">
-					<TextBlock Text="Pag" Foreground="#ccc" FontSize="11" Margin="0,0,4,0"/>
-					<TextBlock Text="{Binding CurrentPageDisplay}" Foreground="White" FontWeight="Bold"/>
-					<TextBlock Text="/" Foreground="#666" Margin="3,0"/>
-					<TextBlock Text="{Binding PagesCount}" Foreground="#ccc"/>
-				</StackPanel>
-				<Slider Width="160" Margin="6,0,0,0" Minimum="1" Maximum="{Binding PagesCount}" Value="{Binding CurrentPageOneBased, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="Navegación rápida"/>
-				<Separator Margin="4,0" Width="1" Background="#444"/>
-				<Button Content="-" Width="26" Height="26" Margin="2,0" Command="{Binding ZoomOutCommand}" ToolTip="Alejar"/>
-				<Button Content="+" Width="26" Height="26" Margin="2,0" Command="{Binding ZoomInCommand}" ToolTip="Acercar"/>
-				<Button Content="{Binding ZoomPercent, StringFormat={}{0}%}" Width="50" Height="26" Margin="4,0,0,0" Command="{Binding ResetZoomCommand}" ToolTip="Restablecer zoom"/>
-			</StackPanel>
-		</Border>
-		<Grid Grid.Row="0" Margin="0,0,0,0">
+			<Grid Grid.Row="0" Margin="0,0,0,0">
 			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="140"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
-			<!-- Panel lateral de miniaturas simples -->
-			<ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Background="#1d1d1d">
-				<ItemsControl ItemsSource="{Binding Pages}">
-					<ItemsControl.ItemTemplate>
-						<DataTemplate>
-							<Button Style="{StaticResource MiniThumbButtonStyle}"
-									Command="{Binding DataContext.GoToPageCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-									CommandParameter="{Binding PageIndex}">
-								<StackPanel>
-									<Image Source="{Binding Image}" Height="72" Stretch="Uniform"/>
-									<TextBlock Text="{Binding PageNumber}" Foreground="#ddd" HorizontalAlignment="Center" Margin="0,2,0,0" FontSize="10"/>
-								</StackPanel>
-							</Button>
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
-				</ItemsControl>
-			</ScrollViewer>
-			<!-- Contenido continuo -->
-			<ScrollViewer x:Name="ContentScroll" Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Background="#111" ScrollChanged="ContentScroll_ScrollChanged">
-				<ListBox x:Name="PagesList" ItemsSource="{Binding Pages}" BorderThickness="0" Background="Transparent" ScrollViewer.CanContentScroll="True" VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
+			<!-- Contenido continuo: eliminada columna de miniaturas y panel flotante -->
+				<ListBox x:Name="PagesList" ItemsSource="{Binding Pages}" BorderThickness="0" Background="Transparent"
+						 ScrollViewer.VerticalScrollBarVisibility="Auto"
+						 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+						 ScrollViewer.CanContentScroll="False"
+						 VirtualizingStackPanel.IsVirtualizing="True"
+						 VirtualizingStackPanel.VirtualizationMode="Recycling">
 					<ListBox.ItemsPanel>
 						<ItemsPanelTemplate>
 							<VirtualizingStackPanel Orientation="Vertical"/>
@@ -87,19 +57,47 @@
 					</ListBox.ItemsPanel>
 					<ListBox.ItemTemplate>
 						<DataTemplate>
-							<Border Margin="0,0,0,24" Padding="8" Background="#181818" CornerRadius="4">
-								<Image Stretch="Uniform" Loaded="Image_Loaded">
-									<Image.Style>
-										<Style TargetType="Image">
-											<Setter Property="Source" Value="{Binding Image}"/>
-										</Style>
-									</Image.Style>
-								</Image>
+							<Border Margin="0,0,0,24" Padding="8" Background="#181818" CornerRadius="4" SnapsToDevicePixels="True">
+								<Border.Effect>
+									<DropShadowEffect Color="#000000" BlurRadius="8" Opacity="0.35" Direction="270" ShadowDepth="2"/>
+								</Border.Effect>
+								<Grid>
+									<!-- Thumbnail blur placeholder (se muestra primero si existe)
+									     y la imagen principal (full) aparece encima y hace fade-in -->
+									<Grid>
+										<Image x:Name="ThumbImage" Stretch="Uniform" Opacity="1" HorizontalAlignment="Center" IsHitTestVisible="False">
+											<Image.Source>
+												<Binding Path="Thumbnail" />
+											</Image.Source>
+											<Image.Effect>
+												<BlurEffect Radius="8"/>
+											</Image.Effect>
+											<Image.Width>
+												<MultiBinding Converter="{StaticResource ZoomedWidthConverter}">
+													<Binding ElementName="PagesList" Path="ActualWidth" />
+													<Binding Path="DataContext.Zoom" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+												</MultiBinding>
+											</Image.Width>
+										</Image>
+
+										<Image x:Name="PageImage" Stretch="Uniform" Loaded="Image_Loaded" Opacity="0" HorizontalAlignment="Center">
+											<Image.Source>
+												<Binding Path="Image" NotifyOnTargetUpdated="True"/>
+											</Image.Source>
+											<Image.Width>
+												<MultiBinding Converter="{StaticResource ZoomedWidthConverter}">
+													<Binding ElementName="PagesList" Path="ActualWidth" />
+													<Binding Path="DataContext.Zoom" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+												</MultiBinding>
+											</Image.Width>
+										</Image>
+									</Grid>
+								</Grid>
 							</Border>
 						</DataTemplate>
 					</ListBox.ItemTemplate>
 				</ListBox>
-			</ScrollViewer>
+            
 		</Grid>
 	</Grid>
 </UserControl>

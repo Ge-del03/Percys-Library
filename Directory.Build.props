@@ -5,11 +5,7 @@
     <Compile Remove="MainWindow.ZoomCompat.g.cs" />
   </ItemGroup>
 
-  <!-- Solo para IntelliSense/DesignTime: definir símbolo y añadir stubs para evitar falsos "rojos" de InitializeComponent -->
-  <PropertyGroup Condition="'$(DesignTimeBuild)' == 'true'">
-    <DefineConstants>$(DefineConstants);DESIGN_TIME</DefineConstants>
-  </PropertyGroup>
-  <ItemGroup Condition="'$(DesignTimeBuild)' == 'true'">
-    <Compile Include="Views\DesignTimeStubs.g.cs" />
-  </ItemGroup>
+  <!-- Nota: los stubs de diseño se han eliminado del repo para evitar que sobreescriban InitializeComponent en tiempo de ejecución.
+       Si se requieren stubs para el diseñador, mantenerlos fuera del repositorio o añadirlos mediante Targets condicionados
+       que solo se ejecuten en el entorno local y no se incluyan en el control de versiones. -->
 </Project>

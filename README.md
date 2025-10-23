@@ -187,6 +187,17 @@ Los logs se guardan en:
 ### Restaurar Configuración
 Eliminar carpeta: `%AppData%\ComicReader\Settings\`
 
+### Reproducción y métricas de rendimiento
+Si quieres validar las mejoras de rendimiento (LRU cache y límite de concurrencia):
+
+- Ejecuta la aplicación desde el código fuente en modo Debug y guarda la salida en un archivo de log:
+```powershell
+dotnet run --project "c:\Users\O11CE\OneDrive\Desktop\Percy Library\ComicReader.csproj" -c Debug > "c:\Users\O11CE\OneDrive\Desktop\Percy Library\logs\run_output.log" 2>&1
+```
+- Abre `logs\run_output.log` y busca líneas con `[Perf]` o textos como `Swap thumbnail->full` para medir tiempos de swap y decodificación.
+- Repite la navegación en la app (abrir cómic, navegar varias páginas) y compara media, mediana y percentiles antes/después de cambios.
+
+
 ## Roadmap
 
 ### Versión 2.1

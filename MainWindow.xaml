@@ -24,6 +24,15 @@
                             UseAeroCaptionButtons="False" />
     </shell:WindowChrome.WindowChrome>
 
+    <Window.Resources>
+        <Style TargetType="Path" x:Key="NavIconStyle">
+            <Setter Property="Fill" Value="White"/>
+            <Setter Property="Width" Value="14"/>
+            <Setter Property="Height" Value="14"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -88,40 +97,30 @@
 
         <!-- Área de Contenido Principal -->
     <!-- Barra superior de controles del lector -->
-    <Border Grid.Row="1" x:Name="ReaderTopBar"
-            Background="{DynamicResource HeaderBackgroundBrush}"
-            Padding="8" Panel.ZIndex="1000"
-            IsEnabled="{Binding IsReaderViewActive, RelativeSource={RelativeSource AncestorType=Window}}">
-        <Border.Style>
-            <Style TargetType="Border">
-                <Setter Property="Visibility" Value="Collapsed"/>
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsReaderViewActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                        <Setter Property="Visibility" Value="Visible"/>
-                    </DataTrigger>
-                    <!-- Ocultar explícitamente si estamos en Home o en Configuración -->
-                    <DataTrigger Binding="{Binding IsHomeViewActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding IsSettingsViewActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Border.Style>
+    <Border Grid.Row="1" x:Name="ReaderTopBar" Style="{StaticResource ReaderTopBarStyle}"
+        Panel.ZIndex="1000"
+        IsEnabled="{Binding IsReaderViewActive, RelativeSource={RelativeSource AncestorType=Window}}">
+        
         <DockPanel>
             <!-- Izquierda: navegación -->
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
                 <Button Content="🏠" ToolTip="Inicio" Click="HomeButton_Click" Style="{StaticResource SecondaryButtonStyle}" Margin="2,0"/>
                 <Button Content="📂" ToolTip="Abrir cómic (Ctrl+O)" Click="OpenFile_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0"/>
-                <Button Content="⟨" ToolTip="Anterior" Click="PrevPage_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0"/>
-                <Button Content="⟩" ToolTip="Siguiente" Click="NextPage_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0"/>
+                <Button x:Name="PrevButton" ToolTip="Anterior" Click="PrevPage_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0">
+                    <!-- Contenido por defecto: flecha izquierda -->
+                    <Path Style="{StaticResource NavIconStyle}" Data="M12,3 L4,12 L12,21" Stroke="White" StrokeThickness="2" StrokeEndLineCap="Round" StrokeStartLineCap="Round" StrokeLineJoin="Round"/>
+                </Button>
+                <Button x:Name="NextButton" ToolTip="Siguiente" Click="NextPage_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0">
+                    <Path Style="{StaticResource NavIconStyle}" Data="M4,3 L12,12 L4,21" Stroke="White" StrokeThickness="2" StrokeEndLineCap="Round" StrokeStartLineCap="Round" StrokeLineJoin="Round"/>
+                </Button>
             </StackPanel>
             <!-- Centro: indicador + slider -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Text="Pág" Foreground="#ccc" Margin="0,0,6,0" VerticalAlignment="Center"/>
                 <TextBlock x:Name="PageIndicator" Text="— / —" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
                 <Slider x:Name="PageSlider" Width="220" Minimum="1" Maximum="1" Value="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="PageSlider_ValueChanged" Margin="12,0,0,0"/>
+                <!-- Barra de progreso del lector (visual, fina y centrada) -->
+                <ProgressBar x:Name="ReaderProgressBar" Width="260" Height="6" Minimum="0" Maximum="100" Value="0" Margin="12,6,0,0" VerticalAlignment="Center" Background="#233044" Foreground="#3B82F6" Visibility="Collapsed"/>
             </StackPanel>
             <!-- Derecha: zoom y utilidades -->
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center">
@@ -134,6 +133,8 @@
                 <Button Content="☰" ToolTip="Miniaturas" Click="ToggleThumbnails_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
                 <Button Content="☾" ToolTip="Modo Nocturno" Click="ToggleNightMode_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
                 <Button Content="⛶" ToolTip="Pantalla Completa Total" Click="ImmersiveFullScreen_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
+                <!-- Toggle lectura continua / paginada -->
+                <Button x:Name="ToggleContinuousButton" Content="📄" ToolTip="Alternar modo de lectura" Click="ToggleContinuous_Click" Style="{StaticResource ReaderToggleButtonStyle}" Margin="6,0"/>
             </StackPanel>
         </DockPanel>
     </Border>

@@ -52,7 +52,7 @@ namespace ComicReader.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/PercysLibrary;component/views/bookmarkspanel.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/ComicReader;component/views/bookmarkspanel.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\BookmarksPanel.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

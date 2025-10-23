@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
+using System.Threading;
 using SharpCompress.Archives.Rar;
 using SharpCompress.Archives.Tar; // Para CBT
 using SharpCompress.Archives.SevenZip; // Para CB7
@@ -13,8 +14,13 @@ using SharpCompress.Common; // Para PasswordProtectedException
 using ComicReader.Models;
 using System.Drawing; // Para Bitmap
 using System.Collections.Concurrent;
+using System.Windows;
 using System.Windows.Threading;
+using System.Windows.Media;
+using System.Globalization;
 using VersOne.Epub; // Para EPUB (requiere NuGet: VersOne.Epub)
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 #if SUPPORT_DJVU
 using DjvuNet; // Para DJVU (requiere NuGet: DjvuNet)
 #endif
@@ -35,24 +41,83 @@ namespace ComicReader.Services
 {
     public partial class ComicPageLoader : IDisposable, IComicPageLoader
     {
+        public event System.Action<int, System.Windows.Media.Imaging.BitmapImage> FullImageReady;
+
+        // Renderer prioritizado para renderizado de imágenes
+        private readonly ComicReader.Core.Rendering.PrioritizedRenderer _renderer = new ComicReader.Core.Rendering.PrioritizedRenderer();
+
+        // Cancellation token source para operaciones en curso (se renueva al cargar/limpiar comic)
+        private CancellationTokenSource _internalCts = new CancellationTokenSource();
+
         private string _filePath;
         private List<Models.ComicPage> _pages = new List<Models.ComicPage>();
-    private readonly ConcurrentDictionary<int, (BitmapImage img, DateTime ts)> _pageCache = new();
-    private readonly ConcurrentDictionary<int, (BitmapImage img, DateTime ts)> _thumbCache = new();
-    private int _pageCacheLimit = 60; // configurable luego
-    private readonly object _lruLock = new();
-    private ILogService _log;
-    private int _prefetchWindow = 4;
-        private object _lock = new object(); // Para sincronizar acceso a recursos compartidos
-    // Tipo real del archivo comprimido detectado por firma para manejar CBR mal renombrados
-    private ArchiveKind _archiveKind = ArchiveKind.None;
+        private readonly ComicReader.ContinuousReader.CacheManager<int, (BitmapImage img, DateTime ts)> _pageCache = new(120);
+        private readonly ComicReader.ContinuousReader.CacheManager<int, (BitmapImage img, DateTime ts)> _thumbCache = new(240);
+        // Inicial: permitir hasta 4 hilos de prefetch en máquinas con >4 cores, pero mínimo 1
+        private System.Threading.SemaphoreSlim _prefetchSemaphore = new(System.Math.Max(1, System.Math.Min(4, Environment.ProcessorCount)));
+        private readonly ConcurrentDictionary<int, Task<BitmapImage>> _ongoingPageLoads = new();
+        private const int MaxDecodeWidth = 1500; // reasonable default for full images
+        // Semaphore to limit concurrent decodes (configurable)
+        private System.Threading.SemaphoreSlim _decodeSemaphore = new(System.Math.Max(1, Math.Min(4, Environment.ProcessorCount / 2)));
+        // Metrics
+        private double _lastSwapMs = 0;
 
-    // Documentos cargados para formatos especiales
+        public int PageCacheCount => _pageCache.Count;
+        public int ThumbCacheCount => _thumbCache.Count;
+        public int OngoingLoadsCount => _ongoingPageLoads.Count;
+        public double LastSwapMs => _lastSwapMs;
+        public int PrefetchWindow => _prefetchWindow;
+
+        public void SetPrefetchWindow(int newWindow)
+        {
+            try
+            {
+                var w = Math.Max(1, Math.Min(16, newWindow));
+                lock (_lock)
+                {
+                    _prefetchWindow = w;
+                    // cap is proportional to window but bounded to avoid excessive concurrency
+                    // e.g., window 1..16 -> cap roughly window/2, clamped to [1,6]
+                    int cap = Math.Max(1, Math.Min(6, (int)Math.Ceiling(w * 0.5)));
+                    try { _prefetchSemaphore = new System.Threading.SemaphoreSlim(cap); } catch { }
+                }
+                _log?.Log($"Prefetch window set to {w}", LogLevel.Info);
+            }
+            catch { }
+        }
+
+        // Allow external tuning of the concurrency cap for image decodes
+        public void SetConcurrencyCap(int cap)
+        {
+            try
+            {
+                int c = Math.Max(1, Math.Min(16, cap));
+                // replace semaphore (best-effort)
+                var old = _decodeSemaphore;
+                _decodeSemaphore = new System.Threading.SemaphoreSlim(c);
+                try { old?.Dispose(); } catch { }
+                _log?.Log($"Decode concurrency cap set to {c}", LogLevel.Info);
+            }
+            catch { }
+        }
+        // Track when a quick thumbnail was placed into page cache to measure swap latency
+        private readonly ConcurrentDictionary<int, DateTime> _quickCachedAt = new();
+        // Limita lecturas concurrentes de archivos comprimidos para evitar saturar I/O y posibles deadlocks
+        private static readonly System.Threading.SemaphoreSlim _archiveSemaphore = new(3);
+        private int _pageCacheLimit = 60; // configurable luego
+        private readonly object _lruLock = new();
+        private ILogService _log;
+        private int _prefetchWindow = 2;
+        private object _lock = new object(); // Para sincronizar acceso a recursos compartidos
+        // Tipo real del archivo comprimido detectado por firma para manejar CBR mal renombrados
+        private ArchiveKind _archiveKind = ArchiveKind.None;
+
+        // Documentos cargados para formatos especiales
 #if SUPPORT_PDF
-    private IDocReader _pdfDocument;
+        private IDocReader _pdfDocument;
 #endif
 #if SUPPORT_DJVU
-    private DjvuDocument _djvuDocument;
+        private DjvuDocument _djvuDocument;
 #endif
 
         public List<Models.ComicPage> Pages => _pages;
@@ -65,6 +130,7 @@ namespace ComicReader.Services
             InitLog();
             _log?.Log("Initializing ComicPageLoader (empty constructor)");
             ApplySettingsParameters();
+            try { SetPrefetchWindow(_prefetchWindow); } catch { }
         }
 
         public ComicPageLoader(string filePath)
@@ -93,6 +159,15 @@ namespace ComicReader.Services
             try { _pages.Clear(); } catch { }
             try { _pageCache.Clear(); } catch { }
             try { _thumbCache.Clear(); } catch { }
+            try
+            {
+                // Cancel any in-flight operations for the previous comic
+                try { _internalCts?.Cancel(); } catch { }
+                try { _internalCts?.Dispose(); } catch { }
+            }
+            catch { }
+            // Create a fresh token source for subsequent loads
+            _internalCts = new CancellationTokenSource();
         }
 
         private void InitLog()
@@ -108,6 +183,7 @@ namespace ComicReader.Services
                 {
                     if (SettingsManager.Settings.PageCacheLimit > 0) _pageCacheLimit = SettingsManager.Settings.PageCacheLimit;
                     if (SettingsManager.Settings.PrefetchWindow > 0) _prefetchWindow = SettingsManager.Settings.PrefetchWindow;
+                    try { SetConcurrencyCap(SettingsManager.Settings.ConcurrencyCap); } catch { }
                 }
             }
             catch { }
@@ -146,7 +222,11 @@ namespace ComicReader.Services
             {
                 _filePath = filePath;
             }
-            
+            // Renew cancellation token for this comic load
+            try { _internalCts?.Cancel(); } catch { }
+            try { _internalCts?.Dispose(); } catch { }
+            _internalCts = new CancellationTokenSource();
+
             _pages.Clear();
             _pageCache.Clear();
             _thumbCache.Clear();
@@ -160,6 +240,8 @@ namespace ComicReader.Services
 
             try
             {
+                using (ComicReader.ContinuousReader.PerformanceLogger.Measure("LoadComicAsync"))
+                {
                 if (string.IsNullOrEmpty(_filePath))
                 {
                     throw new ArgumentException("No se ha especificado un archivo para cargar");
@@ -217,12 +299,15 @@ namespace ComicReader.Services
                     }
                 }
 
+                }
                 if (_pages.Count == 0)
                 {
                     throw new InvalidDataException("El archivo de cómic no contiene páginas de imagen válidas o está vacío.");
                 }
 
                 Logger.Log($"Successfully loaded comic structure for: {_filePath} with {_pages.Count} pages.");
+                // Intentar detectar rendimiento de almacenamiento y ajustar prefetch
+                try { DetectAndAdjustPrefetch(); } catch { }
             }
             catch (PasswordProtectedException ex)
             {
@@ -253,19 +338,32 @@ namespace ComicReader.Services
             await Task.Run(() =>
             {
                 _archiveKind = ArchiveKind.Zip;
-                using (var archive = ZipFile.OpenRead(_filePath))
+                _archiveSemaphore.Wait();
+                try
                 {
-                    var imageEntries = archive.Entries
-                        .Where(e => !string.IsNullOrEmpty(e.FullName) && !e.FullName.EndsWith("/") && IsSupportedImageExtension(Path.GetExtension(e.FullName)))
-                        .OrderBy(e => e.FullName, StringComparer.OrdinalIgnoreCase)
-                        .Select(e => e.FullName)
-                        .ToList();
-                    for (int i = 0; i < imageEntries.Count; i++)
+                    using (var archive = ZipFile.OpenRead(_filePath))
                     {
-                        _pages.Add(new Models.ComicPage(i + 1, imageEntries[i], null));
+                        var imageEntries = archive.Entries
+                            .Where(e => !string.IsNullOrEmpty(e.FullName) && !e.FullName.EndsWith("/") && IsSupportedImageExtension(Path.GetExtension(e.FullName)))
+                            .OrderBy(e => e.FullName, StringComparer.OrdinalIgnoreCase)
+                            .Select(e => e.FullName)
+                            .ToList();
+                        for (int i = 0; i < imageEntries.Count; i++)
+                        {
+                            _pages.Add(new Models.ComicPage(i + 1, imageEntries[i], null));
+                        }
                     }
                 }
-            });
+                catch (Exception ex)
+                {
+                    Logger.LogException($"Error reading CBZ archive: {_filePath}", ex);
+                    throw;
+                }
+                finally
+                {
+                    _archiveSemaphore.Release();
+                }
+            }, _internalCts?.Token ?? CancellationToken.None).ConfigureAwait(false);
         }
 
         private async Task LoadCBRAsync()
@@ -273,19 +371,32 @@ namespace ComicReader.Services
             await Task.Run(() =>
             {
                 _archiveKind = ArchiveKind.Rar;
-                using (var archive = RarArchive.Open(_filePath))
+                _archiveSemaphore.Wait();
+                try
                 {
-                    var imageEntries = archive.Entries
-                        .Where(e => !e.IsDirectory && IsSupportedImageExtension(Path.GetExtension(e.Key)))
-                        .OrderBy(e => e.Key, StringComparer.OrdinalIgnoreCase)
-                        .Select(e => e.Key)
-                        .ToList();
-                    for (int i = 0; i < imageEntries.Count; i++)
+                    using (var archive = RarArchive.Open(_filePath))
                     {
-                        _pages.Add(new Models.ComicPage(i + 1, imageEntries[i], null));
+                        var imageEntries = archive.Entries
+                            .Where(e => !e.IsDirectory && IsSupportedImageExtension(Path.GetExtension(e.Key)))
+                            .OrderBy(e => e.Key, StringComparer.OrdinalIgnoreCase)
+                            .Select(e => e.Key)
+                            .ToList();
+                        for (int i = 0; i < imageEntries.Count; i++)
+                        {
+                            _pages.Add(new Models.ComicPage(i + 1, imageEntries[i], null));
+                        }
                     }
                 }
-            });
+                catch (Exception ex)
+                {
+                    Logger.LogException($"Error reading CBR archive: {_filePath}", ex);
+                    throw;
+                }
+                finally
+                {
+                    _archiveSemaphore.Release();
+                }
+            }, _internalCts?.Token ?? CancellationToken.None).ConfigureAwait(false);
         }
 
         private async Task LoadCBTAsync()
@@ -293,19 +404,32 @@ namespace ComicReader.Services
             await Task.Run(() =>
             {
                 _archiveKind = ArchiveKind.Tar;
-                using (var archive = TarArchive.Open(_filePath))
+                _archiveSemaphore.Wait();
+                try
                 {
-                    var imageEntries = archive.Entries
-                        .Where(e => !e.IsDirectory && IsSupportedImageExtension(Path.GetExtension(e.Key)))
-                        .OrderBy(e => e.Key, StringComparer.OrdinalIgnoreCase)
-                        .Select(e => e.Key)
-                        .ToList();
-                    for (int i = 0; i < imageEntries.Count; i++)
+                    using (var archive = TarArchive.Open(_filePath))
                     {
-                        _pages.Add(new Models.ComicPage(i + 1, imageEntries[i], null));
+                        var imageEntries = archive.Entries
+                            .Where(e => !e.IsDirectory && IsSupportedImageExtension(Path.GetExtension(e.Key)))
+                            .OrderBy(e => e.Key, StringComparer.OrdinalIgnoreCase)
+                            .Select(e => e.Key)
+                            .ToList();
+                        for (int i = 0; i < imageEntries.Count; i++)
+                        {
+                            _pages.Add(new Models.ComicPage(i + 1, imageEntries[i], null));
+                        }
                     }
                 }
-            });
+                catch (Exception ex)
+                {
+                    Logger.LogException($"Error reading CBT archive: {_filePath}", ex);
+                    throw;
+                }
+                finally
+                {
+                    _archiveSemaphore.Release();
+                }
+            }, _internalCts?.Token ?? CancellationToken.None).ConfigureAwait(false);
         }
 
         private async Task LoadCB7Async()
@@ -313,19 +437,32 @@ namespace ComicReader.Services
             await Task.Run(() =>
             {
                 _archiveKind = ArchiveKind.SevenZip;
-                using (var archive = SevenZipArchive.Open(_filePath))
+                _archiveSemaphore.Wait();
+                try
                 {
-                    var imageEntries = archive.Entries
-                        .Where(e => !e.IsDirectory && IsSupportedImageExtension(Path.GetExtension(e.Key)))
-                        .OrderBy(e => e.Key, StringComparer.OrdinalIgnoreCase)
-                        .Select(e => e.Key)
-                        .ToList();
-                    for (int i = 0; i < imageEntries.Count; i++)
+                    using (var archive = SevenZipArchive.Open(_filePath))
                     {
-                        _pages.Add(new Models.ComicPage(i + 1, imageEntries[i], null));
+                        var imageEntries = archive.Entries
+                            .Where(e => !e.IsDirectory && IsSupportedImageExtension(Path.GetExtension(e.Key)))
+                            .OrderBy(e => e.Key, StringComparer.OrdinalIgnoreCase)
+                            .Select(e => e.Key)
+                            .ToList();
+                        for (int i = 0; i < imageEntries.Count; i++)
+                        {
+                            _pages.Add(new Models.ComicPage(i + 1, imageEntries[i], null));
+                        }
                     }
                 }
-            });
+                catch (Exception ex)
+                {
+                    Logger.LogException($"Error reading CB7 archive: {_filePath}", ex);
+                    throw;
+                }
+                finally
+                {
+                    _archiveSemaphore.Release();
+                }
+            }, _internalCts?.Token ?? CancellationToken.None).ConfigureAwait(false);
         }
 
         private async Task LoadFolderAsync(string folderPath)
@@ -341,7 +478,7 @@ namespace ComicReader.Services
                 {
                     _pages.Add(new Models.ComicPage(i + 1, imageFiles[i], null));
                 }
-            });
+            }, _internalCts?.Token ?? CancellationToken.None).ConfigureAwait(false);
         }
 
         private async Task LoadPDFAsync()
@@ -375,7 +512,7 @@ namespace ComicReader.Services
                     _pages.Clear();
                     _pages.Add(new Models.ComicPage(1, "PDF_Error", CreatePlaceholderImage($"Error PDF\n{ex.Message}", 500, 700)));
                 }
-            });
+            }, _internalCts?.Token ?? CancellationToken.None).ConfigureAwait(false);
         }
 
         private async Task LoadEPUBAsync()
@@ -406,7 +543,7 @@ namespace ComicReader.Services
                     Logger.LogException($"Error al cargar EPUB: {_filePath}", ex);
                     _pages.Add(new Models.ComicPage(1, "EPUB Error", CreatePlaceholderImage("EPUB", 200, 200)));
                 }
-            });
+            }, _internalCts?.Token ?? CancellationToken.None).ConfigureAwait(false);
         }
 
         private async Task LoadDJVUAsync()
@@ -433,7 +570,7 @@ namespace ComicReader.Services
                     _pages.Clear();
                     _pages.Add(new Models.ComicPage(1, "DJVU_Error", CreatePlaceholderImage($"Error DJVU\n{ex.Message}", 500, 700)));
                 }
-            });
+            }, _internalCts?.Token ?? CancellationToken.None);
         }
 
         // --- Métodos Auxiliares de Carga ---
@@ -466,21 +603,99 @@ namespace ComicReader.Services
 
         // --- Métodos para Obtener Imágenes ---
 
-        public async Task<BitmapImage> GetPageImageAsync(int pageNumber)
-        {
-            if (pageNumber < 0 || pageNumber >= _pages.Count) return CreatePlaceholderImage("Error", 200, 200);
-            if (_pageCache.TryGetValue(pageNumber, out var cached) && cached.img != null)
-            {
-                _pageCache[pageNumber] = (cached.img, DateTime.UtcNow);
-                return cached.img;
-            }
+    public async Task<BitmapImage> GetPageImageAsync(int pageNumber, int targetWidth = 0)
+    {
+        if (pageNumber < 0 || pageNumber >= _pages.Count) return CreatePlaceholderImage("Error", 200, 200);
 
-            var image = await Task.Run(() => LoadImageFromSource(pageNumber));
-            if (image == null) image = CreatePlaceholderImage("Sin imagen", 200, 200);
-            _pageCache[pageNumber] = (image, DateTime.UtcNow);
-            EnforcePageCacheLimit(pageNumber);
-            return image;
+        // If full image cached, return immediately
+        if (_pageCache.TryGetValue(pageNumber, out var cached) && cached.img != null)
+        {
+            _pageCache[pageNumber] = (cached.img, DateTime.UtcNow);
+            return cached.img;
         }
+
+        // If we have a thumbnail cached, use it as quick response and enqueue full high-priority load
+        if (_thumbCache.TryGetValue(pageNumber, out var tcached) && tcached.img != null)
+        {
+            var quick = tcached.img;
+            _pageCache[pageNumber] = (quick, DateTime.UtcNow);
+            EnforcePageCacheLimit(pageNumber);
+            // Enqueue prioritized full load; do not await
+            _ = StartFullLoadForPageAsync(pageNumber, targetWidth);
+            return quick;
+        }
+
+        // No cache: generate a quick thumbnail and enqueue full load
+        try
+        {
+            var desired = targetWidth <= 0 ? 600 : targetWidth;
+            var quickImg = await GetPageThumbnailAsync(pageNumber, desired, 0);
+            if (quickImg != null)
+            {
+                _pageCache[pageNumber] = (quickImg, DateTime.UtcNow);
+                _quickCachedAt[pageNumber] = DateTime.UtcNow;
+                EnforcePageCacheLimit(pageNumber);
+            }
+            // Enqueue prioritized full load
+            _ = StartFullLoadForPageAsync(pageNumber, targetWidth);
+        }
+        catch { }
+
+        if (_pageCache.TryGetValue(pageNumber, out var after) && after.img != null) return after.img;
+        var placeholder = CreatePlaceholderImage("Cargando", 400, 600);
+        _pageCache[pageNumber] = (placeholder, DateTime.UtcNow);
+        EnforcePageCacheLimit(pageNumber);
+        return placeholder;
+    }
+
+    // Overload con CancellationToken
+    public async Task<BitmapImage> GetPageImageAsync(int pageNumber, int targetWidth, CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested) return CreatePlaceholderImage("Cancelado", 200, 200);
+
+        if (pageNumber < 0 || pageNumber >= _pages.Count) return CreatePlaceholderImage("Error", 200, 200);
+
+        // If full image cached, return immediately
+        if (_pageCache.TryGetValue(pageNumber, out var cached) && cached.img != null)
+        {
+            _pageCache[pageNumber] = (cached.img, DateTime.UtcNow);
+            return cached.img;
+        }
+
+        // If we have a thumbnail cached, use it as quick response and enqueue full high-priority load
+        if (_thumbCache.TryGetValue(pageNumber, out var tcached) && tcached.img != null)
+        {
+            var quick = tcached.img;
+            _pageCache[pageNumber] = (quick, DateTime.UtcNow);
+            EnforcePageCacheLimit(pageNumber);
+            // Enqueue prioritized full load; do not await
+            _ = StartFullLoadForPageAsync(pageNumber, targetWidth, cancellationToken);
+            return quick;
+        }
+
+        // No cache: generate a quick thumbnail and enqueue full load
+        try
+        {
+            var desired = targetWidth <= 0 ? 600 : targetWidth;
+            var quickImg = await GetPageThumbnailAsync(pageNumber, desired, 0, cancellationToken).ConfigureAwait(false);
+            if (quickImg != null)
+            {
+                _pageCache[pageNumber] = (quickImg, DateTime.UtcNow);
+                _quickCachedAt[pageNumber] = DateTime.UtcNow;
+                EnforcePageCacheLimit(pageNumber);
+            }
+            // Enqueue prioritized full load
+            _ = StartFullLoadForPageAsync(pageNumber, targetWidth, cancellationToken);
+        }
+        catch (OperationCanceledException) { return CreatePlaceholderImage("Cancelado", 200, 200); }
+        catch { }
+
+        if (_pageCache.TryGetValue(pageNumber, out var after) && after.img != null) return after.img;
+        var placeholder = CreatePlaceholderImage("Cargando", 400, 600);
+        _pageCache[pageNumber] = (placeholder, DateTime.UtcNow);
+        EnforcePageCacheLimit(pageNumber);
+        return placeholder;
+    }
 
         // Obtener miniatura de una página (decodificada a tamaño pequeño)
         public async Task<BitmapImage> GetPageThumbnailAsync(int pageNumber, int width = 200, int height = 300)
@@ -491,14 +706,46 @@ namespace ComicReader.Services
                 _thumbCache[pageNumber] = (cached.img, DateTime.UtcNow);
                 return cached.img;
             }
-            var image = await Task.Run(() => LoadThumbnailFromSource(pageNumber, width, height));
+            // Si se pasa height==0, mantenemos la relación de aspecto usando solo width
+            var targetWidth = Math.Max(80, width);
+            BitmapImage image = null;
+            try
+            {
+                image = await Task.Run(() => LoadThumbnailFromSource(pageNumber, targetWidth, height <= 0 ? 0 : height), _internalCts.Token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) { return CreatePlaceholderImage("Cancelado", width, height); }
+            catch { /* ignore */ }
             if (image == null) image = CreatePlaceholderImage("Sin imagen", width, height);
             _thumbCache[pageNumber] = (image, DateTime.UtcNow);
             EnforceThumbCacheLimit(pageNumber);
             return image;
         }
 
-        private BitmapImage LoadImageFromSource(int pageNumber)
+        // Overload con CancellationToken para permitir cancelación cooperativa
+        public async Task<BitmapImage> GetPageThumbnailAsync(int pageNumber, int width, int height, CancellationToken cancellationToken)
+        {
+            if (cancellationToken.IsCancellationRequested) return CreatePlaceholderImage("Cancelado", width, height);
+            if (pageNumber < 0 || pageNumber >= _pages.Count) return CreatePlaceholderImage("Error", width, height);
+            if (_thumbCache.TryGetValue(pageNumber, out var cached) && cached.img != null)
+            {
+                _thumbCache[pageNumber] = (cached.img, DateTime.UtcNow);
+                return cached.img;
+            }
+            var targetWidth = Math.Max(80, width);
+            BitmapImage image = null;
+            try
+            {
+                image = await Task.Run(() => LoadThumbnailFromSource(pageNumber, targetWidth, height <= 0 ? 0 : height), cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) { return CreatePlaceholderImage("Cancelado", width, height); }
+            catch { /* ignore */ }
+            if (image == null) image = CreatePlaceholderImage("Sin imagen", width, height);
+            _thumbCache[pageNumber] = (image, DateTime.UtcNow);
+            EnforceThumbCacheLimit(pageNumber);
+            return image;
+        }
+
+    private BitmapImage LoadImageFromSource(int pageNumber, int targetWidth = 0)
         {
             if (pageNumber < 0 || pageNumber >= _pages.Count) return CreatePlaceholderImage("Error", 200, 200);
 
@@ -509,6 +756,7 @@ namespace ComicReader.Services
 
             if (Directory.Exists(_filePath)) // Es una carpeta de imágenes
             {
+                using (ComicReader.ContinuousReader.PerformanceLogger.Measure("LoadImageFromSource_FileRead"))
                 using (var stream = File.OpenRead(fileName))
                 {
                     img = CreateBitmapImage(stream, pageExt);
@@ -526,68 +774,74 @@ namespace ComicReader.Services
                         switch (_archiveKind)
                         {
                             case ArchiveKind.Zip:
-                                using (var archive = ZipFile.OpenRead(_filePath))
+                                _archiveSemaphore.Wait();
+                                try
                                 {
-                                    var entry = archive.Entries.FirstOrDefault(e => e.FullName.Equals(fileName, StringComparison.OrdinalIgnoreCase));
-                                    if (entry != null)
+                                    using (ComicReader.ContinuousReader.PerformanceLogger.Measure("LoadImageFromSource_ZipExtract"))
+                                    using (var archive = ZipFile.OpenRead(_filePath))
                                     {
-                                        using (var es = entry.Open())
-                                        using (var ms = new MemoryStream())
+                                        var entry = archive.Entries.FirstOrDefault(e => e.FullName.Equals(fileName, StringComparison.OrdinalIgnoreCase));
+                                        if (entry != null)
                                         {
-                                            es.CopyTo(ms);
-                                            ms.Position = 0;
-                                            img = CreateBitmapImage(ms, pageExt);
+                                            using (var es = entry.Open())
+                                            using (var ms = new MemoryStream())
+                                            {
+                                                es.CopyTo(ms);
+                                                ms.Position = 0;
+                                                using (ComicReader.ContinuousReader.PerformanceLogger.Measure("Decode_CreateBitmapImage"))
+                                                {
+                                                    // Limit concurrent decodes to avoid CPU saturation
+                                                    _decodeSemaphore.Wait();
+                                                    try
+                                                    {
+                                                        img = CreateBitmapImage(ms, pageExt, targetWidth);
+                                                    }
+                                                    finally { try { _decodeSemaphore.Release(); } catch { } }
+                                                }
+                                            }
                                         }
                                     }
                                 }
-                                break;
-                            case ArchiveKind.Rar:
-                                using (var archive = RarArchive.Open(_filePath))
+                                catch (Exception ex)
                                 {
-                                    var entry = archive.Entries.FirstOrDefault(e => e.Key.Equals(fileName, StringComparison.OrdinalIgnoreCase));
-                                    if (entry != null)
-                                    {
-                                        using (var es = entry.OpenEntryStream())
-                                        using (var ms = new MemoryStream())
-                                        {
-                                            es.CopyTo(ms);
-                                            ms.Position = 0;
-                                            img = CreateBitmapImage(ms, pageExt);
-                                        }
-                                    }
+                                    Logger.LogException($"Error extracting image from zip: {_filePath} -> {fileName}", ex);
+                                    throw;
                                 }
-                                break;
-                            case ArchiveKind.Tar:
-                                using (var archive = TarArchive.Open(_filePath))
-                                {
-                                    var entry = archive.Entries.FirstOrDefault(e => e.Key.Equals(fileName, StringComparison.OrdinalIgnoreCase));
-                                    if (entry != null)
-                                    {
-                                        using (var es = entry.OpenEntryStream())
-                                        using (var ms = new MemoryStream())
-                                        {
-                                            es.CopyTo(ms);
-                                            ms.Position = 0;
-                                            img = CreateBitmapImage(ms, pageExt);
-                                        }
-                                    }
-                                }
+                                finally { _archiveSemaphore.Release(); }
                                 break;
                             case ArchiveKind.SevenZip:
-                                using (var archive = SevenZipArchive.Open(_filePath))
+                                _archiveSemaphore.Wait();
+                                try
                                 {
-                                    var entry = archive.Entries.FirstOrDefault(e => e.Key.Equals(fileName, StringComparison.OrdinalIgnoreCase));
-                                    if (entry != null)
+                                    using (var archive = SevenZipArchive.Open(_filePath))
                                     {
-                                        using (var es = entry.OpenEntryStream())
-                                        using (var ms = new MemoryStream())
+                                        var entry = archive.Entries.FirstOrDefault(e => e.Key.Equals(fileName, StringComparison.OrdinalIgnoreCase));
+                                        if (entry != null)
                                         {
-                                            es.CopyTo(ms);
-                                            ms.Position = 0;
-                                            img = CreateBitmapImage(ms, pageExt);
+                                                using (var es = entry.OpenEntryStream())
+                                                using (var ms = new MemoryStream())
+                                                {
+                                                    es.CopyTo(ms);
+                                                    ms.Position = 0;
+                                                    using (ComicReader.ContinuousReader.PerformanceLogger.Measure("Decode_CreateBitmapImage"))
+                                                    {
+                                                        _decodeSemaphore.Wait();
+                                                        try
+                                                        {
+                                                            img = CreateBitmapImage(ms, pageExt, targetWidth);
+                                                        }
+                                                        finally { try { _decodeSemaphore.Release(); } catch { } }
+                                                    }
+                                                }
                                         }
                                     }
                                 }
+                                catch (Exception ex)
+                                {
+                                    Logger.LogException($"Error extracting image from 7z: {_filePath} -> {fileName}", ex);
+                                    throw;
+                                }
+                                finally { _archiveSemaphore.Release(); }
                                 break;
                             default:
                                 // fallback conservador: intentar con ReaderFactory secuencialmente
@@ -602,7 +856,15 @@ namespace ComicReader.Services
                                             {
                                                 reader.WriteEntryTo(ms);
                                                 ms.Position = 0;
-                                                img = CreateBitmapImage(ms, pageExt);
+                                                using (ComicReader.ContinuousReader.PerformanceLogger.Measure("Decode_CreateBitmapImage"))
+                                                {
+                                                    _decodeSemaphore.Wait();
+                                                    try
+                                                    {
+                                                        img = CreateBitmapImage(ms, pageExt, targetWidth);
+                                                    }
+                                                    finally { try { _decodeSemaphore.Release(); } catch { } }
+                                                }
                                             }
                                             break;
                                         }
@@ -769,7 +1031,7 @@ namespace ComicReader.Services
                                     int w = pageReader.GetPageWidth();
                                     int h = pageReader.GetPageHeight();
                                     var bytes = pageReader.GetImage();
-                                    using (var ms = EncodePngFromBgra(bytes, w, h))
+                                    using (var ms = EncodeBmpFromBgra(bytes, w, h))
                                     { ms.Position = 0; return CreateThumbnailImage(ms, width, height); }
                                 }
                             }
@@ -809,7 +1071,7 @@ namespace ComicReader.Services
         }
 
         // Ruta optimizada para formatos comunes usando extensión; fallback a ImageSharp si no es compatible
-        private BitmapImage CreateBitmapImage(Stream stream, string extension)
+        private BitmapImage CreateBitmapImage(Stream stream, string extension, int targetWidth = 0)
         {
             try
             {
@@ -817,7 +1079,9 @@ namespace ComicReader.Services
                 {
                     // Decodificación con downscale preventivo para evitar cargar imágenes gigantes a resolución completa.
                     // Usamos el ancho objetivo desde Settings (PdfRenderWidth como aproximación) o 2000px por defecto.
-                    int targetWidth = Math.Max(600, SettingsManager.Settings?.PdfRenderWidth ?? 2000);
+                    int maxTarget = SettingsManager.Settings?.PdfRenderWidth ?? MaxDecodeWidth;
+                    // Si se pasó un targetWidth válido, usarlo (permitir que la UI pida un tamaño más ajustado)
+                    if (targetWidth <= 0) targetWidth = Math.Max(600, Math.Min(maxTarget, MaxDecodeWidth));
                     var img = new BitmapImage();
                     img.BeginInit();
                     img.CacheOption = BitmapCacheOption.OnLoad;
@@ -830,17 +1094,60 @@ namespace ComicReader.Services
 
                 // Fallback a ImageSharp para formatos no compatibles nativamente (webp/heic/etc.)
                 stream.Position = 0;
-                var image = SixLabors.ImageSharp.Image.Load(stream);
-                using (var ms = new MemoryStream())
+                // Ejecutar la carga/resize/encode en un Task separado y con timeout para evitar bloqueos extremos
+                try
                 {
-                    // Nota: evitamos dependencias de procesamiento (Mutate/Resize) para no añadir paquetes.
-                    // Se confía en DecodePixelWidth (arriba) en rutas WPF para escalar de forma eficiente.
-                    image.Save(ms, new SixLabors.ImageSharp.Formats.Png.PngEncoder());
-                    ms.Position = 0;
+                    // Si el token interno fue cancelado antes de iniciar, evitar comenzar trabajo costoso
+                    if (_internalCts != null && _internalCts.IsCancellationRequested)
+                        return CreatePlaceholderImage("Cancelado", 200, 200);
+
+                    var bmpTask = Task.Run(() =>
+                    {
+                        var image = SixLabors.ImageSharp.Image.Load(stream);
+                        int localMaxTarget = SettingsManager.Settings?.PdfRenderWidth ?? MaxDecodeWidth;
+                        int localTargetWidth = Math.Max(600, Math.Min(localMaxTarget, MaxDecodeWidth));
+                        if (image.Width > localTargetWidth)
+                        {
+                            image.Mutate(ctx => ctx.Resize(new SixLabors.ImageSharp.Processing.ResizeOptions
+                            {
+                                Size = new SixLabors.ImageSharp.Size(localTargetWidth, 0),
+                                Mode = SixLabors.ImageSharp.Processing.ResizeMode.Max,
+                                Sampler = KnownResamplers.Lanczos3
+                            }));
+                        }
+                        using (var ms = new MemoryStream())
+                        {
+                            // Usar JPEG para codificación más rápida y menor tamaño en disco; calidad razonable
+                            var jpegEncoder = new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder { Quality = 85 };
+                            image.Save(ms, jpegEncoder);
+                            ms.Position = 0;
+                            var img = new BitmapImage();
+                            img.BeginInit();
+                            img.StreamSource = ms;
+                            img.CacheOption = BitmapCacheOption.OnLoad;
+                            img.EndInit();
+                            img.Freeze();
+                            return img;
+                        }
+                    }, _internalCts?.Token ?? CancellationToken.None);
+
+                    // Esperar con timeout; si supera el límite devolvemos placeholder para no bloquear más
+                    if (!bmpTask.Wait(TimeSpan.FromSeconds(8)))
+                    {
+                        // Cancel is not supported inside ImageSharp load, so just return a placeholder
+                        return CreatePlaceholderImage("Sin imagen (timeout)", 200, 200);
+                    }
+                    return bmpTask.Result;
+                }
+                catch
+                {
+                    // Si falla ImageSharp, intentar fallback a BitmapImage básico
                     var img = new BitmapImage();
                     img.BeginInit();
-                    img.StreamSource = ms;
+                    try { stream.Position = 0; } catch { }
+                    img.StreamSource = stream;
                     img.CacheOption = BitmapCacheOption.OnLoad;
+                    img.DecodePixelWidth = Math.Max(600, SettingsManager.Settings?.PdfRenderWidth ?? MaxDecodeWidth);
                     img.EndInit();
                     img.Freeze();
                     return img;
@@ -853,7 +1160,7 @@ namespace ComicReader.Services
                 img.BeginInit();
                 img.StreamSource = stream;
                 img.CacheOption = BitmapCacheOption.OnLoad;
-                img.DecodePixelWidth = Math.Max(600, SettingsManager.Settings?.PdfRenderWidth ?? 2000);
+                img.DecodePixelWidth = Math.Max(600, SettingsManager.Settings?.PdfRenderWidth ?? MaxDecodeWidth);
                 img.EndInit();
                 img.Freeze();
                 return img;
@@ -863,14 +1170,17 @@ namespace ComicReader.Services
         // Mantener compatibilidad con llamadas existentes
         private BitmapImage CreateBitmapImage(Stream stream)
         {
-            return CreateBitmapImage(stream, string.Empty);
+            return CreateBitmapImage(stream, string.Empty, 0);
         }
 
         private BitmapImage BitmapToImageSource(Bitmap bitmap)
         {
             using (var ms = new MemoryStream())
             {
-                bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                // Guardar como BMP (sin compresión) para reducir tiempo de CPU en la conversión
+                #pragma warning disable CA1416 // System.Drawing API used for internal bitmap roundtrip (Windows-only)
+                bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                #pragma warning restore CA1416
                 ms.Position = 0;
                 return CreateBitmapImage(ms);
             }
@@ -884,7 +1194,8 @@ namespace ComicReader.Services
             var pixelFormat = System.Windows.Media.PixelFormats.Bgra32;
             var stride = (width * pixelFormat.BitsPerPixel + 7) / 8;
             var bmp = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, bgraBytes, stride);
-            var encoder = new PngBitmapEncoder();
+            // Usar BMP encoder (sin compresión) para minimizar overhead de CPU vs PNG
+            var encoder = new BmpBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(bmp));
             using (var ms = new MemoryStream())
             {
@@ -895,14 +1206,14 @@ namespace ComicReader.Services
         }
 
         // Devuelve un MemoryStream con PNG a partir de BGRA (útil para miniaturas)
-        private MemoryStream EncodePngFromBgra(byte[] bgraBytes, int width, int height)
+        private MemoryStream EncodeBmpFromBgra(byte[] bgraBytes, int width, int height)
         {
             var dpiX = 96d;
             var dpiY = 96d;
             var pixelFormat = System.Windows.Media.PixelFormats.Bgra32;
             var stride = (width * pixelFormat.BitsPerPixel + 7) / 8;
             var bmp = BitmapSource.Create(width, height, dpiX, dpiY, pixelFormat, null, bgraBytes, stride);
-            var encoder = new PngBitmapEncoder();
+            var encoder = new BmpBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(bmp));
             var ms = new MemoryStream();
             encoder.Save(ms);
@@ -912,16 +1223,63 @@ namespace ComicReader.Services
 
         private BitmapImage CreatePlaceholderImage(string text, int width, int height)
         {
-            using (var image = new System.Drawing.Bitmap(width, height))
-            using (var g = System.Drawing.Graphics.FromImage(image))
-            using (var font = new System.Drawing.Font("Arial", 24))
+            try
             {
-                g.Clear(System.Drawing.Color.White);
-                var size = g.MeasureString(text, font);
-                var x = Math.Max(0, (width - size.Width) / 2);
-                var y = Math.Max(0, (height - size.Height) / 2);
-                g.DrawString(text, font, System.Drawing.Brushes.Gray, new System.Drawing.PointF(x, y));
-                return BitmapToImageSource(image);
+                if (width <= 0) width = 200;
+                if (height <= 0) height = 200;
+
+                var dv = new DrawingVisual();
+                using (var dc = dv.RenderOpen())
+                {
+                    // Background
+                    dc.DrawRectangle(System.Windows.Media.Brushes.White, null, new Rect(0, 0, width, height));
+
+                    // Formatted text (WPF)
+                    var typeface = new Typeface("Segoe UI");
+                    double fontSize = Math.Max(12, Math.Min(36, Math.Min(width, height) / 10.0));
+                    var ft = new FormattedText(
+                        text ?? string.Empty,
+                        CultureInfo.CurrentCulture,
+                        FlowDirection.LeftToRight,
+                        typeface,
+                        fontSize,
+                        System.Windows.Media.Brushes.Gray,
+                        1.0);
+
+                    // Wrap if too wide
+                    ft.MaxTextWidth = Math.Max(20, width - 20);
+                    // Center
+                    double x = Math.Max(0, (width - ft.Width) / 2);
+                    double y = Math.Max(0, (height - ft.Height) / 2);
+                    dc.DrawText(ft, new System.Windows.Point(x, y));
+                }
+
+                var rtb = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+                rtb.Render(dv);
+
+                var encoder = new BmpBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(rtb));
+                using (var ms = new MemoryStream())
+                {
+                    encoder.Save(ms);
+                    ms.Position = 0;
+                    return CreateBitmapImage(ms);
+                }
+            }
+            catch
+            {
+                // Fallback sencillo: devolver un BitmapImage vacío usando a memory stream
+                var img = new BitmapImage();
+                try
+                {
+                    img.BeginInit();
+                    img.StreamSource = new MemoryStream();
+                    img.CacheOption = BitmapCacheOption.OnLoad;
+                    img.EndInit();
+                    img.Freeze();
+                }
+                catch { }
+                return img;
             }
         }
 
@@ -930,13 +1288,159 @@ namespace ComicReader.Services
         public void PreloadPages(int currentPageNumber)
         {
             int window = _prefetchWindow > 0 ? _prefetchWindow : 4;
+            // Priorizar páginas cercanas y limitar concurrencia para no saturar el I/O
+            var toLoad = new List<int>();
             for (int i = 1; i <= window; i++)
             {
                 int prev = currentPageNumber - i;
                 int next = currentPageNumber + i;
-                if (prev >= 0 && !_pageCache.ContainsKey(prev)) _ = Task.Run(async () => await GetPageImageAsync(prev));
-                if (next < _pages.Count && !_pageCache.ContainsKey(next)) _ = Task.Run(async () => await GetPageImageAsync(next));
+                if (prev >= 0 && !_pageCache.ContainsKey(prev)) toLoad.Add(prev);
+                if (next < _pages.Count && !_pageCache.ContainsKey(next)) toLoad.Add(next);
             }
+
+            if (toLoad.Count == 0) return;
+
+            // Use shared prefetch semaphore to avoid I/O saturation and avoid duplicate loads
+            foreach (var idx in toLoad)
+            {
+                if (_pageCache.ContainsKey(idx)) continue; // already loaded
+                // start a background load if not already in-flight
+                // Enqueue as low priority work so visible page loads take precedence
+                ComicReader.ContinuousReader.PerformanceLogger.Log($"Enqueue prefetch page {idx}");
+                _renderer.Enqueue(async () =>
+                {
+                    using (ComicReader.ContinuousReader.PerformanceLogger.Measure($"Prefetch page {idx}"))
+                    {
+                    // Deduplicate via _ongoingPageLoads similar to previous logic
+                    var task = _ongoingPageLoads.GetOrAdd(idx, k => Task.Run(async () =>
+                    {
+                        await _prefetchSemaphore.WaitAsync().ConfigureAwait(false);
+                        try
+                        {
+                            if (!_thumbCache.ContainsKey(idx))
+                            {
+                                try { await GetPageThumbnailAsync(idx, 300, 0, _internalCts.Token).ConfigureAwait(false); } catch { }
+                            }
+                                if (!_pageCache.ContainsKey(idx))
+                            {
+                                var bmp = await Task.Run(() => LoadImageFromSource(idx, 1200), _internalCts.Token).ConfigureAwait(false);
+                                if (bmp != null) _pageCache[idx] = (bmp, DateTime.UtcNow);
+                            }
+                            return _pageCache.TryGetValue(idx, out var v) ? v.img : CreatePlaceholderImage("Sin imagen", 200, 200);
+                        }
+                        catch { return CreatePlaceholderImage("Sin imagen", 200, 200); }
+                        finally { _prefetchSemaphore.Release(); _ongoingPageLoads.TryRemove(idx, out Task<BitmapImage> _dummy); }
+                    }, _internalCts?.Token ?? CancellationToken.None));
+                    try { await task.ConfigureAwait(false); } catch { }
+                    }
+                }, highPriority: false);
+            }
+
+        }
+
+        public void ClearCaches()
+        {
+            try
+            {
+                _pageCache.Clear();
+                _thumbCache.Clear();
+                _ongoingPageLoads.Clear();
+                _quickCachedAt.Clear();
+                _lastSwapMs = 0;
+                Logger.Log("ComicPageLoader caches cleared.");
+            }
+            catch { }
+        }
+
+    // Start a deduplicated, bounded full-image load for a page (used when thumbnail is shown first)
+    private Task<BitmapImage> StartFullLoadForPageAsync(int pageNumber, int targetWidth = 0, CancellationToken cancellationToken = default)
+        {
+            // Enqueue the full load as high priority so it runs before prefetch jobs
+            var tcs = new TaskCompletionSource<BitmapImage>(TaskCreationOptions.RunContinuationsAsynchronously);
+            ComicReader.ContinuousReader.PerformanceLogger.Log($"Enqueue full load page {pageNumber}");
+            _renderer.Enqueue(async () =>
+            {
+                using (ComicReader.ContinuousReader.PerformanceLogger.Measure($"FullLoad page {pageNumber}"))
+                {
+                var task = _ongoingPageLoads.GetOrAdd(pageNumber, k =>
+                {
+                    // Create a task that performs the full load and is cancelable via linkedCTS
+                    return Task.Run(async () =>
+                    {
+                        CancellationTokenSource linkedCts = null;
+                        try
+                        {
+                            await _prefetchSemaphore.WaitAsync().ConfigureAwait(false);
+                            if (cancellationToken.IsCancellationRequested || _internalCts.IsCancellationRequested)
+                                return CreatePlaceholderImage("Cancelado", 200, 200);
+
+                            linkedCts = cancellationToken.CanBeCanceled ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _internalCts.Token) : CancellationTokenSource.CreateLinkedTokenSource(_internalCts.Token);
+                            var tokenToUse = linkedCts.Token;
+                            var sw = System.Diagnostics.Stopwatch.StartNew();
+                            var bmp = await Task.Run(() => LoadImageFromSource(k, targetWidth), tokenToUse).ConfigureAwait(false);
+                            sw.Stop();
+                            if (bmp == null) bmp = CreatePlaceholderImage("Sin imagen", 200, 200);
+                            _pageCache[k] = (bmp, DateTime.UtcNow);
+                            try { FullImageReady?.Invoke(k, bmp); } catch { }
+                            EnforcePageCacheLimit(k);
+                            if (_quickCachedAt.TryRemove(k, out var quickTs))
+                            {
+                                var swapMs = (DateTime.UtcNow - quickTs).TotalMilliseconds;
+                                _lastSwapMs = swapMs;
+                                _log?.Log($"Swap thumbnail->full for page {k} took {swapMs:F0}ms (decode {sw.ElapsedMilliseconds}ms)", LogLevel.Info);
+                            }
+                            return bmp;
+                        }
+                        catch (OperationCanceledException) { return CreatePlaceholderImage("Cancelado", 200, 200); }
+                        catch (Exception ex)
+                        {
+                            try { Logger.LogException($"Error loading full image for page {pageNumber}", ex); } catch { }
+                            return CreatePlaceholderImage("Sin imagen", 200, 200);
+                        }
+                        finally
+                        {
+                            try { _prefetchSemaphore.Release(); } catch { }
+                            try { _ongoingPageLoads.TryRemove(pageNumber, out _); } catch { }
+                            try { linkedCts?.Dispose(); } catch { }
+                        }
+                    }, _internalCts?.Token ?? CancellationToken.None);
+                });
+
+                try
+                {
+                    var res = await task.ConfigureAwait(false);
+                    tcs.TrySetResult(res);
+                }
+                catch (OperationCanceledException) { tcs.TrySetCanceled(); }
+                catch (Exception ex) { tcs.TrySetException(ex); }
+                }
+            }, highPriority: true);
+
+            return tcs.Task;
+        }
+
+        private void DetectAndAdjustPrefetch()
+        {
+            try
+            {
+                // Intento simple: medir latencia de lectura secuencial de 4KB para estimar disco
+                var testFile = _filePath ?? Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)).FirstOrDefault();
+                if (string.IsNullOrEmpty(testFile) || !File.Exists(testFile)) return;
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+                using (var fs = File.OpenRead(testFile))
+                {
+                    byte[] buffer = new byte[4096];
+                    fs.Read(buffer, 0, buffer.Length);
+                }
+                sw.Stop();
+                var latency = sw.Elapsed.TotalMilliseconds;
+                // heurística: si lectura < 5ms -> SSD, aumentar concurrencia; si > 30ms -> HDD, reducir
+                    // heurística: si lectura < 8ms -> SSD, aumentar ventana de prefetch; si > 30ms -> HDD, reducir
+                    if (latency < 8) _prefetchWindow = Math.Min(8, _prefetchWindow + 1);
+                    else if (latency > 30) _prefetchWindow = Math.Max(1, _prefetchWindow - 1);
+                _log?.Log($"Storage read latency heuristic: {latency:F1}ms", LogLevel.Info);
+            }
+            catch { }
         }
 
         private void EnforcePageCacheLimit(int currentPage)
@@ -969,6 +1473,12 @@ namespace ComicReader.Services
         {
             if (disposing)
             {
+#if DEBUG
+                _log?.Log("Disposing ComicPageLoader and cancelling internal operations.");
+#endif
+                try { _internalCts?.Cancel(); } catch { }
+                try { _internalCts?.Dispose(); } catch { }
+
                 _pageCache.Clear();
                 _thumbCache.Clear();
                 _pages.Clear();
@@ -980,6 +1490,16 @@ namespace ComicReader.Services
                 try { _djvuDocument?.Dispose(); } catch {}
 #endif
                 Logger.Log("ComicPageLoader disposed.");
+                // Wait a short time for any ongoing page load tasks to finish to avoid orphaned background work.
+                try
+                {
+                    var ongoing = _ongoingPageLoads?.Values.ToArray();
+                    if (ongoing != null && ongoing.Length > 0)
+                    {
+                        try { Task.WaitAll(ongoing, 3000); } catch { }
+                    }
+                }
+                catch { }
             }
         }
 
@@ -1261,7 +1781,7 @@ namespace ComicReader.Services
                         }
                     }
                     return img;
-                });
+                }, _internalCts?.Token ?? CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -1275,8 +1795,8 @@ namespace ComicReader.Services
             var img = new BitmapImage();
             img.BeginInit();
             img.StreamSource = stream;
-            img.DecodePixelWidth = width;
-            img.DecodePixelHeight = height;
+            // Decodificar por ancho preferentemente para mantener aspecto y evitar distorsión.
+            img.DecodePixelWidth = Math.Max(80, Math.Min(width, 1600));
             img.CacheOption = BitmapCacheOption.OnLoad;
             img.EndInit();
             img.Freeze();
@@ -1458,7 +1978,7 @@ namespace ComicReader.Services
                             Logger.LogException($"Fallback generic reader failed for {_filePath}", ex);
                             throw;
                         }
-                    });
+                    }, _internalCts?.Token ?? CancellationToken.None);
                     break;
             }
         }

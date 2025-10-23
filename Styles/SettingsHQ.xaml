@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Minimal SettingsHQ resources placeholder to avoid empty file/parsing errors -->
+  <SolidColorBrush x:Key="SettingsHQAccent" Color="#FFCC00"/>
+</ResourceDictionary>

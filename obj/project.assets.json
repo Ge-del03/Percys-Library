@@ -326,7 +326,7 @@
     "version": "1.0.0",
     "restore": {
       "projectUniqueName": "C:\\Users\\O11CE\\OneDrive\\Desktop\\Percy Library\\ComicReader.csproj",
-      "projectName": "PercysLibrary",
+      "projectName": "ComicReader",
       "projectPath": "C:\\Users\\O11CE\\OneDrive\\Desktop\\Percy Library\\ComicReader.csproj",
       "packagesPath": "C:\\Users\\O11CE\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\O11CE\\OneDrive\\Desktop\\Percy Library\\obj\\",

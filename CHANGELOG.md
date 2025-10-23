@@ -111,6 +111,19 @@
 
 ---
 
+## [Unreleased] - 2025-10-20
+
+### ✅ Correcciones rápidas
+- Corregidos errores de compilación debido a archivos faltantes y firmas de interfaz. (Stubs agregados para `IComicSource` y `PrioritizedRenderer`)
+- Eliminada advertencia en `MainWindow.cs` y alineada la implementación de `ComicPageLoader` con su interfaz.
+
+### 🛠️ Mejoras internas
+- Añadido `continuousReader.CacheManager` (implemetación ligera) para gestión de caché en memoria.
+- Añadido `continuousReader.PerformanceLogger` y métricas en `ComicPageLoader` para medir latencias de carga y decodificación.
+ - Ajustado límite de concurrencia para prefetch en `ComicPageLoader` a un máximo de 4 tareas concurrentes por defecto. Esto ayuda a reducir picos de CPU durante la decodificación de imágenes en discos rápidos.
+ - Compat shim temporal para `CacheManager` añadido para minimizar cambios en call-sites; se recomienda refactorizar `ComicPageLoader` para usar la API explícita (`Set`, `TryGet`, `TryRemove`).
+
+
 ## [Versión 1.0.0] - 2024-08-15
 
 ### 🎉 **Lanzamiento Inicial**

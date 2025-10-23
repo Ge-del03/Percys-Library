@@ -14,6 +14,7 @@
             <Setter Property="Background" Value="{DynamicResource ItemBackgroundBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="2"/>
+            <EventSetter Event="Loaded" Handler="OnThumbnailItemLoaded"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListViewItem">
@@ -21,7 +22,11 @@
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="8"
-                                Padding="{TemplateBinding Padding}">
+                                Padding="{TemplateBinding Padding}"
+                                Opacity="1">
+                            <Border.RenderTransform>
+                                <TranslateTransform Y="0" />
+                            </Border.RenderTransform>
                             <ContentPresenter/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -39,6 +44,7 @@
                                 <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
                                 <Setter Property="BorderThickness" Value="4"/>
                             </DataTrigger>
+                            <!-- Animación de entrada al cargar el item -->
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -159,10 +165,13 @@
         </Grid>
 
         <!-- Grid de miniaturas -->
-        <ListView Grid.Row="1" ItemsSource="{Binding Thumbnails}"
+    <ListView Grid.Row="1" ItemsSource="{Binding Thumbnails}"
                   ItemContainerStyle="{StaticResource ThumbnailItemStyle}"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+          ScrollViewer.VerticalScrollBarVisibility="Auto"
+          VirtualizingPanel.IsVirtualizing="True"
+          VirtualizingPanel.VirtualizationMode="Recycling"
+          ScrollViewer.CanContentScroll="False"
                   Background="Transparent" BorderThickness="0"
                   Padding="10"
                   Visibility="{Binding IsNotLoading, Converter={StaticResource BoolToVisibilityConverter}}">

@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Windows.Controls;
+using System.Threading;
 using Microsoft.Win32;
 using System.Windows;
 using System.IO;
@@ -25,6 +26,9 @@ namespace ComicReader.Views
 {
     public partial class HomeView : System.Windows.Controls.UserControl, INotifyPropertyChanged
     {
+    private readonly System.Collections.Generic.List<Task> _bgTasks = new System.Collections.Generic.List<Task>();
+    private readonly object _bgLock = new object();
+    private readonly System.Threading.CancellationTokenSource _viewCts = new System.Threading.CancellationTokenSource();
     // Cambiar este valor cuando mejoremos la selección de portada para invalidar caché
     private const string ThumbCacheVersion = "v2";
         private ObservableCollection<ComicFolderItem> _folderContents;
@@ -258,8 +262,24 @@ namespace ComicReader.Views
 
         private void HomeView_Unloaded(object sender, RoutedEventArgs e)
         {
+            // Cancelar y esperar tareas en background iniciadas por esta vista
+            try { _viewCts.Cancel(); } catch { }
+            try
+            {
+                Task[] arr;
+                lock (_bgLock) { arr = _bgTasks.ToArray(); }
+                if (arr != null && arr.Length > 0) Task.WaitAll(arr, 1200);
+            }
+            catch { }
             // Opcional: dejar suscrito para actualizaciones en background
             // UnsubscribeHistory();
+        }
+
+        private void TrackBackgroundTask(Task t)
+        {
+            if (t == null) return;
+            lock (_bgLock) { _bgTasks.Add(t); }
+            t.ContinueWith(_ => { try { lock (_bgLock) { _bgTasks.Remove(t); } } catch { } }, System.Threading.Tasks.TaskScheduler.Default);
         }
 
         private void SubscribeHistory()
@@ -296,6 +316,7 @@ namespace ComicReader.Views
                 {
                     LoadRecentComics();
                     LoadCompletedComics();
+                    try { ForceRefreshView(); } catch { }
                 }
             }
             catch { }
@@ -309,6 +330,18 @@ namespace ComicReader.Views
                 CompletedComics = new ObservableCollection<ContinueItem>(items ?? new ObservableCollection<ContinueItem>());
                 OnPropertyChanged(nameof(CompletedCount));
                 OnPropertyChanged(nameof(HasAnyContinueItems));
+                // Asegurar que las portadas persistidas o generadas se carguen para cada completado
+                try
+                {
+                    foreach (var it in CompletedComics)
+                    {
+                        if (it.CoverThumbnail == null)
+                        {
+                            TrackBackgroundTask(LoadRecentCoverAsync(it));
+                        }
+                    }
+                }
+                catch { }
             }
             catch { }
         }
@@ -367,11 +400,11 @@ namespace ComicReader.Views
             if (_viewRecentComics.Count == 0) return;
 
             int skip = (CurrentPage - 1) * PageSize;
-            foreach (var comic in _viewRecentComics.Skip(skip).Take(PageSize))
+                foreach (var comic in _viewRecentComics.Skip(skip).Take(PageSize))
             {
                 RecentComics.Add(comic);
-                if (comic.CoverThumbnail == null)
-                    _ = LoadRecentCoverAsync(comic);
+                // Forzar la carga de la portada (asegura recarga desde CoverPath/caché/loader)
+                try { TrackBackgroundTask(LoadRecentCoverAsync(comic)); } catch { }
             }
         }
 
@@ -394,6 +427,22 @@ namespace ComicReader.Views
 
         // Permitir que MainWindow fuerce un refresco al volver a Inicio
         public void RefreshRecent() => LoadRecentComics();
+
+        // Forzar refresco desde código (CollectionView refresh) para evitar caching visual
+        public void ForceRefreshView()
+        {
+            try
+            {
+                if (!Dispatcher.CheckAccess())
+                {
+                    Dispatcher.Invoke(ForceRefreshView);
+                    return;
+                }
+                try { System.Windows.Data.CollectionViewSource.GetDefaultView(RecentComics)?.Refresh(); } catch { }
+                try { System.Windows.Data.CollectionViewSource.GetDefaultView(CompletedComics)?.Refresh(); } catch { }
+            }
+            catch { }
+        }
 
         private void LoadLibraries()
         {
@@ -491,6 +540,16 @@ namespace ComicReader.Views
                 FolderContents.Clear();
                 var directory = new DirectoryInfo(folderPath);
 
+                // Build a set of tracked paths (both items and completed) to avoid showing duplicates
+                HashSet<string> tracked = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                try
+                {
+                    var svc = ComicReader.Services.ContinueReadingService.Instance;
+                    foreach (var it in svc.Items) if (!string.IsNullOrWhiteSpace(it.FilePath)) tracked.Add(Path.GetFullPath(it.FilePath));
+                    foreach (var it in svc.CompletedItems) if (!string.IsNullOrWhiteSpace(it.FilePath)) tracked.Add(Path.GetFullPath(it.FilePath));
+                }
+                catch { }
+
                 // Agregar carpetas
                 foreach (var subdir in directory.GetDirectories())
                 {
@@ -509,6 +568,13 @@ namespace ComicReader.Views
                 var comicExtensions = new[] { ".cbz", ".cbr", ".cb7", ".cbt", ".zip", ".rar", ".7z", ".tar", ".pdf", ".epub", ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".heic", ".tif", ".tiff", ".avif" };
                 foreach (var file in directory.GetFiles().Where(f => comicExtensions.Contains(f.Extension.ToLower())))
                 {
+                    // Skip files that are already tracked in 'Seguir leyendo' or 'Completados'
+                    try
+                    {
+                        var full = Path.GetFullPath(file.FullName);
+                        if (tracked.Contains(full)) continue;
+                    }
+                    catch { }
                     var comicItem = new ComicFolderItem
                     {
                         Name = Path.GetFileNameWithoutExtension(file.Name),
@@ -520,7 +586,7 @@ namespace ComicReader.Views
                     };
 
                     // Cargar miniatura de forma asíncrona
-                    _ = LoadThumbnailAsync(comicItem);
+                    TrackBackgroundTask(LoadThumbnailAsync(comicItem));
                     FolderContents.Add(comicItem);
                 }
             }
@@ -570,7 +636,7 @@ namespace ComicReader.Views
                 }
 
                 // Reutilizar caché de portadas de recientes para rapidez
-                var cached = TryLoadThumbFromCache(item.Path);
+                var cached = await TryLoadThumbFromCacheAsync(item.Path, CancellationToken.None).ConfigureAwait(false);
                 if (cached != null)
                 {
                     item.Thumbnail = cached;
@@ -578,12 +644,18 @@ namespace ComicReader.Views
                 }
 
                 BitmapImage cover = null;
-                await Task.Run(async () =>
+                var ctsThumb = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(8));
+                try
                 {
-                    using var loader = new ComicPageLoader(item.Path);
-                    await loader.LoadComicAsync();
-                    cover = await loader.GetCoverThumbnailAsync(320, 240);
-                });
+                    await Task.Run(async () =>
+                    {
+                        using var loader = new ComicPageLoader(item.Path);
+                        await loader.LoadComicAsync().ConfigureAwait(false);
+                        cover = await loader.GetCoverThumbnailAsync(320, 240).ConfigureAwait(false);
+                    }, ctsThumb.Token).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) { }
+                catch { }
 
                 if (cover != null)
                 {
@@ -907,8 +979,10 @@ namespace ComicReader.Views
         {
             try
             {
-                TabContinue.IsChecked = true;
-                TabCompleted.IsChecked = false;
+                var tabContinue = this.FindName("TabContinue") as System.Windows.Controls.Primitives.ToggleButton;
+                var tabCompleted = this.FindName("TabCompleted") as System.Windows.Controls.Primitives.ToggleButton;
+                if (tabContinue != null) tabContinue.IsChecked = true;
+                if (tabCompleted != null) tabCompleted.IsChecked = false;
                 ShowContinueSection();
             }
             catch { }
@@ -918,8 +992,10 @@ namespace ComicReader.Views
         {
             try
             {
-                TabContinue.IsChecked = false;
-                TabCompleted.IsChecked = true;
+                var tabContinue2 = this.FindName("TabContinue") as System.Windows.Controls.Primitives.ToggleButton;
+                var tabCompleted2 = this.FindName("TabCompleted") as System.Windows.Controls.Primitives.ToggleButton;
+                if (tabContinue2 != null) tabContinue2.IsChecked = false;
+                if (tabCompleted2 != null) tabCompleted2.IsChecked = true;
                 ShowCompletedSection();
             }
             catch { }
@@ -930,16 +1006,36 @@ namespace ComicReader.Views
             try
             {
                 LoadCompletedComics();
-                CompletedPanel.Visibility = System.Windows.Visibility.Visible;
-                var sb = new System.Windows.Media.Animation.Storyboard();
-                var da = new System.Windows.Media.Animation.DoubleAnimation(0, 1, new System.Windows.Duration(TimeSpan.FromMilliseconds(220)));
-                System.Windows.Media.Animation.Storyboard.SetTarget(da, CompletedPanel);
-                System.Windows.Media.Animation.Storyboard.SetTargetProperty(da, new System.Windows.PropertyPath("Opacity"));
-                sb.Children.Add(da);
-                sb.Begin();
+                var completedPanel = this.FindName("CompletedPanel") as System.Windows.FrameworkElement;
+                if (completedPanel != null)
+                {
+                    completedPanel.Visibility = System.Windows.Visibility.Visible;
+                    var sb = new System.Windows.Media.Animation.Storyboard();
+                    var da = new System.Windows.Media.Animation.DoubleAnimation(0, 1, new System.Windows.Duration(TimeSpan.FromMilliseconds(220)));
+                    System.Windows.Media.Animation.Storyboard.SetTarget(da, completedPanel);
+                    System.Windows.Media.Animation.Storyboard.SetTargetProperty(da, new System.Windows.PropertyPath("Opacity"));
+                    sb.Children.Add(da);
+                    sb.Begin();
+                }
+                // Ensure completed carousel scrolls to start when shown
+                try
+                {
+                    var sc = this.FindName("CompletedCarouselScroll") as System.Windows.Controls.ScrollViewer;
+                    if (sc != null)
+                    {
+                        // Force layout then scroll to 0
+                        sc.Dispatcher.InvokeAsync(() =>
+                        {
+                            try { sc.ScrollToHorizontalOffset(0); } catch { }
+                        }, System.Windows.Threading.DispatcherPriority.Loaded);
+                    }
+                }
+                catch { }
                 // Hide continue elements
-                ContinueCarouselRoot.Visibility = System.Windows.Visibility.Collapsed;
-                RecentComicsListView.Visibility = System.Windows.Visibility.Collapsed;
+                var continueRoot = this.FindName("ContinueCarouselRoot") as System.Windows.FrameworkElement;
+                if (continueRoot != null) continueRoot.Visibility = System.Windows.Visibility.Collapsed;
+                var recentList = this.FindName("RecentComicsListView") as System.Windows.FrameworkElement;
+                if (recentList != null) recentList.Visibility = System.Windows.Visibility.Collapsed;
             }
             catch { }
         }
@@ -948,11 +1044,42 @@ namespace ComicReader.Views
         {
             try
             {
-                CompletedPanel.Visibility = System.Windows.Visibility.Collapsed;
-                CompletedPanel.Opacity = 0;
+                var completedPanel2 = this.FindName("CompletedPanel") as System.Windows.FrameworkElement;
+                if (completedPanel2 != null)
+                {
+                    completedPanel2.Visibility = System.Windows.Visibility.Collapsed;
+                    completedPanel2.Opacity = 0;
+                }
                 // Restore continue view
-                ContinueCarouselRoot.Visibility = IsRecentListView ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
-                RecentComicsListView.Visibility = IsRecentListView ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+                var continueRoot2 = this.FindName("ContinueCarouselRoot") as System.Windows.FrameworkElement;
+                var recentList2 = this.FindName("RecentComicsListView") as System.Windows.FrameworkElement;
+                if (continueRoot2 != null) continueRoot2.Visibility = IsRecentListView ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+                if (recentList2 != null) recentList2.Visibility = IsRecentListView ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+            }
+            catch { }
+        }
+
+        // Navegación del carrusel de Completados (misma lógica que Seguir leyendo)
+        private void CompletedCarouselPrev_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            try
+            {
+                var sv = this.FindName("CompletedCarouselScroll") as System.Windows.Controls.ScrollViewer;
+                if (sv == null) return;
+                double page = sv.ViewportWidth * 0.9;
+                sv.ScrollToHorizontalOffset(Math.Max(0, sv.HorizontalOffset - page));
+            }
+            catch { }
+        }
+
+        private void CompletedCarouselNext_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            try
+            {
+                var sv = this.FindName("CompletedCarouselScroll") as System.Windows.Controls.ScrollViewer;
+                if (sv == null) return;
+                double page = sv.ViewportWidth * 0.9;
+                sv.ScrollToHorizontalOffset(Math.Min(sv.ScrollableWidth, sv.HorizontalOffset + page));
             }
             catch { }
         }
@@ -996,11 +1123,34 @@ namespace ComicReader.Views
                 var placeholder = LoadAppIconImage();
                 comic.CoverThumbnail = placeholder;
 
-                // Intentar cargar desde caché
-                var cached = TryLoadThumbFromCache(comic.FilePath);
+                // Si el item ya tiene una CoverPath persistida, cargarla primero
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(comic.CoverPath) && File.Exists(comic.CoverPath))
+                    {
+                        var bi = new BitmapImage();
+                        using (var fs = File.OpenRead(comic.CoverPath))
+                        {
+                            bi.BeginInit();
+                            bi.CacheOption = BitmapCacheOption.OnLoad;
+                            bi.StreamSource = fs;
+                            bi.EndInit();
+                            bi.Freeze();
+                        }
+                        comic.CoverThumbnail = bi;
+                        // Log
+                        try { File.AppendAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\logs\\cover_debug.log"), DateTime.Now.ToString("o") + " HomeView: loaded CoverPath for " + comic.FilePath + Environment.NewLine); } catch { }
+                        return;
+                    }
+                }
+                catch { }
+
+                // Intentar cargar desde caché temporal
+                var cached = await TryLoadThumbFromCacheAsync(comic.FilePath, CancellationToken.None).ConfigureAwait(false);
                 if (cached != null)
                 {
-                    comic.CoverThumbnail = cached;
+                    // assign on UI thread
+                    System.Windows.Application.Current.Dispatcher.Invoke(() => comic.CoverThumbnail = cached);
                     return;
                 }
 
@@ -1011,12 +1161,18 @@ namespace ComicReader.Views
                     if (File.Exists(comic.FilePath) || Directory.Exists(comic.FilePath))
                     {
                         BitmapImage cover = null;
-                        await Task.Run(async () =>
+                        var ctsCover = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(10));
+                        try
                         {
-                            using var loader = new ComicPageLoader(comic.FilePath);
-                            await loader.LoadComicAsync();
-                            cover = await loader.GetCoverThumbnailAsync(400, 600);
-                        });
+                            await Task.Run(async () =>
+                            {
+                                using var loader = new ComicPageLoader(comic.FilePath);
+                                await loader.LoadComicAsync().ConfigureAwait(false);
+                                cover = await loader.GetCoverThumbnailAsync(400, 600).ConfigureAwait(false);
+                            }, ctsCover.Token).ConfigureAwait(false);
+                        }
+                        catch (OperationCanceledException) { }
+                        catch { }
 
                         if (cover != null)
                         {
@@ -1024,7 +1180,21 @@ namespace ComicReader.Views
                             System.Windows.Application.Current.Dispatcher.Invoke(() =>
                             {
                                 comic.CoverThumbnail = cover;
-                                SaveThumbToCache(comic.FilePath, cover);
+                                var savedPath = SaveThumbToCache(comic.FilePath, cover);
+                                // Si guardamos correctamente en la caché, usar esa ruta como CoverPath y persistir via servicio
+                                try
+                                {
+                                    if (!string.IsNullOrWhiteSpace(savedPath))
+                                    {
+                                        comic.CoverPath = savedPath;
+                                        // Guardar metadata inmediatamente
+                                        try { ComicReader.Services.ContinueReadingService.Instance.Save(); } catch { }
+                                    }
+                                    // Asegurar también la persistencia 'oficial' en la carpeta de covers
+                                    try { _ = ComicReader.Services.ContinueReadingService.Instance.EnsurePersistedCoverAsync(comic); } catch { }
+                                }
+                                catch { }
+                                try { File.AppendAllText(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\logs\\cover_debug.log"), DateTime.Now.ToString("o") + " HomeView: generated cover for " + comic.FilePath + Environment.NewLine); } catch { }
                             });
                         }
                     }
@@ -1162,7 +1332,31 @@ namespace ComicReader.Views
             catch { return null; }
         }
 
-        private void SaveThumbToCache(string filePath, BitmapSource image)
+        private Task<BitmapImage> TryLoadThumbFromCacheAsync(string filePath, CancellationToken cancellationToken)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    if (cancellationToken.IsCancellationRequested) return null as BitmapImage;
+                    var p = GetThumbCachePath(filePath);
+                    if (!File.Exists(p)) return null as BitmapImage;
+                    var bmp = new BitmapImage();
+                    using (var fs = File.OpenRead(p))
+                    {
+                        bmp.BeginInit();
+                        bmp.CacheOption = BitmapCacheOption.OnLoad;
+                        bmp.StreamSource = fs;
+                        bmp.EndInit();
+                        bmp.Freeze();
+                    }
+                    return bmp;
+                }
+                catch { return null; }
+            }, cancellationToken);
+        }
+
+        private string SaveThumbToCache(string filePath, BitmapSource image)
         {
             try
             {
@@ -1173,8 +1367,9 @@ namespace ComicReader.Views
                     encoder.Frames.Add(BitmapFrame.Create(image));
                     encoder.Save(fs);
                 }
+                return p;
             }
-            catch { }
+            catch { return null; }
         }
 
         private void ShowRecentInFolder_Click(object sender, System.Windows.RoutedEventArgs e)

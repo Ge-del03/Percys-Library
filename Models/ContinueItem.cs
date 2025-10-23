@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
@@ -98,7 +100,39 @@ namespace ComicReader.Models
         public BitmapImage CoverThumbnail
         {
             get => _coverThumbnail;
-            set { if (!Equals(_coverThumbnail, value)) { _coverThumbnail = value; OnPropertyChanged(); } }
+            set
+            {
+                if (Equals(_coverThumbnail, value)) return;
+                _coverThumbnail = value;
+                // Notificar solamente una vez para evitar que listeners reasignen CoverPath -> reentradas
+                OnPropertyChanged(nameof(CoverThumbnail));
+            }
+        }
+
+        private string _coverPath;
+        [JsonPropertyName("coverPath")]
+        public string CoverPath
+        {
+            get => _coverPath;
+            set
+            {
+                if (_coverPath == value) return;
+                _coverPath = value;
+                OnPropertyChanged(nameof(CoverPath));
+
+                // Cargar la imagen directamente en el backing field para evitar disparar lógica
+                // en el setter de CoverThumbnail que pudiera reinvocarse y crear un bucle.
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(_coverPath) && File.Exists(_coverPath))
+                    {
+                        // NOTE: previously this setter started an untracked background load of the image file.
+                        // Loading of cover thumbnails is now the responsibility of the UI layer (HomeView/ContinueReadingService)
+                        // which already performs tracked background loads. This avoids orphaned Task.Run calls.
+                    }
+                }
+                catch { }
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
