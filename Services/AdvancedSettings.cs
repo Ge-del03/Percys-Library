@@ -30,7 +30,52 @@ namespace ComicReader.Services
         Dark,
         Comic,
         Sepia,
-        HighContrast
+        HighContrast,
+
+        // Marvel-inspired / high energy palettes
+        StarkRed,
+        PatriotBlue,
+        ArañaRoja,
+        GammaGreen,
+        AsgardGold,
+
+        // DC-inspired / heroic palettes
+        BatNight,
+        KryptonBlue,
+        MetroNeon,
+        AmazonEmerald,
+        OracleGray,
+
+        // Manga styles
+        ShonenBurst,
+        ShojoBloom,
+        SeinenNoir,
+        GekigaSepia,
+        MangaInk,
+
+        // Classic comic ages & styles
+        GoldenAge,
+        SilverAge,
+        BronzeAge,
+        PopArt,
+        Pulps,
+
+        // Retro / modern hybrids
+        NoirStrip,
+        PastelRetro,
+        NeonCyber,
+        Vaporwave,
+        Retro80s,
+
+        // Misc stylistic palettes
+        ComicPop,
+        VintagePaper,
+        CelShade,
+        CartoonBright,
+        MonochromeHighContrast,
+        PastelGentle,
+        // Exclusive app-branded theme
+        PercysLibrary
     }
 
     public class AdvancedSettings : INotifyPropertyChanged

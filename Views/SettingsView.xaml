@@ -1,112 +1,90 @@
 <UserControl x:Class="ComicReader.Views.SettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:ComicReader.Views"
-             x:Name="SettingsViewRoot"
-             Height="400" Width="600">
-    <!--
-      Diseño "Comic Premium v2":
-      - Se usan claves DynamicResource para que los Theme ResourceDictionaries las redefinan.
-      - Estructura clara: header + panel de 2 columnas con Expanders para cada sección.
-      - Componentes reutilizables (StatCard, SectionHeader).
-      - Validación de entradas numéricas y animaciones sutiles.
-      - Requiere definir recursos (brushes, fonts) en App.xaml o ResourceDictionaries de tema:
-        ComicBackgroundBrush, ComicPaperBrush, ComicCardBackgroundBrush, ComicPanelBorderBrush,
-        ComicAccentBrush, ComicAccentBrush2, ComicMutedTextBrush, ComicTextBrush, ComicNumberBrush,
-        ComicButtonBrush, ComicButtonBorderBrush, ComicFontDisplay, ComicFontPrimary.
-    -->
-
-    <UserControl.Resources>
-        <!-- Paleta alto contraste - estilo cómic -->
-        <SolidColorBrush x:Key="ComicCardBackgroundBrush">#FF0F1720</SolidColorBrush>
-        <SolidColorBrush x:Key="ComicPanelBorderBrush">#FFFFE082</SolidColorBrush>
-        <SolidColorBrush x:Key="ComicButtonBrush">#FF1F2937</SolidColorBrush>
-        <SolidColorBrush x:Key="ComicButtonBorderBrush">#FFFFC107</SolidColorBrush>
-        <SolidColorBrush x:Key="ComicTextBrush">#FFF7F7F7</SolidColorBrush>
-        <SolidColorBrush x:Key="ComicBackgroundBrush">#FF071018</SolidColorBrush>
-        <SolidColorBrush x:Key="ComicAccentBrush">#FFE63946</SolidColorBrush>
-        <SolidColorBrush x:Key="ComicAccentBrush2">#FF2ECC71</SolidColorBrush>
-        <SolidColorBrush x:Key="ComicMutedTextBrush">#FFBDBDBD</SolidColorBrush>
-        <SolidColorBrush x:Key="ComicPaperBrush">#FF0B1220</SolidColorBrush>
-        <SolidColorBrush x:Key="ComicNumberBrush">#FFFFEE99</SolidColorBrush>
-        <FontFamily x:Key="ComicFontDisplay">Segoe UI</FontFamily>
-        <FontFamily x:Key="ComicFontPrimary">Segoe UI</FontFamily>
-
-        <local:HexToBrushConverter x:Key="HexToBrushConverter"/>
-
-        <!-- Estilos reutilizables -->
-        <Style x:Key="ComicCardStyle" TargetType="Border">
-            <Setter Property="CornerRadius" Value="10"/>
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="Padding" Value="14"/>
-            <Setter Property="Margin" Value="10"/>
-            <Setter Property="Background" Value="{DynamicResource ComicCardBackgroundBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource ComicPanelBorderBrush}"/>
-            <Setter Property="SnapsToDevicePixels" Value="True"/>
-        </Style>
-
-        <Style x:Key="SectionHeader" TargetType="StackPanel">
-            <Setter Property="Orientation" Value="Horizontal"/>
-            <Setter Property="Margin" Value="0,0,0,8"/>
-        </Style>
-
-        <Style x:Key="ComicButtonStyle" TargetType="Button">
-            <Setter Property="FontFamily" Value="{DynamicResource ComicFontDisplay}"/>
-            <Setter Property="Padding" Value="10,8"/>
-            <Setter Property="Margin" Value="6"/>
-            <Setter Property="Background" Value="{DynamicResource ComicButtonBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource ComicButtonBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="Foreground" Value="{DynamicResource ComicTextBrush}"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="MinWidth" Value="110"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid>
-                            <Border x:Name="Bd" CornerRadius="6" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
-                            </Border>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Opacity" Value="0.95"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="RenderTransform">
-                                    <Setter.Value>
-                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Tarjeta estadística -->
-        <DataTemplate x:Key="StatCardTemplate">
-            <Border CornerRadius="8" BorderBrush="{DynamicResource ComicPanelBorderBrush}" BorderThickness="2" Background="{Binding BackgroundBrush, FallbackValue={DynamicResource ComicAccentBrush}}" Padding="10" Width="260" Height="120" Margin="6">
-                <StackPanel>
-                    <TextBlock Text="{Binding Title}" FontFamily="{DynamicResource ComicFontPrimary}" Foreground="{Binding TitleBrush, FallbackValue={DynamicResource ComicTextBrush}}" FontWeight="Bold"/>
-                    <TextBlock Text="{Binding Value}" FontSize="22" FontFamily="{DynamicResource ComicFontDisplay}" Foreground="{Binding ValueBrush, FallbackValue={DynamicResource ComicNumberBrush}}" FontWeight="Bold" Margin="0,8,0,0"/>
-                    <TextBlock Text="{Binding Subtitle}" FontSize="12" Foreground="{DynamicResource ComicMutedTextBrush}" Margin="0,6,0,0"/>
-                </StackPanel>
-            </Border>
-        </DataTemplate>
-
-        <!-- Animación discreta para aplicar tema -->
-        <Storyboard x:Key="ApplyThemeAnim">
-            <!-- Subtle opacity pulse instead of scaling to avoid animatability/path issues in templates -->
-            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.95" To="1" Duration="0:0:0.12" AutoReverse="True"/>
-        </Storyboard>
-    </UserControl.Resources>
-
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:conv="clr-namespace:ComicReader.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="800">
     <Grid>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="Interfaz de configuración (obsoleta)" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" />
-            <TextBlock Text="Usa la nueva ventana de Preferencias (SettingsWindow)." Margin="0,8,0,0" HorizontalAlignment="Center"/>
+        <Grid.Resources>
+            <conv:SelectedSectionToVisibilityConverter x:Key="SelectedToVisibility" />
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Left: sections + search -->
+        <StackPanel Grid.Column="0" Margin="8">
+            <TextBox x:Name="SearchBox" Margin="0,0,0,8" TextChanged="SearchBox_TextChanged" />
+            <ListBox ItemsSource="{Binding Sections}" SelectedItem="{Binding SelectedSection, Mode=TwoWay}" Height="400" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                <Button Content="Guardar" Command="{Binding SaveCommand}" Width="90" Margin="4,0" />
+                <Button Content="Aplicar" Command="{Binding ApplyCommand}" Width="90" Margin="4,0" />
+            </StackPanel>
         </StackPanel>
+
+        <!-- Right: content for selected section -->
+        <Border Grid.Column="1" Margin="8" Padding="12" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <ScrollViewer>
+                <StackPanel>
+                    <TextBlock Text="Sección: " FontWeight="Bold" />
+                    <TextBlock Text="{Binding SelectedSection}" Margin="0,0,0,12" />
+
+                    <!-- General -->
+                    <StackPanel Visibility="{Binding SelectedSection, Converter={StaticResource SelectedToVisibility}, ConverterParameter=General}">
+                        <TextBlock Text="Tema" />
+                        <ComboBox ItemsSource="{Binding AvailableThemes}" SelectedValue="{Binding AppSettings.Theme, Mode=TwoWay}"/>
+                        <CheckBox Content="Mostrar miniaturas" IsChecked="{Binding AppSettings.ThumbnailsVisible, Mode=TwoWay}" />
+                        <CheckBox Content="Modo nocturno" IsChecked="{Binding AppSettings.IsNightMode, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <!-- Apariencia -->
+                    <StackPanel Visibility="{Binding SelectedSection, Converter={StaticResource SelectedToVisibility}, ConverterParameter=Apariencia}">
+                        <TextBlock Text="Brillo" />
+                        <Slider Minimum="0.5" Maximum="1.5" Value="{Binding AppSettings.Brightness, Mode=TwoWay}" />
+                        <TextBlock Text="Contraste" Margin="0,8,0,0" />
+                        <Slider Minimum="0.5" Maximum="1.5" Value="{Binding AppSettings.Contrast, Mode=TwoWay}" />
+                        <Button Content="Restablecer apariencia avanzada" Command="{Binding ResetAdvancedAppearanceCommand}" Margin="0,8,0,0"/>
+                    </StackPanel>
+
+                    <!-- Lectura -->
+                    <StackPanel Visibility="{Binding SelectedSection, Converter={StaticResource SelectedToVisibility}, ConverterParameter=Lectura}">
+                        <CheckBox Content="Desplazamiento continuo" IsChecked="{Binding AppSettings.EnableContinuousScroll, Mode=TwoWay}" />
+                        <TextBlock Text="Paso de scroll (ratio)" Margin="0,8,0,0" />
+                        <Slider Minimum="0.1" Maximum="1.0" Value="{Binding AppSettings.PageScrollStepRatio, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <!-- Controles -->
+                    <StackPanel Visibility="{Binding SelectedSection, Converter={StaticResource SelectedToVisibility}, ConverterParameter=Controles}">
+                        <CheckBox Content="Usar espacio para siguiente página" IsChecked="{Binding AppSettings.SpacebarNextPage, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <!-- Rendimiento -->
+                    <StackPanel Visibility="{Binding SelectedSection, Converter={StaticResource SelectedToVisibility}, ConverterParameter=Rendimiento}">
+                        <TextBlock Text="Prefetch window" />
+                        <TextBox Text="{Binding AppSettings.PrefetchWindow, Mode=TwoWay}" Width="80" />
+                        <Button Content="Optimizar caché" Command="{Binding OptimizeCommand}" Margin="0,8,0,0" />
+                    </StackPanel>
+
+                    <!-- Personalizacion -->
+                    <StackPanel Visibility="{Binding SelectedSection, Converter={StaticResource SelectedToVisibility}, ConverterParameter=Personalizacion}">
+                        <TextBlock Text="Carpeta por defecto" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox Text="{Binding AppSettings.DefaultComicsFolder, Mode=TwoWay}" Width="300" />
+                            <Button Content="Cambiar" Command="{Binding ChangeFolderCommand}" Margin="8,0,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Acerca -->
+                    <StackPanel Visibility="{Binding SelectedSection, Converter={StaticResource SelectedToVisibility}, ConverterParameter=Acerca}">
+                        <TextBlock Text="Percy's Library" FontSize="16" FontWeight="Bold" />
+                        <TextBlock Text="Versión: 1.0 (stub)" />
+                        <Button Content="Ver créditos" Command="{Binding ViewCreditsCommand}" Margin="0,8,0,0" />
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
     </Grid>
 </UserControl>

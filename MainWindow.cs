@@ -28,7 +28,6 @@ namespace ComicReader
     private ComicPageLoader _comicLoader = new ComicPageLoader();
     private int _currentPageIndex;
     private HomeView _homeView; // Se inicializa tras cargar Settings
-    private SettingsView _settingsView = null; // Se inicializa tras cargar Settings
         private Image _currentComicImage;
     private ScrollViewer _readerScrollViewer;
     private Grid _readerCenterGrid;
@@ -157,7 +156,9 @@ namespace ComicReader
         public bool IsComicViewActive => _isComicOpen;
         public bool IsReaderViewActive => CurrentView == _readerScrollViewer || CurrentView == _continuousView || _isComicOpen;
         public bool IsHomeViewActive => CurrentView == _homeView;
-        public bool IsSettingsViewActive => CurrentView == _settingsView;
+        public bool IsSettingsViewActive =>
+            // Devuelve true si actualmente la ventana de Settings está abierta
+            (System.Windows.Application.Current != null && System.Windows.Application.Current.Windows.OfType<Views.SettingsWindow>().Any());
 
         public MainWindow()
         {
@@ -209,6 +210,8 @@ namespace ComicReader
             // Configurar ventana inicial
             ConfigureInitialWindowState();
             this.Closing += MainWindow_Closing;
+            // En modo DEBUG, abrir la Configuración automáticamente una vez para pruebas rápidas
+            // (DEBUG auto-open removed)
             // Loader HUD removed; no timer initialized.
         }
 
@@ -565,19 +568,41 @@ namespace ComicReader
 
         private void ShowSettingsView()
         {
-            // Cancelar cargas/miniaturas pendientes
-            try { Interlocked.Increment(ref _pageLoadSeq); } catch { }
-            try { Interlocked.Increment(ref _thumbLoadSeq); } catch { }
-            if (this.FindName("MainContentArea") is ContentControl content)
-                content.Content = _settingsView;
-            CurrentView = _settingsView;
-            _isComicOpen = false;
-            OnPropertyChanged(nameof(IsComicViewActive));
-            OnPropertyChanged(nameof(IsReaderViewActive));
-            // Ocultar miniaturas si estaban activas
-            HideThumbnailsPanel();
-            // Ocultar barra del lector
-            SetReaderTopBarVisible(false);
+            // Abrir la configuración en una ventana separada (no embebida)
+            try
+            {
+                // Si ya existe una ventana de Settings abierta, llevarla al frente.
+                var existing = System.Windows.Application.Current?.Windows
+                    .OfType<Views.SettingsWindow>()
+                    .FirstOrDefault();
+                try { ComicReader.Utils.DevLogger.Debug("ShowSettingsView invoked. Existing SettingsWindow? " + (existing != null)); } catch { }
+                // Debug message removed
+                if (existing != null)
+                {
+                    try { existing.WindowState = System.Windows.WindowState.Normal; } catch { }
+                    try { existing.Activate(); } catch { }
+                    try { existing.Focus(); } catch { }
+                }
+                else
+                {
+                    var win = new Views.SettingsWindow();
+                    try { ComicReader.Utils.DevLogger.Debug("Creating new SettingsWindow instance."); } catch { }
+                    // No establecer Owner para que sea una ventana totalmente separada
+                    win.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+                    try { win.ShowInTaskbar = true; } catch { }
+                    win.Show();
+                }
+            }
+            catch (Exception ex)
+            {
+                try { MessageBox.Show($"No se pudo abrir Configuración: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
+            }
+            finally
+            {
+                // Asegurar el mismo efecto sobre la UI principal que antes
+                try { HideThumbnailsPanel(); } catch { }
+                try { SetReaderTopBarVisible(false); } catch { }
+            }
         }
 
         private void HideThumbnailsPanel()
@@ -706,13 +731,11 @@ namespace ComicReader
         {
             try
             {
-                var win = new Views.SettingsWindow();
-                win.Owner = this;
-                win.ShowDialog();
+                ShowSettingsView();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"No se pudo abrir Configuración: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                try { MessageBox.Show($"No se pudo abrir Configuración: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
             }
         }
 

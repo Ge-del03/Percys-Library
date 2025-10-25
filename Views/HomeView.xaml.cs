@@ -39,6 +39,7 @@ namespace ComicReader.Views
         private ObservableCollection<ComicLibrary> _libraries;
     private bool _hasRecentComics;
     private bool _isRecentListView;
+        private string _continueViewMode = "Carousel"; // Carousel | Grid | List
     private int _recentCardColumns = 3;
     private bool _historySubscribed = false;
     private int _currentPage = 1;
@@ -158,6 +159,22 @@ namespace ComicReader.Views
             set { _isRecentListView = value; OnPropertyChanged(nameof(IsRecentListView)); }
         }
 
+        public string ContinueViewMode
+        {
+            get => _continueViewMode;
+            set
+            {
+                if (string.Equals(_continueViewMode, value, StringComparison.OrdinalIgnoreCase)) return;
+                _continueViewMode = value ?? "Carousel";
+                OnPropertyChanged(nameof(ContinueViewMode));
+                // Keep backward-compatible boolean in sync
+                IsRecentListView = string.Equals(_continueViewMode, "List", StringComparison.OrdinalIgnoreCase);
+                // Persist
+                try { SettingsManager.Settings.ContinueViewMode = _continueViewMode; SettingsManager.SaveSettings(); } catch { }
+                UpdateContinueViewVisibility();
+            }
+        }
+
         public int RecentCardColumns
         {
             get => _recentCardColumns;
@@ -226,7 +243,17 @@ namespace ComicReader.Views
             ReopenCompletedCommand = new RelayCommand(p => OnReopenCompleted(p as string), p => !string.IsNullOrWhiteSpace(p as string));
             ShowInFolderCommand = new RelayCommand(p => OnShowInFolder(p as string), p => !string.IsNullOrWhiteSpace(p as string));
             // Preferencias
-            IsRecentListView = SettingsManager.Settings.IsRecentListView;
+            // Inicializar modo de vista desde settings (compatibilidad con IsRecentListView)
+            try
+            {
+                var mode = SettingsManager.Settings.ContinueViewMode;
+                if (string.IsNullOrWhiteSpace(mode)) mode = SettingsManager.Settings.IsRecentListView ? "List" : "Carousel";
+                ContinueViewMode = mode;
+            }
+            catch
+            {
+                IsRecentListView = SettingsManager.Settings.IsRecentListView;
+            }
             RecentCardColumns = LoadInt("RecentCardColumns", 3);
             PageSize = LoadInt("RecentPageSize", 24);
             SortBy = LoadString("RecentSortBy", "Reciente");
@@ -1034,6 +1061,8 @@ namespace ComicReader.Views
                 // Hide continue elements
                 var continueRoot = this.FindName("ContinueCarouselRoot") as System.Windows.FrameworkElement;
                 if (continueRoot != null) continueRoot.Visibility = System.Windows.Visibility.Collapsed;
+                var gridRoot = this.FindName("ContinueGridRoot") as System.Windows.FrameworkElement;
+                if (gridRoot != null) gridRoot.Visibility = System.Windows.Visibility.Collapsed;
                 var recentList = this.FindName("RecentComicsListView") as System.Windows.FrameworkElement;
                 if (recentList != null) recentList.Visibility = System.Windows.Visibility.Collapsed;
             }
@@ -1050,11 +1079,8 @@ namespace ComicReader.Views
                     completedPanel2.Visibility = System.Windows.Visibility.Collapsed;
                     completedPanel2.Opacity = 0;
                 }
-                // Restore continue view
-                var continueRoot2 = this.FindName("ContinueCarouselRoot") as System.Windows.FrameworkElement;
-                var recentList2 = this.FindName("RecentComicsListView") as System.Windows.FrameworkElement;
-                if (continueRoot2 != null) continueRoot2.Visibility = IsRecentListView ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
-                if (recentList2 != null) recentList2.Visibility = IsRecentListView ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+                // Restore continue view (handle Carousel / Grid / List)
+                UpdateContinueViewVisibility();
             }
             catch { }
         }
@@ -1408,9 +1434,9 @@ namespace ComicReader.Views
 
         private void ToggleRecentView_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            IsRecentListView = !IsRecentListView;
-            SettingsManager.Settings.IsRecentListView = IsRecentListView;
-            SettingsManager.SaveSettings();
+            // Toggle between List and Carousel for backward compatibility
+            if (string.Equals(ContinueViewMode, "List", StringComparison.OrdinalIgnoreCase)) ContinueViewMode = "Carousel";
+            else ContinueViewMode = "List";
         }
 
         private void IncreaseCardColumns_Click(object sender, System.Windows.RoutedEventArgs e)
@@ -1591,6 +1617,112 @@ namespace ComicReader.Views
             }
         }
         
+        // Vista selector handlers
+        private void SetViewCarousel_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ContinueViewMode = "Carousel";
+        }
+
+        private void SetViewGrid_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ContinueViewMode = "Grid";
+        }
+
+        private void SetViewList_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            ContinueViewMode = "List";
+        }
+
+        private void UpdateContinueViewVisibility()
+        {
+            try
+            {
+                var continueRoot = this.FindName("ContinueCarouselRoot") as System.Windows.FrameworkElement;
+                var gridRoot = this.FindName("ContinueGridRoot") as System.Windows.FrameworkElement;
+                var recentList = this.FindName("RecentComicsListView") as System.Windows.FrameworkElement;
+
+                // Determine current visible element
+                System.Windows.FrameworkElement currentVisible = null;
+                if (continueRoot != null && continueRoot.Visibility == System.Windows.Visibility.Visible) currentVisible = continueRoot;
+                else if (gridRoot != null && gridRoot.Visibility == System.Windows.Visibility.Visible) currentVisible = gridRoot;
+                else if (recentList != null && recentList.Visibility == System.Windows.Visibility.Visible) currentVisible = recentList;
+
+                // Determine target element based on ContinueViewMode
+                System.Windows.FrameworkElement target = null;
+                if (string.Equals(ContinueViewMode, "Carousel", StringComparison.OrdinalIgnoreCase)) target = continueRoot;
+                else if (string.Equals(ContinueViewMode, "Grid", StringComparison.OrdinalIgnoreCase)) target = gridRoot;
+                else if (string.Equals(ContinueViewMode, "List", StringComparison.OrdinalIgnoreCase)) target = recentList;
+
+                // If already showing target, just ensure toggle buttons are updated
+                try
+                {
+                    var b1 = this.FindName("BtnViewCarousel") as System.Windows.Controls.Primitives.ToggleButton;
+                    var b2 = this.FindName("BtnViewGrid") as System.Windows.Controls.Primitives.ToggleButton;
+                    var b3 = this.FindName("BtnViewList") as System.Windows.Controls.Primitives.ToggleButton;
+                    if (b1 != null) b1.IsChecked = string.Equals(ContinueViewMode, "Carousel", StringComparison.OrdinalIgnoreCase);
+                    if (b2 != null) b2.IsChecked = string.Equals(ContinueViewMode, "Grid", StringComparison.OrdinalIgnoreCase);
+                    if (b3 != null) b3.IsChecked = string.Equals(ContinueViewMode, "List", StringComparison.OrdinalIgnoreCase);
+                }
+                catch { }
+
+                // If target is same as current, nothing to animate
+                if (target == currentVisible)
+                {
+                    // still ensure scroll reset for carousel
+                    if (target == continueRoot && continueRoot != null)
+                    {
+                        try { var sc = this.FindName("ContinueCarouselScroll") as System.Windows.Controls.ScrollViewer; if (sc != null) sc.Dispatcher.InvokeAsync(() => { try { sc.ScrollToHorizontalOffset(0); } catch { } }, System.Windows.Threading.DispatcherPriority.Loaded); } catch { }
+                    }
+                    return;
+                }
+
+                // Animate hide of currentVisible and show of target (fade out -> collapse, fade in -> visible)
+                try
+                {
+                    // Fade out current
+                    if (currentVisible != null)
+                    {
+                        var sbOut = new System.Windows.Media.Animation.Storyboard();
+                        var daOut = new System.Windows.Media.Animation.DoubleAnimation(1.0, 0.0, new System.Windows.Duration(TimeSpan.FromMilliseconds(160)));
+                        System.Windows.Media.Animation.Storyboard.SetTarget(daOut, currentVisible);
+                        System.Windows.Media.Animation.Storyboard.SetTargetProperty(daOut, new System.Windows.PropertyPath("Opacity"));
+                        sbOut.Children.Add(daOut);
+                        sbOut.Begin();
+                        // after short delay collapse
+                        Task.Delay(180).ContinueWith(_ =>
+                        {
+                            try { currentVisible.Dispatcher.Invoke(() => { currentVisible.Visibility = System.Windows.Visibility.Collapsed; currentVisible.Opacity = 0; }); } catch { }
+                        });
+                    }
+
+                    // Show target with fade in
+                    if (target != null)
+                    {
+                        target.Dispatcher.Invoke(() => { target.Visibility = System.Windows.Visibility.Visible; target.Opacity = 0; });
+                        var sbIn = new System.Windows.Media.Animation.Storyboard();
+                        var daIn = new System.Windows.Media.Animation.DoubleAnimation(0.0, 1.0, new System.Windows.Duration(TimeSpan.FromMilliseconds(220)));
+                        System.Windows.Media.Animation.Storyboard.SetTarget(daIn, target);
+                        System.Windows.Media.Animation.Storyboard.SetTargetProperty(daIn, new System.Windows.PropertyPath("Opacity"));
+                        sbIn.Children.Add(daIn);
+                        sbIn.Begin();
+
+                        // If switching to carousel, ensure scroll pos is reset after layout
+                        if (target == continueRoot)
+                        {
+                            try
+                            {
+                                var sc = this.FindName("ContinueCarouselScroll") as System.Windows.Controls.ScrollViewer;
+                                if (sc != null) sc.Dispatcher.InvokeAsync(() => { try { sc.ScrollToHorizontalOffset(0); } catch { } }, System.Windows.Threading.DispatcherPriority.Loaded);
+                            }
+                            catch { }
+                        }
+                    }
+                }
+                catch { }
+            }
+            catch { }
+        }
+
         // Permite que MainWindow navegue directamente a una carpeta y muestre su contenido
         public void NavigateToFolder(string folderPath)
         {

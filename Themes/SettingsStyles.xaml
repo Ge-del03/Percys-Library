@@ -1,6 +1,0 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-				xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- Estilos de ajustes mínimos: archivo placeholder para evitar error de compilación.
-	    Si había estilos presentes, reponer desde el control de versiones. -->
-
-</ResourceDictionary>

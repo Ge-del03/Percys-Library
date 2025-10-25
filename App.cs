@@ -14,6 +14,18 @@ namespace ComicReader
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            // If invoked with --validate-themes, run a headless theme validation pass and exit
+            try
+            {
+                if (e?.Args != null && e.Args.Any(a => a.Equals("--validate-themes", StringComparison.OrdinalIgnoreCase)))
+                {
+                    RunThemeValidationAndExit();
+                    return;
+                }
+            }
+            catch { }
+
             // Crear y mostrar MainWindow manualmente ahora que removimos StartupUri
             var main = new MainWindow();
             main.Show();
@@ -35,6 +47,62 @@ namespace ComicReader
             {
                 try { Logger.LogException("Error al abrir archivo por asociación", ex); } catch { }
             }
+            // Abrir último cómic si el usuario lo solicita en la configuración
+            try
+            {
+                if (SettingsManager.Settings != null && SettingsManager.Settings.OpenLastOnStartup && !string.IsNullOrWhiteSpace(SettingsManager.Settings.LastOpenedFilePath))
+                {
+                    var last = SettingsManager.Settings.LastOpenedFilePath;
+                    if (System.IO.File.Exists(last) || System.IO.Directory.Exists(last))
+                    {
+                        var mi2 = typeof(MainWindow).GetMethod("OpenComicFile", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                        mi2?.Invoke(main, new object[] { last });
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private void RunThemeValidationAndExit()
+        {
+            var results = new List<string>();
+            try
+            {
+                var themes = ComicReader.Themes.ThemeManager.GetAvailableThemes();
+                foreach (var t in themes)
+                {
+                    try
+                    {
+                        // Apply and give the dispatcher a moment
+                        ComicReader.Themes.ThemeManager.CurrentTheme = t.Mode;
+                        this.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+                        results.Add($"OK: {t.Name} ({t.Mode})");
+                    }
+                    catch (Exception ex)
+                    {
+                        results.Add($"ERROR: {t.Name} ({t.Mode}) -> {ex.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                results.Add("Fatal error during theme validation: " + ex.Message);
+            }
+
+            try
+            {
+                var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                var dir = System.IO.Path.Combine(appData, "PercysLibrary", "validation");
+                System.IO.Directory.CreateDirectory(dir);
+                var outFile = System.IO.Path.Combine(dir, "theme-validation-" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".log");
+                System.IO.File.WriteAllLines(outFile, results);
+                Logger.Log("Theme validation finished. Results written to " + outFile, LogLevel.Info);
+            }
+            catch { }
+
+            // Show a simple message and exit
+            try { MessageBox.Show("Theme validation completed. Revisa el log en %AppData%\\PercysLibrary\\validation.", "Validación de temas", MessageBoxButton.OK, MessageBoxImage.Information); } catch { }
+            Environment.Exit(0);
         }
         public App()
         {
@@ -134,6 +202,18 @@ namespace ComicReader
         {
             try
             {
+                // If the theme maps to a ThemeMode we manage programmatically, prefer that
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(themeName) && Enum.TryParse<ComicReader.Services.ThemeMode>(themeName, out var tm))
+                    {
+                        ComicReader.Themes.ThemeManager.ApplyTheme(tm);
+                        Logger.Log($"Applied programmatic theme: {themeName}", LogLevel.Info);
+                        return;
+                    }
+                }
+                catch { }
+
                 var oldThemeDictionaries = Application.Current.Resources.MergedDictionaries
                     .Where(rd => rd.Source != null && rd.Source.OriginalString.Contains("Theme.xaml"))
                     .ToList();

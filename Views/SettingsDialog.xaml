@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Window x:Class="ComicReader.Views.SettingsDialog"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Configuración (obsoleta)" Width="640" Height="420" WindowStartupLocation="CenterOwner">
-    <Grid>
-        <TextBlock Text="(Interfaz de configuración obsoleta)" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="14"/>
-    </Grid>
-</Window>

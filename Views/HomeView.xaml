@@ -20,22 +20,23 @@
             <conv:CoverPathOrThumbnailConverter x:Key="CoverPathOrThumbnailConverter" />
             
             <!-- ===== Estilos mínimos para Recientes (limpios y discretos) ===== -->
-            <SolidColorBrush x:Key="RecentsAccent" Color="#3B82F6"/>
-            <SolidColorBrush x:Key="RecentsAccentDark" Color="#2563EB"/>
-            <SolidColorBrush x:Key="RecentsDanger" Color="#EF4444"/>
-            <SolidColorBrush x:Key="RecentsDangerDark" Color="#DC2626"/>
-            <SolidColorBrush x:Key="RecentsText" Color="#F9FAFB"/>
-            <SolidColorBrush x:Key="RecentsSubtle" Color="#E5E7EB"/>
-            <SolidColorBrush x:Key="RecentsCardBg" Color="#FFFFFFFF"/>
-            <SolidColorBrush x:Key="RecentsCardBorder" Color="#E5E7EB"/>
+            <!-- Asignamos colores locales a claves del tema para que cambien con el tema seleccionado -->
+            <SolidColorBrush x:Key="RecentsAccent" Color="{DynamicResource AccentColor}"/>
+            <SolidColorBrush x:Key="RecentsAccentDark" Color="{DynamicResource PrimaryColor}"/>
+            <SolidColorBrush x:Key="RecentsDanger" Color="{DynamicResource ErrorColor}"/>
+            <SolidColorBrush x:Key="RecentsDangerDark" Color="{DynamicResource ErrorColor}"/>
+            <SolidColorBrush x:Key="RecentsText" Color="{DynamicResource TextColor}"/>
+            <SolidColorBrush x:Key="RecentsSubtle" Color="{DynamicResource SecondaryTextColor}"/>
+            <SolidColorBrush x:Key="RecentsCardBg" Color="{DynamicResource PanelBackgroundColor}"/>
+            <SolidColorBrush x:Key="RecentsCardBorder" Color="{DynamicResource BorderColor}"/>
 
             <!-- Botón base discreto -->
             <Style x:Key="RecentsButton" TargetType="Button">
                 <Setter Property="Padding" Value="10,6"/>
                 <Setter Property="Margin" Value="6,0"/>
-                <Setter Property="Foreground" Value="#111827"/>
-                <Setter Property="Background" Value="#F3F4F6"/>
-                <Setter Property="BorderBrush" Value="#D1D5DB"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="Template">
@@ -52,36 +53,36 @@
                 </Setter>
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="#E5E7EB"/>
+                        <Setter Property="Background" Value="{DynamicResource ItemHoverBrush}"/>
                     </Trigger>
                 </Style.Triggers>
             </Style>
             <!-- Botón primario -->
             <Style x:Key="RecentsPrimaryButton" TargetType="Button" BasedOn="{StaticResource RecentsButton}">
-                <Setter Property="Foreground" Value="#FFFFFF"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                 <Setter Property="Background" Value="{StaticResource RecentsAccent}"/>
                 <Setter Property="BorderBrush" Value="{StaticResource RecentsAccentDark}"/>
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="#4F83F7"/>
+                        <Setter Property="Background" Value="{DynamicResource ItemHoverBrush}"/>
                     </Trigger>
                 </Style.Triggers>
             </Style>
             <!-- Botón peligro -->
             <Style x:Key="RecentsDangerButton" TargetType="Button" BasedOn="{StaticResource RecentsButton}">
-                <Setter Property="Foreground" Value="#FFFFFF"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                 <Setter Property="Background" Value="{StaticResource RecentsDanger}"/>
                 <Setter Property="BorderBrush" Value="{StaticResource RecentsDangerDark}"/>
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="#F87171"/>
+                        <Setter Property="Background" Value="{DynamicResource ErrorHoverBrush}"/>
                     </Trigger>
                 </Style.Triggers>
             </Style>
             <!-- Tarjeta simple (más discreta en panel oscuro) -->
             <Style x:Key="RecentsCard" TargetType="Border">
-                <Setter Property="Background" Value="#FAFFFFFF"/>
-                <Setter Property="BorderBrush" Value="#E6EAF0"/>
+                <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="CornerRadius" Value="10"/>
                 <Setter Property="Padding" Value="10"/>
@@ -116,9 +117,9 @@
 
             <!-- Chip buttons (discretos) -->
             <Style x:Key="ChipButton" TargetType="Button" BasedOn="{StaticResource RecentsButton}">
-                <Setter Property="Background" Value="#14FFFFFF"/>
-                <Setter Property="Foreground" Value="#FFFFFF"/>
-                <Setter Property="BorderBrush" Value="#33FFFFFF"/>
+                <Setter Property="Background" Value="{DynamicResource OverlayBackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                 <Setter Property="Padding" Value="10,6"/>
                 <Setter Property="Margin" Value="6,0"/>
                 <Setter Property="Template">
@@ -135,35 +136,45 @@
                 </Setter>
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="#22FFFFFF"/>
+                        <Setter Property="Background" Value="{DynamicResource OverlayBackgroundBrush}"/>
                     </Trigger>
                 </Style.Triggers>
             </Style>
             <Style x:Key="ChipButtonDanger" TargetType="Button" BasedOn="{StaticResource ChipButton}">
-                <Setter Property="Background" Value="#26EF4444"/>
-                <Setter Property="BorderBrush" Value="#3DEF4444"/>
+                <Setter Property="Background" Value="{DynamicResource ErrorBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource ErrorBrush}"/>
             </Style>
 
             <!-- ToggleButton style matching ChipButton visual to use as tab toggles -->
             <Style x:Key="ChipToggleButton" TargetType="ToggleButton">
                 <Setter Property="Padding" Value="10,6"/>
                 <Setter Property="Margin" Value="6,0"/>
-                <Setter Property="Foreground" Value="#FFFFFF"/>
-                <Setter Property="Background" Value="#14FFFFFF"/>
-                <Setter Property="BorderBrush" Value="#33FFFFFF"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                <Setter Property="Background" Value="{DynamicResource OverlayBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ToggleButton">
-                            <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="16">
+                            <Border x:Name="bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="16" RenderTransformOrigin="0.5,0.5">
+                                <Border.RenderTransform>
+                                    <ScaleTransform ScaleX="1" ScaleY="1" />
+                                </Border.RenderTransform>
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="bd" Property="Background" Value="#22FFFFFF"/>
+                                    <Setter TargetName="bd" Property="Background" Value="{DynamicResource OverlayBackgroundBrush}"/>
                                 </Trigger>
                                 <Trigger Property="IsChecked" Value="True">
-                                    <Setter TargetName="bd" Property="Background" Value="#3B82F6"/>
-                                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                                    <!-- Active visual: colored background, stronger border and slight scale -->
+                                    <Setter TargetName="bd" Property="Background" Value="{StaticResource RecentsAccent}"/>
+                                    <Setter TargetName="bd" Property="BorderBrush" Value="{StaticResource RecentsAccentDark}"/>
+                                    <Setter TargetName="bd" Property="RenderTransform">
+                                        <Setter.Value>
+                                            <ScaleTransform ScaleX="1.04" ScaleY="1.04" />
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -176,7 +187,7 @@
                 <Setter Property="Padding" Value="6"/>
                 <Setter Property="Margin" Value="2,1"/>
                 <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="Foreground" Value="#E6ECF8"/>
+                <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
                 <Setter Property="SnapsToDevicePixels" Value="True"/>
                 <!-- Quitar borde de enfoque que aparece como barra al seleccionar -->
                 <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
@@ -193,7 +204,7 @@
                                       Command="{Binding DataContext.ShowInFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                       CommandParameter="{Binding FilePath}"/>
                             <Separator/>
-                            <MenuItem Header="Quitar de la lista" Foreground="#FCA5A5"
+                            <MenuItem Header="Quitar de la lista" Foreground="{DynamicResource ErrorBrush}"
                                       Command="{Binding DataContext.RemoveRecentComicCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                       CommandParameter="{Binding FilePath}"/>
                         </ContextMenu>
@@ -201,17 +212,17 @@
                 </Setter>
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="#14253A"/>
+                        <Setter Property="Background" Value="{DynamicResource OverlayBackgroundBrush}"/>
                     </Trigger>
                     <Trigger Property="IsSelected" Value="True">
-                        <Setter Property="Background" Value="#1E3A8A"/>
+                        <Setter Property="Background" Value="{DynamicResource ItemSelectedBrush}"/>
                     </Trigger>
                 </Style.Triggers>
             </Style>
             <Style x:Key="RecentsGridHeader" TargetType="GridViewColumnHeader">
-                <Setter Property="Background" Value="#1F2B45"/>
-                <Setter Property="Foreground" Value="#E6ECF8"/>
-                <Setter Property="BorderBrush" Value="#263146"/>
+                <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                 <Setter Property="BorderThickness" Value="0,0,0,1"/>
                 <Setter Property="FontFamily" Value="Segoe UI"/>
                 <Setter Property="FontWeight" Value="SemiBold"/>
@@ -223,7 +234,7 @@
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="BorderBrush" Value="Transparent"/>
                 <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="Foreground" Value="#FFFFFF"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                 <Setter Property="Padding" Value="8,4"/>
                 <Setter Property="Margin" Value="8,0"/>
                 <Setter Property="Cursor" Value="Hand"/>
@@ -238,16 +249,16 @@
                 </Setter>
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="#14FFFFFF"/>
+                        <Setter Property="Background" Value="{DynamicResource OverlayBackgroundBrush}"/>
                     </Trigger>
                 </Style.Triggers>
             </Style>
             <Style x:Key="TextDangerButton" TargetType="Button" BasedOn="{StaticResource TextActionButton}">
-                <Setter Property="Foreground" Value="#FCA5A5"/>
+                <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}"/>
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="#1AEF4444"/>
-                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                        <Setter Property="Background" Value="{DynamicResource ErrorHoverBrush}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                     </Trigger>
                 </Style.Triggers>
             </Style>
@@ -260,7 +271,7 @@
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="BorderBrush" Value="Transparent"/>
                 <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="Foreground" Value="#E6ECF8"/>
+                <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
                 <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="Template">
                     <Setter.Value>
@@ -271,11 +282,11 @@
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="root" Property="Background" Value="#14253A"/>
-                                    <Setter TargetName="root" Property="BorderBrush" Value="#263146"/>
+                                    <Setter TargetName="root" Property="Background" Value="{DynamicResource OverlayBackgroundBrush}"/>
+                                    <Setter TargetName="root" Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                                 </Trigger>
                                 <Trigger Property="IsPressed" Value="True">
-                                    <Setter TargetName="root" Property="Background" Value="#1B2E4A"/>
+                                    <Setter TargetName="root" Property="Background" Value="{DynamicResource PanelBackgroundBrush}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -287,9 +298,9 @@
             <Style x:Key="CarouselNavButton" TargetType="Button">
                 <Setter Property="Width" Value="42"/>
                 <Setter Property="Height" Value="42"/>
-                <Setter Property="Background" Value="#33000000"/>
-                <Setter Property="Foreground" Value="#FFFFFFFF"/>
-                <Setter Property="BorderBrush" Value="#55FFFFFF"/>
+                <Setter Property="Background" Value="{DynamicResource OverlayBackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="Template">
@@ -301,7 +312,7 @@
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="root" Property="Background" Value="#55000000"/>
+                                    <Setter TargetName="root" Property="Background" Value="{DynamicResource OverlayBackgroundBrush}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -310,8 +321,8 @@
             </Style>
             
             <!-- Contenedor y fondo propio para la sección de Recientes -->
-            <SolidColorBrush x:Key="RecentsPanelBackgroundBrush" Color="#FF162238"/>
-            <SolidColorBrush x:Key="RecentsPanelBorderBrush" Color="#44FFFFFF"/>
+            <SolidColorBrush x:Key="RecentsPanelBackgroundBrush" Color="{DynamicResource PanelBackgroundColor}"/>
+            <SolidColorBrush x:Key="RecentsPanelBorderBrush" Color="{DynamicResource BorderColor}"/>
             
             <Style x:Key="RecentsSectionContainer" TargetType="Border">
                 <Setter Property="Background" Value="{StaticResource RecentsPanelBackgroundBrush}"/>
@@ -337,10 +348,10 @@
     </Style>
         <!-- Estilos de Cómic -->
         <LinearGradientBrush x:Key="ComicBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#FF0F172A" Offset="0"/>
-            <GradientStop Color="#FF1F2A44" Offset="0.35"/>
-            <GradientStop Color="#FF1E3A8A" Offset="0.7"/>
-            <GradientStop Color="#FF3B82F6" Offset="1"/>
+            <GradientStop Color="{DynamicResource WindowBackgroundColor}" Offset="0"/>
+            <GradientStop Color="{DynamicResource PanelBackgroundColor}" Offset="0.35"/>
+            <GradientStop Color="{DynamicResource AccentColor}" Offset="0.7"/>
+            <GradientStop Color="{DynamicResource PrimaryColor}" Offset="1"/>
         </LinearGradientBrush>
         
         <RadialGradientBrush x:Key="HalftonePattern" Center="0.3,0.3" RadiusX="0.9" RadiusY="0.9">
@@ -354,7 +365,7 @@
         <DrawingBrush x:Key="StarburstBrush" ViewportUnits="Absolute" TileMode="Tile" Viewport="0,0,64,64" Stretch="None">
             <DrawingBrush.Drawing>
                 <DrawingGroup>
-                    <GeometryDrawing Brush="#12FFFFFF">
+                    <GeometryDrawing Brush="{DynamicResource OverlayBackgroundBrush}">
                         <GeometryDrawing.Geometry>
                             <GeometryGroup>
                                 <GeometryGroup.Children>
@@ -428,8 +439,8 @@
 
         <!-- Panel estilo viñeta -->
         <Style x:Key="VignettePanelStyle" TargetType="Border">
-            <Setter Property="Background" Value="#FFFDFDFD"/>
-            <Setter Property="BorderBrush" Value="#111111"/>
+            <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="6"/>
             <Setter Property="CornerRadius" Value="18"/>
             <Setter Property="Padding" Value="16"/>
@@ -437,7 +448,7 @@
         </Style>
         <!-- Cinta de título en viñeta -->
         <Style x:Key="VignetteRibbonStyle" TargetType="Border">
-            <Setter Property="Background" Value="#111111"/>
+            <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
             <Setter Property="CornerRadius" Value="10"/>
             <Setter Property="Padding" Value="6,4"/>
             <Setter Property="Margin" Value="0,0,0,10"/>
@@ -458,8 +469,8 @@
         <!-- Elementos Decorativos de Cómic -->
         <Canvas>
             <!-- Efecto POW! -->
-            <Border Canvas.Right="50" Canvas.Top="30" 
-                    Background="#FFFF6B00" BorderBrush="#FFFF4500" BorderThickness="4"
+        <Border Canvas.Right="50" Canvas.Top="30" 
+            Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="4"
                     CornerRadius="20" RenderTransformOrigin="0.5,0.5">
                 <Border.RenderTransform>
                     <RotateTransform Angle="15"/>
@@ -469,8 +480,8 @@
             </Border>
             
             <!-- Efecto BAM! -->
-            <Border Canvas.Left="80" Canvas.Bottom="120" 
-                    Background="#FF00B4D8" BorderBrush="#FF0077B6" BorderThickness="4"
+        <Border Canvas.Left="80" Canvas.Bottom="120" 
+            Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="4"
                     CornerRadius="25" RenderTransformOrigin="0.5,0.5">
                 <Border.RenderTransform>
                     <RotateTransform Angle="-20"/>
@@ -480,8 +491,8 @@
             </Border>
             
             <!-- Efecto ZOOM! -->
-            <Border Canvas.Right="120" Canvas.Bottom="80" 
-                    Background="#FFFF006E" BorderBrush="#FFD90429" BorderThickness="4"
+        <Border Canvas.Right="120" Canvas.Bottom="80" 
+            Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="4"
                     CornerRadius="30" RenderTransformOrigin="0.5,0.5">
                 <Border.RenderTransform>
                     <RotateTransform Angle="25"/>
@@ -491,7 +502,7 @@
             </Border>
             
             <!-- Estrella Decorativa -->
-            <Path Canvas.Left="200" Canvas.Top="60" Fill="#FFFFD60A" Stroke="#FFFF8500" StrokeThickness="2"
+        <Path Canvas.Left="200" Canvas.Top="60" Fill="{DynamicResource AccentBrush}" Stroke="{DynamicResource PrimaryBrush}" StrokeThickness="2"
                   Data="M 50,0 L 61,35 L 98,35 L 68,57 L 79,91 L 50,70 L 21,91 L 32,57 L 2,35 L 39,35 Z"
                   RenderTransformOrigin="0.5,0.5">
                 <Path.RenderTransform>
@@ -526,7 +537,7 @@
                 <Border Style="{StaticResource SpeechBubbleStyle}" HorizontalAlignment="Center" Margin="0,0,0,24">
                     <TextBlock Text="¡Tu aventura de lectura comienza aquí!" 
                                FontFamily="Comic Sans MS" FontSize="18" FontWeight="Bold"
-                               Foreground="#FF1E293B" TextAlignment="Center"/>
+                               Foreground="{DynamicResource SecondaryTextBrush}" TextAlignment="Center"/>
                 </Border>
 
                 <!-- Paneles tipo viñetas (sin duplicados) -->
@@ -535,18 +546,18 @@
                     <Border Style="{StaticResource VignettePanelStyle}">
                         <StackPanel>
                             <Border Style="{StaticResource VignetteRibbonStyle}">
-                                <TextBlock Text="ARCHIVO" Foreground="#FFFFFF" FontFamily="Impact" FontSize="14"/>
+                                <TextBlock Text="ARCHIVO" Foreground="{DynamicResource TextBrush}" FontFamily="Impact" FontSize="14"/>
                             </Border>
-                            <Button Style="{StaticResource ComicButtonStyle}"
-                                    Background="#FF10B981" BorderBrush="#FF059669" Foreground="White"
+                <Button Style="{StaticResource ComicButtonStyle}"
+                    Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource PrimaryBrush}" Foreground="{DynamicResource TextBrush}"
                                     Click="OpenFile_Click" HorizontalAlignment="Stretch">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                     <TextBlock Text="📁" FontSize="20" Margin="0,0,8,0"/>
                                     <TextBlock Text="ABRIR ARCHIVO"/>
                                 </StackPanel>
                             </Button>
-                            <Button Style="{StaticResource ComicButtonStyle}"
-                                    Background="#FF8B5CF6" BorderBrush="#FF7C3AED" Foreground="White"
+                <Button Style="{StaticResource ComicButtonStyle}"
+                    Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource PrimaryBrush}" Foreground="{DynamicResource TextBrush}"
                                     Click="EnterReadingMode_Click" HorizontalAlignment="Stretch" Margin="0,8,0,0">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                     <TextBlock Text="📖" FontSize="20" Margin="0,0,8,0"/>
@@ -559,11 +570,11 @@
                     <!-- Abrir carpeta -->
                     <Border Style="{StaticResource VignettePanelStyle}">
                         <StackPanel>
-                            <Border Style="{StaticResource VignetteRibbonStyle}">
-                                <TextBlock Text="CARPETA" Foreground="#FFFFFF" FontFamily="Impact" FontSize="14"/>
+                                <Border Style="{StaticResource VignetteRibbonStyle}">
+                                <TextBlock Text="CARPETA" Foreground="{DynamicResource TextBrush}" FontFamily="Impact" FontSize="14"/>
                             </Border>
-                            <Button Style="{StaticResource ComicButtonStyle}"
-                                    Background="#FF3B82F6" BorderBrush="#FF1D4ED8" Foreground="White"
+                <Button Style="{StaticResource ComicButtonStyle}"
+                    Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource PrimaryBrush}" Foreground="{DynamicResource TextBrush}"
                                     Click="OpenFolder_Click" HorizontalAlignment="Stretch">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                     <TextBlock Text="📂" FontSize="20" Margin="0,0,8,0"/>
@@ -578,11 +589,11 @@
                     <!-- Favoritos -->
                     <Border Style="{StaticResource VignettePanelStyle}">
                         <StackPanel>
-                            <Border Style="{StaticResource VignetteRibbonStyle}">
-                                <TextBlock Text="FAVORITOS" Foreground="#FFFFFF" FontFamily="Impact" FontSize="14"/>
+                                <Border Style="{StaticResource VignetteRibbonStyle}">
+                                <TextBlock Text="FAVORITOS" Foreground="{DynamicResource TextBrush}" FontFamily="Impact" FontSize="14"/>
                             </Border>
-                            <Button Style="{StaticResource ComicButtonStyle}"
-                                    Background="#FFEC4899" BorderBrush="#FFDB2777" Foreground="White"
+                <Button Style="{StaticResource ComicButtonStyle}"
+                    Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource PrimaryBrush}" Foreground="{DynamicResource TextBrush}"
                                     Click="OpenFavorites_Click" HorizontalAlignment="Stretch">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                     <TextBlock Text="⭐" FontSize="18" Margin="0,0,6,0"/>
@@ -595,11 +606,11 @@
                     <!-- Estadísticas -->
                     <Border Style="{StaticResource VignettePanelStyle}">
                         <StackPanel>
-                            <Border Style="{StaticResource VignetteRibbonStyle}">
-                                <TextBlock Text="ESTADÍSTICAS" Foreground="#FFFFFF" FontFamily="Impact" FontSize="14"/>
+                                <Border Style="{StaticResource VignetteRibbonStyle}">
+                                <TextBlock Text="ESTADÍSTICAS" Foreground="{DynamicResource TextBrush}" FontFamily="Impact" FontSize="14"/>
                             </Border>
-                            <Button Style="{StaticResource ComicButtonStyle}"
-                                    Background="#FFF59E0B" BorderBrush="#FFDB8A00" Foreground="White"
+                <Button Style="{StaticResource ComicButtonStyle}"
+                    Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource PrimaryBrush}" Foreground="{DynamicResource TextBrush}"
                                     Click="OpenComicStats_Click" HorizontalAlignment="Stretch">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                     <TextBlock Text="📈" FontSize="18" Margin="0,0,6,0"/>
@@ -615,8 +626,8 @@
             <Border Grid.Row="1" Name="EmptyStatePanel" HorizontalAlignment="Center" Margin="0,24,0,32" Padding="20"
                     Visibility="{Binding HasAnyContinueItems, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                 <StackPanel HorizontalAlignment="Center" MaxWidth="520">
-                    <TextBlock Text="Sin lecturas para continuar" FontFamily="Segoe UI" FontSize="20" FontWeight="SemiBold" Foreground="#FFFFFF" TextAlignment="Center"/>
-                    <TextBlock Text="Abre un archivo y aparecerá en Seguir leyendo." FontFamily="Segoe UI" FontSize="13" Foreground="#D1D5DB" TextAlignment="Center" Margin="0,6,0,16"/>
+                    <TextBlock Text="Sin lecturas para continuar" FontFamily="Segoe UI" FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" TextAlignment="Center"/>
+                    <TextBlock Text="Abre un archivo y aparecerá en Seguir leyendo." FontFamily="Segoe UI" FontSize="13" Foreground="{DynamicResource SecondaryTextBrush}" TextAlignment="Center" Margin="0,6,0,16"/>
                 </StackPanel>
             </Border>
 
@@ -641,9 +652,9 @@
                             <Button Style="{StaticResource GhostIconButton}" Click="UpFolder_Click" ToolTip="Subir un nivel" Margin="6,0,0,0">
                                 <TextBlock Text="⬆" FontSize="14"/>
                             </Button>
-                            <TextBlock Text="Carpeta:" Foreground="#E6ECF8" Margin="10,0,6,0" VerticalAlignment="Center"/>
-                            <Border Background="#0E1729" BorderBrush="#263146" BorderThickness="1" CornerRadius="6" Padding="8,4">
-                                <TextBlock Text="{Binding CurrentFolderPath}" Foreground="#FFFFFF" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Text="Carpeta:" Foreground="{DynamicResource SecondaryTextBrush}" Margin="10,0,6,0" VerticalAlignment="Center"/>
+                            <Border Background="{DynamicResource PanelBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="8,4">
+                                <TextBlock Text="{Binding CurrentFolderPath}" Foreground="{DynamicResource TextBrush}" FontFamily="Consolas" FontSize="12"/>
                             </Border>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
@@ -678,7 +689,7 @@
                                                 <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
                                             <!-- Miniatura o icono -->
-                                            <Grid Grid.Row="0" Background="#0B1326" ClipToBounds="True">
+                                            <Grid Grid.Row="0" Background="{DynamicResource PanelBackgroundBrush}" ClipToBounds="True">
                                                 <Image Source="{Binding Thumbnail}" Stretch="UniformToFill"/>
                                                 <TextBlock Text="📁" FontSize="48" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsFolder, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                                 <TextBlock Text="📘" FontSize="42" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsFolder, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
@@ -704,7 +715,7 @@
                                                 <Setter.Value>
                                                     <ControlTemplate TargetType="ItemsControl">
                                                         <Grid>
-                                                            <TextBlock Text="Esta carpeta está vacía." Foreground="#9FB0C8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            <TextBlock Text="Esta carpeta está vacía." Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                         </Grid>
                                                     </ControlTemplate>
                                                 </Setter.Value>
@@ -740,9 +751,9 @@
                     <!-- Barra de herramientas de Recientes (limpia, con lo esencial) -->
                     <DockPanel Grid.Row="0" LastChildFill="False" Margin="12,8,12,6">
                         <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="Seguir leyendo" x:Name="MainSectionTitle" FontFamily="Segoe UI Semibold" FontSize="16" FontWeight="SemiBold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
-                            <Border Background="#1FFFFFFF" CornerRadius="10" Padding="8,3" Margin="10,0,0,0" BorderBrush="#28FFFFFF" BorderThickness="1">
-                                <TextBlock Text="{Binding RecentComics.Count}" Foreground="#FFFFFF" FontFamily="Consolas" FontSize="12"/>
+                            <TextBlock Text="Seguir leyendo" x:Name="MainSectionTitle" FontFamily="Segoe UI Semibold" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center"/>
+                            <Border Background="{DynamicResource OverlayBackgroundBrush}" CornerRadius="10" Padding="8,3" Margin="10,0,0,0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                                <TextBlock Text="{Binding RecentComics.Count}" Foreground="{DynamicResource TextBrush}" FontFamily="Consolas" FontSize="12"/>
                             </Border>
                             <!-- Pestañas -->
                             <StackPanel Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
@@ -757,7 +768,7 @@
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
                             <!-- Ordenar -->
                             <StackPanel Orientation="Horizontal" Margin="6,0" VerticalAlignment="Center" Visibility="{Binding HasRecentComics, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <TextBlock Text="Ordenar:" Foreground="#9FB0C8" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Ordenar:" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
                                 <ComboBox Width="140" SelectedValuePath="Content" SelectedValue="{Binding SortBy, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                     <ComboBoxItem Content="Reciente"/>
                                     <ComboBoxItem Content="Progreso"/>
@@ -766,24 +777,38 @@
                             </StackPanel>
                             <!-- Ocultar completados -->
                             <CheckBox Content="Ocultar terminados" IsChecked="{Binding HideCompleted, Mode=TwoWay}"
-                                      Foreground="#E6ECF8" VerticalAlignment="Center" Margin="8,0"/>
-                            <!-- Alternar vista (Lista / Tarjeta) -->
-                            <ToggleButton IsChecked="{Binding IsRecentListView, Mode=TwoWay}" Click="ToggleRecentView_Click" ToolTip="Alternar vista (Lista / Tarjeta)" Style="{StaticResource ChipToggleButton}">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="▦" Margin="0,0,6,0"/>
-                                    <TextBlock Text="Vista lista"/>
-                                </StackPanel>
-                            </ToggleButton>
+                                      Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" Margin="8,0"/>
+                            <!-- Selección de vista: Carrusel / Grid / Lista -->
+                            <StackPanel Orientation="Horizontal" Margin="6,0" VerticalAlignment="Center">
+                                <ToggleButton x:Name="BtnViewCarousel" Click="SetViewCarousel_Click" Style="{StaticResource ChipToggleButton}" ToolTip="Vista carrusel">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="◀" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Carrusel"/>
+                                    </StackPanel>
+                                </ToggleButton>
+                                <ToggleButton x:Name="BtnViewGrid" Click="SetViewGrid_Click" Style="{StaticResource ChipToggleButton}" Margin="6,0,0,0" ToolTip="Vista rejilla">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="▦" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Rejilla"/>
+                                    </StackPanel>
+                                </ToggleButton>
+                                <ToggleButton x:Name="BtnViewList" Click="SetViewList_Click" Style="{StaticResource ChipToggleButton}" Margin="6,0,0,0" ToolTip="Vista lista">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="☰" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Lista"/>
+                                    </StackPanel>
+                                </ToggleButton>
+                            </StackPanel>
                             <!-- Paginación compacta -->
                             <StackPanel Orientation="Horizontal" Margin="6,0" VerticalAlignment="Center" Visibility="{Binding HasMultiplePages, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <Button Style="{StaticResource GhostIconButton}" Click="PrevRecentPage_Click" ToolTip="Anterior">
                                     <TextBlock Text="◀" FontSize="12"/>
                                 </Button>
-                                <Border Background="#101827" CornerRadius="12" Padding="10,2" Margin="4,0">
-                                    <TextBlock Text="{Binding CurrentPage}" Foreground="#FFFFFF" FontFamily="Consolas" FontSize="12"/>
+                                <Border Background="{DynamicResource PanelBackgroundBrush}" CornerRadius="12" Padding="10,2" Margin="4,0">
+                                    <TextBlock Text="{Binding CurrentPage}" Foreground="{DynamicResource TextBrush}" FontFamily="Consolas" FontSize="12"/>
                                 </Border>
-                                <TextBlock Text="/" Foreground="#9FB0C8" Margin="2,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding TotalPages}" Foreground="#E6ECF8" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center"/>
+                                <TextBlock Text="/" Foreground="{DynamicResource SecondaryTextBrush}" Margin="2,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding TotalPages}" Foreground="{DynamicResource SecondaryTextBrush}" FontFamily="Consolas" FontSize="12" VerticalAlignment="Center"/>
                                 <Button Style="{StaticResource GhostIconButton}" Click="NextRecentPage_Click" ToolTip="Siguiente" Margin="4,0,0,0">
                                     <TextBlock Text="▶" FontSize="12"/>
                                 </Button>
@@ -792,10 +817,10 @@
                             <Button Style="{StaticResource TextDangerButton}" Click="ClearRecentComics_Click">
                                 <TextBlock Text="Limpiar lista"/>
                             </Button>
-                            <Border Background="#0E1729" CornerRadius="8" Padding="8,4" Margin="12,0" VerticalAlignment="Center">
+                            <Border Background="{DynamicResource PanelBackgroundBrush}" CornerRadius="8" Padding="8,4" Margin="12,0" VerticalAlignment="Center">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Completados:" Foreground="#9FB0C8" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="{Binding CompletedCount}" Foreground="#FFFFFF" FontFamily="Consolas"/>
+                                    <TextBlock Text="Completados:" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding CompletedCount}" Foreground="{DynamicResource TextBrush}" FontFamily="Consolas"/>
                                 </StackPanel>
                             </Border>
                             <Button Style="{StaticResource TextDangerButton}" Click="ClearCompleted_Click" ToolTip="Limpiar completados">
@@ -865,7 +890,7 @@
                                                                         </MultiBinding>
                                                                     </Image.Source>
                                                                 </Image>
-                                                                <Border Name="LoadingBorder" Background="#66000000" Visibility="Collapsed">
+                                                                <Border Name="LoadingBorder" Background="{DynamicResource OverlayBackgroundBrush}" Visibility="Collapsed">
                                                                     <TextBlock Text="Cargando…" Foreground="White" FontFamily="Segoe UI" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                                 </Border>
                                                                 <Rectangle VerticalAlignment="Bottom" Height="120">
@@ -877,8 +902,8 @@
                                                                     </Rectangle.Fill>
                                                                 </Rectangle>
                                                                 <!-- Botón de quitar (esquina superior derecha) -->
-                                                                <Button x:Name="RemoveCardButton" Style="{StaticResource GhostIconButton}"
-                                                                        Background="#EF4444" BorderBrush="#FFFFFF" Foreground="#FFFFFF"
+                                                                        <Button x:Name="RemoveCardButton" Style="{StaticResource GhostIconButton}"
+                                                                        Background="{DynamicResource ErrorBrush}" BorderBrush="{DynamicResource BorderBrush}" Foreground="{DynamicResource TextBrush}"
                                                                         BorderThickness="1" Width="36" Height="36" Opacity="0.95"
                                                                         ToolTip="Quitar de la lista"
                                                                         Command="{Binding DataContext.RemoveRecentComicCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
@@ -890,17 +915,17 @@
                                                                     <TextBlock Text="✖" FontSize="16" FontWeight="Bold"/>
                                                                 </Button>
 
-                                                                <Button Background="#44000000" BorderBrush="#55FFFFFF" BorderThickness="1" Width="110" Height="30" Cursor="Hand"
+                                                                <Button Background="{DynamicResource OverlayBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Width="110" Height="30" Cursor="Hand"
                                                                         Command="{Binding DataContext.OpenComicCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                         CommandParameter="{Binding FilePath}"
                                                                         HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                                    <TextBlock Text="Continuar" Foreground="#FFFFFF" FontWeight="SemiBold"/>
+                                                                    <TextBlock Text="Continuar" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold"/>
                                                                 </Button>
                                                             </Grid>
                                                             <!-- Título + progreso -->
                                                             <StackPanel Grid.Row="1" Margin="8,8,8,10">
                                                                 <TextBlock Text="{Binding DisplayName}" Style="{StaticResource CardTitleText}"/>
-                                                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressPercent, Mode=OneWay}" Height="6" Margin="0,6,0,0" Background="#233044" Foreground="{DynamicResource Brush.Primary}"/>
+                                                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressPercent, Mode=OneWay}" Height="6" Margin="0,6,0,0" Background="{DynamicResource PanelBackgroundBrush}" Foreground="{DynamicResource PrimaryBrush}"/>
                                                             </StackPanel>
                                                         </Grid>
                                                         <Border.RenderTransform>
@@ -937,6 +962,52 @@
                                         <TextBlock Text="▶" FontSize="16"/>
                                     </Button>
                                 </Grid>
+                            </Grid>
+                            <!-- Vista en rejilla (Grid) para Seguir leyendo -->
+                            <Grid Name="ContinueGridRoot" Visibility="Collapsed">
+                                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="8,8,8,8">
+                                    <ItemsControl ItemsSource="{Binding RecentComics}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal" ItemWidth="180" ItemHeight="320"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Width="180" Margin="8" Cursor="Hand" MouseLeftButtonUp="OpenRecentComic_Click" Style="{StaticResource ModernCardBorder}">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <Grid Grid.Row="0" Height="220" ClipToBounds="True">
+                                                            <Image Stretch="UniformToFill">
+                                                                <Image.Source>
+                                                                    <MultiBinding Converter="{StaticResource CoverPathOrThumbnailConverter}">
+                                                                        <Binding Path="CoverPath"/>
+                                                                        <Binding Path="CoverThumbnail"/>
+                                                                    </MultiBinding>
+                                                                </Image.Source>
+                                                            </Image>
+                                                            <Rectangle VerticalAlignment="Bottom" Height="80">
+                                                                <Rectangle.Fill>
+                                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                                        <GradientStop Color="#00000000" Offset="0"/>
+                                                                        <GradientStop Color="#CC000000" Offset="1"/>
+                                                                    </LinearGradientBrush>
+                                                                </Rectangle.Fill>
+                                                            </Rectangle>
+                                                        </Grid>
+                                                            <StackPanel Grid.Row="1" Margin="8,6,8,8">
+                                                            <TextBlock Text="{Binding DisplayName}" Style="{StaticResource CardTitleText}" TextTrimming="CharacterEllipsis"/>
+                                                            <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressPercent, Mode=OneWay}" Height="6" Margin="0,6,0,0" Background="{DynamicResource PanelBackgroundBrush}" Foreground="{DynamicResource PrimaryBrush}"/>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
                             </Grid>
                             <!-- Panel de Completados (ahora carrusel horizontal como 'Seguir leyendo') -->
                             <Grid x:Name="CompletedPanel" Visibility="Collapsed" Opacity="0">
@@ -982,20 +1053,20 @@
                                                                             </LinearGradientBrush>
                                                                         </Rectangle.Fill>
                                                                     </Rectangle>
-                                                                    <Border Background="#10B981" CornerRadius="8" Padding="6" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8">
-                                                                        <TextBlock Text="Completado ✅" Foreground="#FFFFFF" FontSize="12" FontWeight="SemiBold"/>
+                                                                    <Border Background="{DynamicResource AccentBrush}" CornerRadius="8" Padding="6" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8">
+                                                                        <TextBlock Text="Completado ✅" Foreground="{DynamicResource TextBrush}" FontSize="12" FontWeight="SemiBold"/>
                                                                     </Border>
-                                                                    <Button Background="#44000000" BorderBrush="#55FFFFFF" BorderThickness="1" Width="110" Height="30" Cursor="Hand"
+                                                                    <Button Background="{DynamicResource OverlayBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Width="110" Height="30" Cursor="Hand"
                                                                             Command="{Binding DataContext.ReopenCompletedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                             CommandParameter="{Binding FilePath}"
                                                                             HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                                        <TextBlock Text="Releer" Foreground="#FFFFFF" FontWeight="SemiBold"/>
+                                                                        <TextBlock Text="Releer" Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold"/>
                                                                     </Button>
                                                                 </Grid>
                                                                  <StackPanel Grid.Row="1" Margin="8,8,8,10">
                                                                      <TextBlock Text="{Binding DisplayName}" Style="{StaticResource CardTitleText}"/>
                                                                      <TextBlock Text="{Binding DateCompleted, StringFormat={}{0:dd/MM/yyyy}}" Style="{StaticResource CardSubText}"/>
-                                                                     <ProgressBar Minimum="0" Maximum="100" Value="100" Height="6" Margin="0,6,0,0" Background="#233044" Foreground="{DynamicResource Brush.Success}"/>
+                                                                     <ProgressBar Minimum="0" Maximum="100" Value="100" Height="6" Margin="0,6,0,0" Background="{DynamicResource PanelBackgroundBrush}" Foreground="{DynamicResource PrimaryBrush}"/>
                                                                      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,6,0,0">
                                                                          <Button Style="{StaticResource TextActionButton}" Click="CompletedMenu_Click" Tag="{Binding FilePath}">⋯</Button>
                                                                      </StackPanel>
@@ -1021,9 +1092,9 @@
                                 <ListView.Resources>
                                     <!-- Encabezado del GridView: barra más visible/contrastada -->
                                     <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource RecentsGridHeader}">
-                                        <Setter Property="Background" Value="#0E1729"/>
-                                        <Setter Property="Foreground" Value="#FFFFFF"/>
-                                        <Setter Property="BorderBrush" Value="#263146"/>
+                                        <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                                        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                                         <Setter Property="BorderThickness" Value="0,0,0,2"/>
                                         <Setter Property="FontSize" Value="12"/>
                                     </Style>

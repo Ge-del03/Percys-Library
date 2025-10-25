@@ -1,2 +1,0 @@
-Este archivo reemplaza al antiguo `ThumbnailGridView.cs` que causaba definiciones duplicadas.
-No debe existir un `ThumbnailGridView.cs` en esta carpeta. Si OneDrive lo recrea, elimínalo.

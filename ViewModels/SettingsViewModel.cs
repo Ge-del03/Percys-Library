@@ -1,14 +1,15 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
+using System.Windows;
 using System.Windows.Input;
-using ComicReader.Commands;
 using ComicReader.Models;
 using ComicReader.Services;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Reflection;
+using ComicReader.Themes;
 
 namespace ComicReader.ViewModels
 {
@@ -16,206 +17,360 @@ namespace ComicReader.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
         private void Raise([CallerMemberName] string n = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));
-        // Exponer la instancia global de settings para binding directo desde la vista.
-        public UserAppSettings AppSettings => SettingsManager.Settings;
 
-    public ObservableCollection<string> Themes { get; } = new ObservableCollection<string>();
-        public ObservableCollection<string> Sections { get; } = new ObservableCollection<string> { "General", "Apariencia", "Lectura", "Avanzado" };
+    // Expose the app settings (requires SettingsManager in your project)
+    // Use the existing AppSettings type declared in ComicReader.Services
+    public AppSettings AppSettings => SettingsManager.Settings;
 
-        private string _selectedSection;
-        public string SelectedSection { get => _selectedSection; set { _selectedSection = value; Raise(); } }
+        // Sections
+        public ObservableCollection<string> Sections { get; } = new ObservableCollection<string>(new[] {
+            "General", "Apariencia", "Lectura", "Controles", "Rendimiento", "Seguridad", "Personalizacion", "Acerca"
+        });
+
+        private string _selectedSection = "General";
+        public string SelectedSection
+        {
+            get => _selectedSection;
+            set
+            {
+                if (_selectedSection == value) return;
+                _selectedSection = value;
+                Raise();
+            }
+        }
+
+        // Theme & appearance lists
+        public ObservableCollection<string> AvailableThemes { get; } = new ObservableCollection<string>(new[] { "Comic Clásico", "Comic Moderno", "Manga", "Vintage", "Nocturno" });
+        public ObservableCollection<string> AccentColors { get; } = new ObservableCollection<string>(new[] { "Rojo", "Azul", "Amarillo", "Verde", "Naranja" });
+        public ObservableCollection<string> AvailableFonts { get; } = new ObservableCollection<string>(new[] { "Komika Axis", "Bangers", "Comic Sans MS", "Segoe UI" });
+
+        // Commands (many)
         public ICommand SaveCommand { get; }
         public ICommand ApplyCommand { get; }
         public ICommand RestoreDefaultsCommand { get; }
         public ICommand ClearCacheCommand { get; }
         public ICommand PreviewCommand { get; }
-        public ICommand ExportCommand { get; }
-        public ICommand ImportCommand { get; }
+        public ICommand ExportCommandWithDialog { get; }
+        public ICommand ImportCommandWithDialog { get; }
+        public ICommand EditBackgroundCommand { get; }
+        public ICommand RestartUICommand { get; }
+        public ICommand SelectSectionCommand { get; }
+        public ICommand PreviewThemeCommand { get; }
+        public ICommand ChangeFolderCommand { get; }
+        public ICommand ViewLogsCommand { get; }
+        public ICommand OpenFolderCommand { get; }
+        public ICommand OptimizeCommand { get; }
+        public ICommand ConfigureShortcutsCommand { get; }
+        public ICommand ViewCreditsCommand { get; }
+        public ICommand OpenWebsiteCommand { get; }
+        public ICommand ApplyAccentCommand { get; }
+        public ICommand PreviewFontCommand { get; }
+        public ICommand ResetAdvancedAppearanceCommand { get; }
 
-        // For preview UI binding
-        private string _previewTheme;
-        public string PreviewTheme { get => _previewTheme; set { _previewTheme = value; Raise(); } }
+        // Small fallback Relay in case project lacks a RelayCommand
+        private class SimpleRelay : ICommand
+        {
+            private readonly Action<object> _act;
+            private readonly Func<object, bool> _can;
+            public SimpleRelay(Action<object> act, Func<object, bool> can = null) { _act = act; _can = can; }
+            public event EventHandler CanExecuteChanged;
+            public bool CanExecute(object parameter) => _can?.Invoke(parameter) ?? true;
+            public void Execute(object parameter) => _act?.Invoke(parameter);
+            public void RaiseCanExecute() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         public SettingsViewModel()
         {
-            // Ensure settings are loaded
-            try { SettingsManager.LoadSettings(); } catch { }
-
-            // Discover available themes from Themes/*Theme.xaml
+            // Try to populate ThemeInfo list from ThemeManager if available
             try
             {
-                var themeDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Themes");
-                if (System.IO.Directory.Exists(themeDir))
+                var avail = ThemeManager.GetAvailableThemes();
+                foreach (var t in avail)
                 {
-                    var files = System.IO.Directory.GetFiles(themeDir, "*Theme.xaml");
-                    foreach (var f in files)
-                    {
-                        try
-                        {
-                            var name = System.IO.Path.GetFileNameWithoutExtension(f);
-                            if (name.EndsWith("Theme", StringComparison.OrdinalIgnoreCase))
-                            {
-                                name = name.Substring(0, name.Length - "Theme".Length);
-                            }
-                            if (!Themes.Contains(name)) Themes.Add(name);
-                        }
-                        catch { }
-                    }
-                }
-                // Ensure some sensible defaults
-                if (Themes.Count == 0) { Themes.Add("Dark"); Themes.Add("Light"); }
-            }
-            catch { }
-
-            SelectedSection = Sections.Count > 0 ? Sections[0] : "General";
-
-            // Listen to changes on AppSettings so PreviewTheme updates when user changes Theme or Variant
-            try
-            {
-                if (SettingsManager.Settings != null)
-                {
-                    SettingsManager.Settings.PropertyChanged += (s, e) => {
-                        try
-                        {
-                            if (e.PropertyName == nameof(SettingsManager.Settings.Theme) || e.PropertyName == nameof(SettingsManager.Settings.ThemeAccentVariant) || e.PropertyName == nameof(SettingsManager.Settings.AccentColor))
-                            {
-                                var t = SettingsManager.Settings.Theme ?? "Dark";
-                                var v = SettingsManager.Settings.ThemeAccentVariant ?? "Default";
-                                PreviewTheme = t + ":" + v;
-                            }
-                        }
-                        catch { }
-                    };
+                    if (!ThemeInfos.Any(x => x.Mode == t.Mode)) ThemeInfos.Add(t);
                 }
             }
             catch { }
 
-            SaveCommand = new RelayCommand(async () => {
-                try {
-                    SettingsManager.SaveNow();
-                    await SettingsManager.FlushPendingSavesAsync(System.Threading.CancellationToken.None);
-                } catch { }
-            });
-
-            ApplyCommand = new RelayCommand(() => {
+            // Build commands (prefer existing RelayCommand if present)
+            Func<Action, ICommand> mk = (act) =>
+            {
                 try
                 {
-                    var theme = SettingsManager.Settings?.Theme;
-                    if (!string.IsNullOrWhiteSpace(theme))
+                    var rcType = Type.GetType("ComicReader.Commands.RelayCommand, ComicReader");
+                    if (rcType != null)
                     {
-                        try { App.ApplyTheme(theme); } catch { }
+                        return (ICommand)Activator.CreateInstance(rcType, (Action)act);
                     }
-                    // Persist via debounced path
-                    try { SettingsManager.SaveSettings(); } catch { }
+                }
+                catch { }
+                return new SimpleRelay(_ => act());
+            };
+
+            SaveCommand = mk(() =>
+            {
+                try { SettingsManager.SaveNow(); MessageBox.Show("Ajustes guardados.", "Guardar", MessageBoxButton.OK, MessageBoxImage.Information); } catch { MessageBox.Show("Error al guardar ajustes.", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+            });
+
+            ApplyCommand = mk(() =>
+            {
+                try
+                {
+                    SettingsManager.SaveSettings();
+                    try { ThemeManager.CurrentTheme = (ThemeMode)Enum.Parse(typeof(ThemeMode), SettingsManager.Settings.Theme); } catch { }
+                    try { ThemeManager.ApplyAccent(SettingsManager.Settings.AccentColorName); } catch { }
+                    try { if (!string.IsNullOrWhiteSpace(SettingsManager.Settings.ReaderFontName)) Application.Current.Resources["ReaderFontFamily"] = new System.Windows.Media.FontFamily(SettingsManager.Settings.ReaderFontName); } catch { }
+                    try { Application.Current.Resources["UIScale"] = SettingsManager.Settings.UIScale; } catch { }
+                    Raise(nameof(AppSettings));
+                    MessageBox.Show("Cambios aplicados.", "Aplicar", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch { MessageBox.Show("No se pudieron aplicar cambios.", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+            });
+
+            RestoreDefaultsCommand = mk(() =>
+            {
+                try { SettingsManager.ResetToDefaults(); SettingsManager.SaveNow(); Raise(nameof(AppSettings)); MessageBox.Show("Ajustes restaurados.", "Restaurar", MessageBoxButton.OK, MessageBoxImage.Information); } catch { }
+            });
+
+            ClearCacheCommand = mk(() =>
+            {
+                try { DiskImageCache.CleanupOld(0); MessageBox.Show("Caché limpiado.", "Caché", MessageBoxButton.OK, MessageBoxImage.Information); } catch { MessageBox.Show("No se pudo limpiar caché.", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+            });
+
+            PreviewCommand = mk(() =>
+            {
+                try { if (SelectedThemeInfo != null) ThemeManager.ApplyTheme(SelectedThemeInfo.Mode); } catch { }
+            });
+
+            ExportCommandWithDialog = new SimpleRelay(_ =>
+            {
+                try
+                {
+                    var dlg = new Microsoft.Win32.SaveFileDialog { Filter = "JSON settings|*.json", FileName = "percys-settings.json", Title = "Exportar ajustes" };
+                    if (dlg.ShowDialog() == true) ExportTo(dlg.FileName);
+                }
+                catch { MessageBox.Show("Error exportando ajustes.", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+            });
+
+            ImportCommandWithDialog = new SimpleRelay(_ =>
+            {
+                try
+                {
+                    var dlg = new Microsoft.Win32.OpenFileDialog { Filter = "JSON settings|*.json", Title = "Importar ajustes" };
+                    if (dlg.ShowDialog() == true) ImportFrom(dlg.FileName);
+                }
+                catch { MessageBox.Show("Error importando ajustes.", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+            });
+
+            EditBackgroundCommand = new SimpleRelay(_ =>
+            {
+                try
+                {
+                    var ofd = new Microsoft.Win32.OpenFileDialog { Filter = "Imágenes|*.png;*.jpg;*.jpeg;*.bmp" };
+                    if (ofd.ShowDialog() == true)
+                    {
+                        SettingsManager.Settings.ReaderBackgroundCustomPath = ofd.FileName;
+                        SettingsManager.SaveSettings();
+                        Raise(nameof(AppSettings));
+                    }
+                }
+                catch { }
+            });
+
+            RestartUICommand = mk(() => { try { ThemeManager.ApplyTheme(ThemeManager.CurrentTheme); MessageBox.Show("Interfaz reiniciada.", "Reiniciar", MessageBoxButton.OK, MessageBoxImage.Information); } catch { } });
+
+            SelectSectionCommand = new SimpleRelay(p => { try { if (p is string s) SelectedSection = s; } catch { } });
+
+            PreviewThemeCommand = mk(() => { try { if (SelectedThemeInfo != null) ThemeManager.ApplyTheme(SelectedThemeInfo.Mode); } catch { } });
+
+            ChangeFolderCommand = new SimpleRelay(_ =>
+            {
+                try
+                {
+                    var dlg = new System.Windows.Forms.FolderBrowserDialog();
+                    var result = dlg.ShowDialog();
+                    if (result == System.Windows.Forms.DialogResult.OK)
+                    {
+                        SettingsManager.Settings.DefaultComicsFolder = dlg.SelectedPath;
+                        SettingsManager.SaveSettings();
+                        Raise(nameof(AppSettings));
+                    }
+                }
+                catch { }
+            });
+
+            ViewLogsCommand = mk(() =>
+            {
+                try
+                {
+                    var path = SettingsManager.GetLogsFolderPath();
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() { FileName = path, UseShellExecute = true });
+                }
+                catch { MessageBox.Show("No se pudieron abrir los logs.", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+            });
+
+            OpenFolderCommand = mk(() =>
+            {
+                try
+                {
+                    var dir = AppDomain.CurrentDomain.BaseDirectory;
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() { FileName = dir, UseShellExecute = true });
+                }
+                catch { }
+            });
+
+            OptimizeCommand = mk(() =>
+            {
+                try { DiskImageCache.CleanupOld(50); MessageBox.Show("Optimización completada.", "Optimizar", MessageBoxButton.OK, MessageBoxImage.Information); } catch { MessageBox.Show("No se pudo optimizar.", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+            });
+
+            ConfigureShortcutsCommand = mk(() => {
+                try
+                {
+                    var win = new ComicReader.Views.ShortcutsWindow();
+                    var owner = Application.Current?.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
+                    if (owner != null) win.Owner = owner;
+                    win.ShowDialog();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("No se pudo abrir el editor de atajos: " + ex.Message, "Atajos", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            });
+            ViewCreditsCommand = mk(() => { MessageBox.Show("Créditos: Equipo Percy - Diseño UI/UX.", "Créditos", MessageBoxButton.OK, MessageBoxImage.Information); });
+            OpenWebsiteCommand = mk(() => { try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo() { FileName = "https://example.com", UseShellExecute = true }); } catch { } });
+
+            ApplyAccentCommand = mk(() =>
+            {
+                try
+                {
+                    // example: store accent name and save
+                    SettingsManager.SaveSettings();
                     Raise(nameof(AppSettings));
                 }
                 catch { }
             });
 
-            RestoreDefaultsCommand = new RelayCommand(() => {
-                try { SettingsManager.ResetToDefaults(); Raise(nameof(AppSettings)); } catch { }
+            PreviewFontCommand = mk(() =>
+            {
+                try { MessageBox.Show("Vista previa de fuente (implementación simple).", "Fuente", MessageBoxButton.OK, MessageBoxImage.Information); } catch { }
             });
 
-            ClearCacheCommand = new RelayCommand(() => {
-                try {
-                    var cache = ComicReader.Core.Services.ServiceLocator.TryGet<ComicReader.Core.Abstractions.IImageCache>();
-                    if (cache != null)
+            ResetAdvancedAppearanceCommand = mk(() =>
+            {
+                try
+                {
+                    SettingsManager.Settings.VignetteBorderThickness = 4;
+                    SettingsManager.Settings.EnableComicEffects = true;
+                    SettingsManager.SaveSettings();
+                    Raise(nameof(AppSettings));
+                    MessageBox.Show("Apariencia avanzada restablecida.", "Restablecer", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch { }
+            });
+
+            // ThemeInfos collection (if ThemeManager available)
+            ThemeInfos = new ObservableCollection<ThemeInfo>();
+            try
+            {
+                var themes = ThemeManager.GetAvailableThemes();
+                foreach (var t in themes) ThemeInfos.Add(t);
+                // Set initial SelectedThemeInfo based on persisted setting
+                try
+                {
+                    var cur = SettingsManager.Settings.Theme;
+                    if (!string.IsNullOrWhiteSpace(cur) && Enum.TryParse<ThemeMode>(cur, out var curMode))
                     {
-                        var mi = cache.GetType().GetMethod("Clear");
-                        if (mi != null) mi.Invoke(cache, null);
+                        var match = ThemeInfos.FirstOrDefault(x => x.Mode == curMode);
+                        if (match != null) _selectedThemeInfo = match; // set backing field to avoid double-save
                     }
-                } catch { }
-            });
+                }
+                catch { }
+                // HomeView-specific theme option removed — no per-screen default selection
+            }
+            catch { }
 
-            PreviewCommand = new RelayCommand(() => {
-                try {
-                    // Set PreviewTheme to the current selected theme so SettingsHub updates the LivePreview control
-                    // TEMP: toggle between current theme and a known alternate to force a DP change for verification
-                    var current = SettingsManager.Settings?.Theme ?? AppSettings?.Theme ?? "Dark";
-                    var alt = string.Equals(current, "Light", StringComparison.OrdinalIgnoreCase) ? "Dark" : "Light";
-                    PreviewTheme = alt == PreviewTheme ? current : alt;
-                    // setter raises PropertyChanged
-                } catch { }
-            });
-
-                PreviewCommand = new RelayCommand(() => {
-                    try {
-                        // Set PreviewTheme to the current selected theme (non-destructive)
-                        var themeName = SettingsManager.Settings?.Theme ?? AppSettings?.Theme ?? "Dark";
-                        var variant = SettingsManager.Settings?.ThemeAccentVariant ?? "Default";
-                        PreviewTheme = themeName + ":" + variant;
-                    } catch { }
-                });
-            ImportCommand = new RelayCommand(() => {
-                try {
-                    var path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "percy_settings_export.json");
-                    if (System.IO.File.Exists(path))
-                    {
-                        var json = System.IO.File.ReadAllText(path);
-                        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                        var obj = JsonSerializer.Deserialize<UserAppSettings>(json, options);
-                        if (obj != null)
-                        {
-                            try
-                            {
-                                if (SettingsManager.Settings == null) SettingsManager.LoadSettings();
-                                // Copy public writable properties from imported object into the live Settings instance
-                                var target = SettingsManager.Settings;
-                                var props = typeof(UserAppSettings).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                                foreach (var p in props)
-                                {
-                                    if (!p.CanRead || !p.CanWrite) continue;
-                                    try
-                                    {
-                                        var val = p.GetValue(obj);
-                                        // Special-case collections: if property is a list, try to copy items
-                                        var targetVal = p.GetValue(target);
-                                        if (targetVal is System.Collections.IList && val is System.Collections.IList)
-                                        {
-                                            var tgtList = targetVal as System.Collections.IList;
-                                            tgtList.Clear();
-                                            foreach (var item in (System.Collections.IList)val) tgtList.Add(item);
-                                        }
-                                        else
-                                        {
-                                            p.SetValue(target, val);
-                                        }
-                                    }
-                                    catch { }
-                                }
-                                SettingsManager.SaveSettings();
-                                Raise(nameof(AppSettings));
-                            }
-                            catch (Exception ex)
-                            {
-                                try { var log = ComicReader.Core.Services.ServiceLocator.TryGet<ComicReader.Core.Abstractions.ILogService>(); log?.LogException("Import apply failed", ex); } catch { }
-                            }
-                        }
-                    }
-                } catch (Exception ex) { try { var log = ComicReader.Core.Services.ServiceLocator.TryGet<ComicReader.Core.Abstractions.ILogService>(); log?.LogException("Import failed", ex); } catch { } }
-            });
-
-            // Export command - default writes to Desktop path; tests can call ExportTo(path) directly
-            ExportCommand = new RelayCommand(() => {
-                try {
-                    var path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "percy_settings_export.json");
-                    ExportTo(path);
-                } catch { }
-            });
-
-            // NOTE: removed automatic PreviewCommand invocation; preview should be triggered by the view when ready.
+            // initial selection
+            SelectedSection = Sections.FirstOrDefault();
         }
 
-        // Expose a programmatic export method useful for tests and advanced flows
+        private ThemeInfo _selectedThemeInfo;
+        public ThemeInfo SelectedThemeInfo
+        {
+            get => _selectedThemeInfo;
+            set
+            {
+                if (_selectedThemeInfo == value) return;
+                _selectedThemeInfo = value;
+                // Persist selection to AppSettings and optionally preview
+                try
+                {
+                    if (_selectedThemeInfo != null)
+                    {
+                        SettingsManager.Settings.Theme = _selectedThemeInfo.Mode.ToString();
+                        SettingsManager.SaveSettings();
+                        if (SettingsManager.Settings.EnableLivePreview)
+                        {
+                            ThemeManager.ApplyTheme(_selectedThemeInfo.Mode);
+                        }
+                    }
+                }
+                catch { }
+                Raise();
+            }
+        }
+
+        // Per-screen HomeView theme removed; use global theme only
+
+        // Theme info collection
+        public ObservableCollection<ThemeInfo> ThemeInfos { get; }
+
+        // Simple filter helper used by SearchBox
+        public void FilterSections(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query)) return;
+            var found = Sections.FirstOrDefault(s => s.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0);
+            if (found != null) SelectedSection = found;
+        }
+
+        // Export/Import implementation
         public void ExportTo(string path)
         {
             try
             {
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                var json = JsonSerializer.Serialize(SettingsManager.Settings, options);
-                System.IO.File.WriteAllText(path, json);
+                var json = JsonSerializer.Serialize(SettingsManager.Settings, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(path, json);
             }
-            catch { }
+            catch { throw; }
+        }
+
+        public void ImportFrom(string path)
+        {
+            try
+            {
+                if (!File.Exists(path)) return;
+                var txt = File.ReadAllText(path);
+                AppSettings obj = null;
+                try { obj = JsonSerializer.Deserialize<AppSettings>(txt); } catch { obj = null; }
+                if (obj == null) return;
+
+                try
+                {
+                    var cur = SettingsManager.GetSettingsFilePath();
+                    if (!string.IsNullOrWhiteSpace(cur) && File.Exists(cur))
+                    {
+                        var bak = cur + ".bak." + DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+                        File.Copy(cur, bak, true);
+                    }
+                }
+                catch { }
+
+                SettingsManager.ReplaceSettings(obj);
+                SettingsManager.SaveNow();
+                Raise(nameof(AppSettings));
+                MessageBox.Show("Ajustes importados y aplicados.", "Importar", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch { throw; }
         }
     }
 }
