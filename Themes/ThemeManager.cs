@@ -12,7 +12,8 @@ namespace ComicReader.Themes
         private static readonly Dictionary<ThemeMode, ResourceDictionary> _themes = 
             new Dictionary<ThemeMode, ResourceDictionary>();
         
-        private static ThemeMode _currentTheme = ThemeMode.Comic;
+    // Default to the branded Percy's Library theme
+    private static ThemeMode _currentTheme = ThemeMode.PercysLibrary;
         public static event Action<ThemeMode> ThemeChanged;
 
         static ThemeManager()

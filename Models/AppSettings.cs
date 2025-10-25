@@ -17,7 +17,8 @@ namespace ComicReader.Services
             return true;
         }
 
-        private string _theme = "Dark";
+    // Default application theme changed to Percy's Library branded theme
+    private string _theme = "PercysLibrary";
         public string Theme { get => _theme; set => SetProperty(ref _theme, value); }
 
         private bool _thumbnailsVisible = true;
