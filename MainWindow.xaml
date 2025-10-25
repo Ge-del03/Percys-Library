@@ -97,21 +97,25 @@
 
         <!-- Área de Contenido Principal -->
     <!-- Barra superior de controles del lector -->
-    <Border Grid.Row="1" x:Name="ReaderTopBar" Style="{StaticResource ReaderTopBarStyle}"
+    <Border Grid.Row="1" x:Name="ReaderTopBar" Style="{DynamicResource ReaderTopBarStyle}"
         Panel.ZIndex="1000"
         IsEnabled="{Binding IsReaderViewActive, RelativeSource={RelativeSource AncestorType=Window}}">
         
         <DockPanel>
             <!-- Izquierda: navegación -->
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                <Button Content="🏠" ToolTip="Inicio" Click="HomeButton_Click" Style="{StaticResource SecondaryButtonStyle}" Margin="2,0"/>
-                <Button Content="📂" ToolTip="Abrir cómic (Ctrl+O)" Click="OpenFile_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0"/>
-                <Button x:Name="PrevButton" ToolTip="Anterior" Click="PrevPage_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0">
-                    <!-- Contenido por defecto: flecha izquierda -->
-                    <Path Style="{StaticResource NavIconStyle}" Data="M12,3 L4,12 L12,21" Stroke="White" StrokeThickness="2" StrokeEndLineCap="Round" StrokeStartLineCap="Round" StrokeLineJoin="Round"/>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                <Button ToolTip="Inicio" Click="HomeButton_Click" Style="{DynamicResource ReaderIconButtonStyle}" Margin="2,0">
+                    <Path Style="{StaticResource NavIconStyle}" Data="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" Fill="{DynamicResource TextBrush}"/>
                 </Button>
-                <Button x:Name="NextButton" ToolTip="Siguiente" Click="NextPage_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0">
-                    <Path Style="{StaticResource NavIconStyle}" Data="M4,3 L12,12 L4,21" Stroke="White" StrokeThickness="2" StrokeEndLineCap="Round" StrokeStartLineCap="Round" StrokeLineJoin="Round"/>
+                <Button ToolTip="Abrir cómic (Ctrl+O)" Click="OpenFile_Click" Style="{DynamicResource ReaderIconButtonStyle}" Margin="2,0">
+                    <Path Style="{StaticResource NavIconStyle}" Data="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z" Fill="{DynamicResource TextBrush}"/>
+                </Button>
+                <Button x:Name="PrevButton" ToolTip="Anterior" Click="PrevPage_Click" Style="{DynamicResource ReaderIconButtonStyle}" Margin="2,0">
+                    <!-- Contenido por defecto: flecha izquierda -->
+                    <Path Style="{StaticResource NavIconStyle}" Data="M12,3 L4,12 L12,21" Stroke="{DynamicResource TextBrush}" StrokeThickness="2" StrokeEndLineCap="Round" StrokeStartLineCap="Round" StrokeLineJoin="Round"/>
+                </Button>
+                <Button x:Name="NextButton" ToolTip="Siguiente" Click="NextPage_Click" Style="{DynamicResource ReaderIconButtonStyle}" Margin="2,0">
+                    <Path Style="{StaticResource NavIconStyle}" Data="M4,3 L12,12 L4,21" Stroke="{DynamicResource TextBrush}" StrokeThickness="2" StrokeEndLineCap="Round" StrokeStartLineCap="Round" StrokeLineJoin="Round"/>
                 </Button>
             </StackPanel>
             <!-- Centro: indicador + slider -->
@@ -123,18 +127,28 @@
                 <ProgressBar x:Name="ReaderProgressBar" Width="260" Height="6" Minimum="0" Maximum="100" Value="0" Margin="12,6,0,0" VerticalAlignment="Center" Background="{DynamicResource PanelBackgroundBrush}" Foreground="{DynamicResource AccentBrush}" Visibility="Collapsed"/>
             </StackPanel>
             <!-- Derecha: zoom y utilidades -->
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <Button Content="－" ToolTip="Zoom Out" Click="ZoomOut_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
-                <Button Content="100%" ToolTip="Restablecer" Click="Zoom100_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
-                <Button Content="＋" ToolTip="Zoom In" Click="ZoomIn_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Content="－" ToolTip="Zoom Out" Click="ZoomOut_Click" Style="{DynamicResource ReaderIconButtonStyle}" Margin="2,0"/>
+                <Button Content="100%" ToolTip="Restablecer" Click="Zoom100_Click" Style="{DynamicResource ReaderIconButtonStyle}" Margin="2,0"/>
+                <Button Content="＋" ToolTip="Zoom In" Click="ZoomIn_Click" Style="{DynamicResource ReaderIconButtonStyle}" Margin="2,0"/>
                 <Separator Width="10" Background="Transparent"/>
-                <Button Content="⟳" ToolTip="Rotar" Click="Rotate_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
+                <Button ToolTip="Rotar" Click="Rotate_Click" Style="{DynamicResource ReaderIconButtonStyle}" Margin="2,0">
+                    <Path Style="{StaticResource NavIconStyle}" Data="M12 6V2L8 6l4 4V8c2.8 0 5 2.2 5 5 0 1.1-.3 2.1-.9 3l1.5 1.5C19.4 16.1 20 14.1 20 12c0-4.4-3.6-8-8-8z" Fill="{DynamicResource TextBrush}"/>
+                </Button>
                 <Separator Width="10" Background="Transparent"/>
-                <Button Content="☰" ToolTip="Miniaturas" Click="ToggleThumbnails_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
-                <Button Content="☾" ToolTip="Modo Nocturno" Click="ToggleNightMode_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
-                <Button Content="⛶" ToolTip="Pantalla Completa Total" Click="ImmersiveFullScreen_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
+                <Button ToolTip="Miniaturas" Click="ToggleThumbnails_Click" Style="{DynamicResource ReaderIconButtonStyle}" Margin="2,0">
+                    <Path Style="{StaticResource NavIconStyle}" Data="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z" Fill="{DynamicResource TextBrush}"/>
+                </Button>
+                <Button ToolTip="Modo Nocturno" Click="ToggleNightMode_Click" Style="{DynamicResource ReaderIconButtonStyle}" Margin="2,0">
+                    <Path Style="{StaticResource NavIconStyle}" Data="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" Fill="{DynamicResource TextBrush}"/>
+                </Button>
+                <Button ToolTip="Pantalla Completa Total" Click="ImmersiveFullScreen_Click" Style="{DynamicResource ReaderIconButtonStyle}" Margin="2,0">
+                    <Path Style="{StaticResource NavIconStyle}" Data="M7 14H5v5h5v-2H7v-3zm10 5h-3v2h5v-5h-2v3zM7 5h3V3H5v5h2V5zm10 0v3h2V3h-5v2h3z" Fill="{DynamicResource TextBrush}"/>
+                </Button>
                 <!-- Toggle lectura continua / paginada -->
-                <Button x:Name="ToggleContinuousButton" Content="📄" ToolTip="Alternar modo de lectura" Click="ToggleContinuous_Click" Style="{StaticResource ReaderToggleButtonStyle}" Margin="6,0"/>
+                <Button x:Name="ToggleContinuousButton" ToolTip="Alternar modo de lectura" Click="ToggleContinuous_Click" Style="{DynamicResource ReaderToggleButtonStyle}" Margin="6,0">
+                    <Path Style="{StaticResource NavIconStyle}" Data="M6 2h8l4 4v14H6z" Fill="{DynamicResource TextBrush}"/>
+                </Button>
             </StackPanel>
         </DockPanel>
     </Border>
@@ -147,7 +161,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Panel lateral de miniaturas (sin ScrollViewer externo para mantener virtualización) -->
-    <Border x:Name="ThumbPanel" Grid.Column="0" Width="240" Background="{DynamicResource PanelBackgroundBrush}" Visibility="Collapsed">
+        <Border x:Name="ThumbPanel" Grid.Column="0" Width="240" Background="{DynamicResource PanelBackgroundBrush}" Visibility="Collapsed">
             <ListBox x:Name="ThumbList"
                      BorderThickness="0"
                      Background="Transparent"
@@ -164,7 +178,12 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Margin="8" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="6" Padding="6" Style="{StaticResource ThumbCardStyle}">
+                        <Border Margin="8" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="6" Padding="6" Style="{DynamicResource ThumbCardStyle}">
+                            <Border.ToolTip>
+                                <ToolTip Placement="Right" StaysOpen="False">
+                                    <Image Source="{Binding Thumbnail}" Width="280" Height="380" Stretch="Uniform" />
+                                </ToolTip>
+                            </Border.ToolTip>
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
@@ -172,11 +191,6 @@
                                 </Grid.RowDefinitions>
                                 <Image Source="{Binding Thumbnail}" Stretch="Uniform" Height="140"/>
                                 <TextBlock Grid.Row="1" Text="{Binding PageNumber}" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
-                                <Border.ToolTip>
-                                    <ToolTip Placement="Right" StaysOpen="False">
-                                        <Image Source="{Binding Thumbnail}" Width="280" Height="380" Stretch="Uniform" />
-                                    </ToolTip>
-                                </Border.ToolTip>
                             </Grid>
                         </Border>
                     </DataTemplate>

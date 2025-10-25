@@ -123,6 +123,25 @@
  - Ajustado límite de concurrencia para prefetch en `ComicPageLoader` a un máximo de 4 tareas concurrentes por defecto. Esto ayuda a reducir picos de CPU durante la decodificación de imágenes en discos rápidos.
  - Compat shim temporal para `CacheManager` añadido para minimizar cambios en call-sites; se recomienda refactorizar `ComicPageLoader` para usar la API explícita (`Set`, `TryGet`, `TryRemove`).
 
+### 🎨 Interfaz y Animaciones (Unreleased)
+
+- Añadidos controles para gestionar animaciones desde la UI (`SettingsWindow`) y persistencia en `AppSettings`:
+	- `EnableAnimations` (master switch)
+	- `EnableAnimationsReaderTopBar`, `EnableAnimationsReaderOverlay`, `EnableAnimationsButtons`, `EnableAnimationsPageTurn`
+	- `KeepReaderOverlayVisible` (mantener overlay/topbar visible)
+
+- Reemplazados varios contenidos emoji en botones del `ReaderTopBar` por iconos vectoriales (`Path`) y se mejoró `ReaderIconButtonStyle` con sombra y transformaciones para hover/press.
+
+- Storyboards del modo lectura ahora se declaran como recursos en `Styles/ReadingMode.xaml` y se inician desde `MainWindow.cs` sólo cuando las flags correspondientes están activas. Esto evita errores por orden de carga y permite deshabilitar animaciones en tiempo de ejecución.
+
+- Se añadieron convertidores y bindings defensivos para controlar micro-animaciones (hover/press) mediante `MultiBinding` y `AppSettings` expuesto en recursos de la aplicación.
+
+Cambios relevantes en el código:
+- `Styles/ReadingMode.xaml` — estilos y storyboards centralizados.
+- `MainWindow.xaml` / `MainWindow.cs` — iconos vectoriales, control de overlay y arranque condicional de storyboards.
+- `Views/SettingsWindow.xaml` — checkboxes para toggles de animación y persistencia de `KeepReaderOverlayVisible`.
+- `Docs/ReadingMode_Customization.md` — documentación actualizada sobre el nuevo patrón de animaciones.
+
 
 ## [Versión 1.0.0] - 2024-08-15
 
