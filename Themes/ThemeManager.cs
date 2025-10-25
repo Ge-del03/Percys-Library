@@ -421,6 +421,62 @@ namespace ComicReader.Themes
 
             // Re-generate brushes for any colors we added
             CreateBrushesFromColors(theme);
+
+            // Accessibility: ensure sufficient contrast between text and window background.
+            // If contrast is too low, pick a fallback (black or white) that provides better contrast.
+            try
+            {
+                if (theme.Contains("WindowBackgroundColor") && theme.Contains("TextColor"))
+                {
+                    var wb = theme["WindowBackgroundColor"] as Color? ?? Colors.Black;
+                    var tc = theme["TextColor"] as Color? ?? Colors.White;
+                    double cr = ContrastRatio(wb, tc);
+                    const double minContrast = 4.5; // WCAG AA for normal text
+                    if (cr < minContrast)
+                    {
+                        // Choose black or white whichever gives better contrast against the background
+                        var blackContrast = ContrastRatio(wb, Colors.Black);
+                        var whiteContrast = ContrastRatio(wb, Colors.White);
+                        var better = blackContrast >= whiteContrast ? Colors.Black : Colors.White;
+                        theme["TextColor"] = better;
+                        // Secondary/disabled text should also be adjusted to be a readable fraction of main text
+                        theme["SecondaryTextColor"] = MakeRelativeShade((Color)theme["TextColor"], 0.65);
+                        theme["DisabledTextColor"] = MakeRelativeShade((Color)theme["TextColor"], 0.4);
+                        // Recreate brushes for the adjusted colors
+                        CreateBrushesFromColors(theme);
+                    }
+                }
+            }
+            catch { }
+        }
+
+        // Compute relative luminance per WCAG
+        private static double LinearizeChannel(byte c)
+        {
+            double v = c / 255.0;
+            return (v <= 0.03928) ? (v / 12.92) : Math.Pow((v + 0.055) / 1.055, 2.4);
+        }
+
+        private static double RelativeLuminance(Color color)
+        {
+            return 0.2126 * LinearizeChannel(color.R) + 0.7152 * LinearizeChannel(color.G) + 0.0722 * LinearizeChannel(color.B);
+        }
+
+        private static double ContrastRatio(Color a, Color b)
+        {
+            var la = RelativeLuminance(a) + 0.05;
+            var lb = RelativeLuminance(b) + 0.05;
+            return la > lb ? la / lb : lb / la;
+        }
+
+        // Make a shade of the given base color by interpolating towards black/white to reach a readable tone
+        private static Color MakeRelativeShade(Color baseColor, double factor)
+        {
+            // factor 1.0 => baseColor, factor 0.0 => black
+            byte R = (byte)Math.Round(baseColor.R * factor);
+            byte G = (byte)Math.Round(baseColor.G * factor);
+            byte B = (byte)Math.Round(baseColor.B * factor);
+            return Color.FromRgb(R, G, B);
         }
 
         public static void SaveCurrentTheme()
