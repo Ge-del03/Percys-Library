@@ -1708,3 +1708,154 @@
 2025-10-25 11:23:54.925 [Info] [Perf] 2025-10-25T15:23:54.9251322Z - Decode_CreateBitmapImage took 107ms
 2025-10-25 11:23:54.926 [Info] [Perf] 2025-10-25T15:23:54.9267804Z - LoadImageFromSource_ZipExtract took 121ms
 2025-10-25 11:23:54.928 [Info] [Perf] 2025-10-25T15:23:54.9282868Z - Prefetch page 1 took 128ms
+2025-10-25 11:27:10.903 [Info] Logger inicializado
+2025-10-25 11:27:11.259 [Info] Applied programmatic theme: Retro80s
+2025-10-25 11:27:11.894 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 11:27:11.902 [Info] Decode concurrency cap set to 4
+2025-10-25 11:27:11.915 [Info] Prefetch window set to 2
+2025-10-25 11:27:23.634 [Info] Decode concurrency cap set to 4
+2025-10-25 11:31:06.590 [Info] Logger inicializado
+2025-10-25 11:31:06.914 [Info] Applied programmatic theme: ComicPop
+2025-10-25 11:31:07.346 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 11:31:07.351 [Info] Decode concurrency cap set to 4
+2025-10-25 11:31:07.356 [Info] Prefetch window set to 2
+2025-10-25 11:31:19.802 [Info] Decode concurrency cap set to 4
+2025-10-25 11:31:30.343 [Info] Decode concurrency cap set to 4
+2025-10-25 11:31:37.176 [Info] Decode concurrency cap set to 4
+2025-10-25 11:31:42.493 [Info] Decode concurrency cap set to 4
+2025-10-25 11:31:46.559 [Info] Decode concurrency cap set to 4
+2025-10-25 11:31:50.994 [Info] Decode concurrency cap set to 4
+2025-10-25 11:31:55.810 [Info] Decode concurrency cap set to 4
+2025-10-25 11:33:37.670 [Info] Logger inicializado
+2025-10-25 11:33:37.919 [Info] Applied programmatic theme: CelShade
+2025-10-25 11:33:38.268 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 11:33:38.270 [Info] Decode concurrency cap set to 4
+2025-10-25 11:33:38.273 [Info] Prefetch window set to 2
+2025-10-25 11:36:11.213 [Info] Logger inicializado
+2025-10-25 11:36:11.579 [Info] Applied programmatic theme: CelShade
+2025-10-25 11:36:12.007 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 11:36:12.009 [Info] Decode concurrency cap set to 4
+2025-10-25 11:36:12.011 [Info] Prefetch window set to 2
+2025-10-25 11:37:21.594 [Info] Logger inicializado
+2025-10-25 11:37:22.213 [Info] Applied programmatic theme: CelShade
+2025-10-25 11:37:22.947 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 11:37:22.961 [Info] Decode concurrency cap set to 4
+2025-10-25 11:37:22.995 [Info] Prefetch window set to 2
+2025-10-25 11:37:36.838 [Info] Decode concurrency cap set to 4
+2025-10-25 11:37:46.569 [Info] Decode concurrency cap set to 4
+2025-10-25 11:38:15.844 [Info] Decode concurrency cap set to 4
+2025-10-25 11:38:15.846 [Info] Decode concurrency cap set to 4
+2025-10-25 11:40:44.147 [Info] Logger inicializado
+2025-10-25 11:40:44.354 [Info] Applied programmatic theme: PercysLibrary
+2025-10-25 11:40:44.658 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 11:40:44.663 [Info] Decode concurrency cap set to 4
+2025-10-25 11:40:44.667 [Info] Prefetch window set to 2
+2025-10-25 11:41:07.954 [Info] Decode concurrency cap set to 4
+2025-10-25 11:42:41.604 [Info] Decode concurrency cap set to 4
+2025-10-25 11:45:41.983 [Info] Logger inicializado
+2025-10-25 11:45:42.321 [Info] Applied programmatic theme: PercysLibrary
+2025-10-25 11:45:42.913 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 11:45:42.999 [Info] Decode concurrency cap set to 4
+2025-10-25 11:45:43.070 [Info] Prefetch window set to 2
+2025-10-25 11:46:22.831 [Info] Logger inicializado
+2025-10-25 11:46:23.222 [Info] Applied programmatic theme: PercysLibrary
+2025-10-25 11:46:23.601 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 11:46:23.603 [Info] Decode concurrency cap set to 4
+2025-10-25 11:46:23.606 [Info] Prefetch window set to 2
+2025-10-25 11:53:36.363 [Info] Logger inicializado
+2025-10-25 11:53:36.823 [Info] Applied programmatic theme: PercysLibrary
+2025-10-25 11:53:37.312 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 11:53:37.315 [Info] Decode concurrency cap set to 4
+2025-10-25 11:53:37.320 [Info] Prefetch window set to 2
+2025-10-25 11:55:47.050 [Info] Logger inicializado
+2025-10-25 11:55:47.458 [Info] Applied programmatic theme: PercysLibrary
+2025-10-25 11:55:47.742 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 11:55:47.746 [Info] Decode concurrency cap set to 4
+2025-10-25 11:55:47.748 [Info] Prefetch window set to 2
+2025-10-25 11:56:07.228 [Info] Decode concurrency cap set to 4
+2025-10-25 11:56:11.908 [Info] Decode concurrency cap set to 4
+2025-10-25 11:59:15.145 [Info] Logger inicializado
+2025-10-25 11:59:15.661 [Info] Applied programmatic theme: PercysLibrary
+2025-10-25 11:59:16.087 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 11:59:16.089 [Info] Decode concurrency cap set to 4
+2025-10-25 11:59:16.091 [Info] Prefetch window set to 2
+2025-10-25 11:59:30.499 [Info] Decode concurrency cap set to 4
+2025-10-25 11:59:37.846 [Info] Decode concurrency cap set to 4
+2025-10-25 12:00:50.310 [Info] Logger inicializado
+2025-10-25 12:00:50.728 [Info] Applied programmatic theme: PercysLibrary
+2025-10-25 12:00:51.020 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 12:00:51.023 [Info] Decode concurrency cap set to 4
+2025-10-25 12:00:51.025 [Info] Prefetch window set to 2
+2025-10-25 12:02:57.681 [Info] Logger inicializado
+2025-10-25 12:02:58.095 [Info] Applied programmatic theme: PercysLibrary
+2025-10-25 12:02:58.404 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 12:02:58.406 [Info] Decode concurrency cap set to 4
+2025-10-25 12:02:58.408 [Info] Prefetch window set to 2
+2025-10-25 12:07:37.128 [Info] Logger inicializado
+2025-10-25 12:07:37.492 [Info] Applied programmatic theme: PercysLibrary
+2025-10-25 12:07:38.036 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 12:07:38.039 [Info] Decode concurrency cap set to 4
+2025-10-25 12:07:38.041 [Info] Prefetch window set to 2
+2025-10-25 12:07:51.023 [Info] Decode concurrency cap set to 4
+2025-10-25 12:09:05.476 [Info] Logger inicializado
+2025-10-25 12:09:05.775 [Info] Applied programmatic theme: CelShade
+2025-10-25 12:09:06.217 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 12:09:06.228 [Info] Decode concurrency cap set to 4
+2025-10-25 12:09:06.230 [Info] Prefetch window set to 2
+2025-10-25 12:09:14.840 [Info] Decode concurrency cap set to 4
+2025-10-25 12:09:40.695 [Info] Decode concurrency cap set to 4
+2025-10-25 12:14:52.707 [Info] Logger inicializado
+2025-10-25 12:14:53.132 [Info] Applied programmatic theme: CelShade
+2025-10-25 12:14:53.717 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 12:14:53.726 [Info] Decode concurrency cap set to 4
+2025-10-25 12:14:53.747 [Info] Prefetch window set to 2
+2025-10-25 12:16:22.557 [Info] Logger inicializado
+2025-10-25 12:16:23.039 [Info] Applied programmatic theme: CelShade
+2025-10-25 12:16:23.997 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 12:16:24.172 [Info] Decode concurrency cap set to 4
+2025-10-25 12:16:24.247 [Info] Prefetch window set to 2
+2025-10-25 12:16:38.811 [Info] Decode concurrency cap set to 4
+2025-10-25 12:16:51.276 [Info] Decode concurrency cap set to 4
+2025-10-25 12:16:57.076 [Info] Decode concurrency cap set to 4
+2025-10-25 12:17:03.892 [Info] Decode concurrency cap set to 4
+2025-10-25 12:17:53.712 [Info] Logger inicializado
+2025-10-25 12:17:53.969 [Info] Applied programmatic theme: PercysLibrary
+2025-10-25 12:17:54.364 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 12:17:54.368 [Info] Decode concurrency cap set to 4
+2025-10-25 12:17:54.372 [Info] Prefetch window set to 2
+2025-10-25 12:18:09.876 [Info] Decode concurrency cap set to 4
+2025-10-25 12:27:16.407 [Info] Logger inicializado
+2025-10-25 12:27:17.008 [Info] Applied programmatic theme: ComicPop
+2025-10-25 12:27:17.591 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 12:27:17.594 [Info] Decode concurrency cap set to 4
+2025-10-25 12:27:17.598 [Info] Prefetch window set to 2
+2025-10-25 12:32:45.653 [Info] Logger inicializado
+2025-10-25 12:32:46.086 [Info] Applied programmatic theme: ComicPop
+2025-10-25 12:32:46.634 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 12:32:46.637 [Info] Decode concurrency cap set to 4
+2025-10-25 12:32:46.641 [Info] Prefetch window set to 2
+2025-10-25 12:46:47.373 [Info] Logger inicializado
+2025-10-25 12:46:47.665 [Info] Applied programmatic theme: PercysLibrary
+2025-10-25 12:46:48.181 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 12:46:48.184 [Info] Decode concurrency cap set to 4
+2025-10-25 12:46:48.185 [Info] Prefetch window set to 2
+2025-10-25 13:01:38.814 [Info] Logger inicializado
+2025-10-25 13:01:39.245 [Info] Applied programmatic theme: PercysLibrary
+2025-10-25 13:01:39.804 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 13:01:39.810 [Info] Decode concurrency cap set to 4
+2025-10-25 13:01:39.818 [Info] Prefetch window set to 2
+2025-10-25 13:01:49.695 [Info] Decode concurrency cap set to 4
+2025-10-25 13:01:55.859 [Info] Decode concurrency cap set to 4
+2025-10-25 13:02:52.752 [Info] Logger inicializado
+2025-10-25 13:02:52.998 [Info] Applied programmatic theme: PercysLibrary
+2025-10-25 13:02:53.295 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 13:02:53.297 [Info] Decode concurrency cap set to 4
+2025-10-25 13:02:53.299 [Info] Prefetch window set to 2
+2025-10-25 13:03:21.266 [Info] Decode concurrency cap set to 4
+2025-10-25 13:03:23.125 [Info] Decode concurrency cap set to 4
+2025-10-25 13:10:00.849 [Info] Logger inicializado
+2025-10-25 13:10:01.212 [Info] Applied programmatic theme: Retro80s
+2025-10-25 13:10:01.499 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-25 13:10:01.501 [Info] Decode concurrency cap set to 4
+2025-10-25 13:10:01.503 [Info] Prefetch window set to 2
+2025-10-25 13:10:24.067 [Info] Decode concurrency cap set to 4

@@ -164,7 +164,7 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Margin="8" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="6" Padding="6">
+                        <Border Margin="8" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="6" Padding="6" Style="{StaticResource ThumbCardStyle}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
@@ -172,6 +172,11 @@
                                 </Grid.RowDefinitions>
                                 <Image Source="{Binding Thumbnail}" Stretch="Uniform" Height="140"/>
                                 <TextBlock Grid.Row="1" Text="{Binding PageNumber}" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                                <Border.ToolTip>
+                                    <ToolTip Placement="Right" StaysOpen="False">
+                                        <Image Source="{Binding Thumbnail}" Width="280" Height="380" Stretch="Uniform" />
+                                    </ToolTip>
+                                </Border.ToolTip>
                             </Grid>
                         </Border>
                     </DataTemplate>

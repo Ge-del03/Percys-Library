@@ -12,8 +12,7 @@ namespace ComicReader.Themes
         private static readonly Dictionary<ThemeMode, ResourceDictionary> _themes = 
             new Dictionary<ThemeMode, ResourceDictionary>();
         
-    // Default to the branded Percy's Library theme
-    private static ThemeMode _currentTheme = ThemeMode.PercysLibrary;
+        private static ThemeMode _currentTheme = ThemeMode.Comic;
         public static event Action<ThemeMode> ThemeChanged;
 
         static ThemeManager()
@@ -110,80 +109,16 @@ namespace ComicReader.Themes
             _themes[ThemeMode.PastelGentle] = P(Color.FromRgb(200,220,240), Color.FromRgb(240,200,220), Color.FromRgb(220,240,200), Color.FromRgb(250,250,250), Color.FromRgb(255,255,255), Color.FromRgb(30,30,30));
 
             // Exclusive branded theme for the app: "Percy's Library"
-            // Refined palette: deep-navy base, soft illuminated gradient, warm secondary accents.
-            {
-                var theme = new ResourceDictionary();
-                // Core colors
-                theme["PrimaryColor"] = Color.FromRgb(59, 130, 246);   // brand blue
-                theme["SecondaryColor"] = Color.FromRgb(255, 167, 38); // warm orange-gold (slightly deeper)
-                theme["AccentColor"] = Color.FromRgb(255, 167, 38);    // accent
-                theme["ErrorColor"] = Color.FromRgb(239, 83, 80);
-
-                // Backgrounds
-                theme["WindowBackgroundColor"] = Color.FromRgb(12, 18, 30); // very deep navy
-                theme["PanelBackgroundColor"] = Color.FromRgb(18, 26, 44);  // slightly lighter panel
-                theme["HeaderBackgroundColor"] = Color.FromRgb(22, 32, 54);
-                theme["InputBackgroundColor"] = Color.FromRgb(24, 34, 56);
-
-                // Text
-                theme["TextColor"] = Color.FromRgb(236, 241, 250); // soft light
-                theme["SecondaryTextColor"] = Color.FromRgb(170, 185, 200);
-                theme["DisabledTextColor"] = Color.FromRgb(110, 120, 130);
-
-                // Interaction colors
-                theme["BorderColor"] = Color.FromRgb(40, 60, 80);
-                theme["ItemHoverColor"] = Color.FromRgb(30, 40, 60);
-                theme["ItemSelectedColor"] = Color.FromRgb(59, 130, 246);
-                theme["CurrentPageColor"] = Color.FromRgb(255, 243, 224);
-
-                // Create brushes and richer visuals
-                CreateBrushesFromColors(theme);
-
-                // Window gradient: subtle vignette + blue glow to the right
-                var winGrad = new LinearGradientBrush();
-                winGrad.StartPoint = new Point(0, 0);
-                winGrad.EndPoint = new Point(1, 1);
-                winGrad.GradientStops.Add(new GradientStop(Color.FromRgb(10, 16, 28), 0.0));
-                winGrad.GradientStops.Add(new GradientStop(Color.FromRgb(18, 32, 58), 0.45));
-                winGrad.GradientStops.Add(new GradientStop(Color.FromRgb(36, 92, 198), 1.0));
-                winGrad.Freeze();
-                theme["WindowBackgroundBrush"] = winGrad;
-
-                // Panel background: subtle semi-transparent overlay to let window gradient show
-                var panelBrush = new SolidColorBrush(Color.FromArgb(220, 18, 26, 44)); panelBrush.Freeze();
-                theme["PanelBackgroundBrush"] = panelBrush;
-
-                // Accent brush for buttons and outlines
-                var accent = new SolidColorBrush((Color)theme["AccentColor"]); accent.Freeze();
-                theme["AccentBrush"] = accent;
-
-                // Outline for accent buttons (slightly darker stroke)
-                var accentStroke = new SolidColorBrush(Color.FromRgb(200, 120, 30)); accentStroke.Freeze();
-                theme["AccentStrokeBrush"] = accentStroke;
-
-                // Header title brush (slightly brighter)
-                var titleBrush = new SolidColorBrush(Color.FromRgb(250, 250, 250)); titleBrush.Freeze();
-                theme["HeaderTextBrush"] = titleBrush;
-
-                // Item hover/pressed brushes
-                var hover = new SolidColorBrush(Color.FromArgb(80, 255, 200, 120)); hover.Freeze();
-                theme["ItemHoverBrush"] = hover;
-                var pressed = new SolidColorBrush(Color.FromArgb(120, 255, 160, 60)); pressed.Freeze();
-                theme["ItemPressedBrush"] = pressed;
-
-                // Small glow overlay to add depth
-                var overlay = new LinearGradientBrush();
-                overlay.StartPoint = new Point(0.0, 0.0); overlay.EndPoint = new Point(1, 0);
-                overlay.GradientStops.Add(new GradientStop(Color.FromArgb(0, 0, 0, 0), 0.0));
-                overlay.GradientStops.Add(new GradientStop(Color.FromArgb(30, 255, 255, 255), 0.55));
-                overlay.GradientStops.Add(new GradientStop(Color.FromArgb(0, 0, 0, 0), 1.0));
-                overlay.Freeze();
-                theme["WindowShineBrush"] = overlay;
-
-                // Ensure required brushes exist and finalize
-                EnsureThemeComplete(theme);
-                _themes[ThemeMode.PercysLibrary] = theme;
-            }
+            // Palette uses the app's signature deep-navy background and bright blue accent,
+            // with a warm secondary for highlights. Ensure contrast-safe choices.
+            _themes[ThemeMode.PercysLibrary] = P(
+                Color.FromRgb(59, 130, 246),   // PrimaryColor - brand blue (#3B82F6)
+                Color.FromRgb(255, 211, 102),  // SecondaryColor - warm accent (golden)
+                Color.FromRgb(59, 130, 246),   // AccentColor - brand blue
+                Color.FromRgb(14, 23, 41),     // WindowBackgroundColor - deep navy (#0E1729)
+                Color.FromRgb(16, 24, 41),     // PanelBackgroundColor - slightly lighter panel
+                Color.FromRgb(230, 236, 248)   // TextColor - soft light text (#E6ECF8)
+            );
 
             // Validate and fill missing keys for all themes
             foreach (var kv in _themes)

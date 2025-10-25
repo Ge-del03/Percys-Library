@@ -34,4 +34,18 @@
     <GradientStop Color="{StaticResource Color.Primary.Purple}" Offset="0.5"/>
     <GradientStop Color="{StaticResource Color.Primary.Blue}" Offset="1"/>
   </LinearGradientBrush>
+
+  <!-- Backwards-compatible resource names used across XAML -->
+  <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource Color.Primary.Blue}" />
+  <SolidColorBrush x:Key="AccentForegroundBrush" Color="#FFFFFFFF" />
+  <SolidColorBrush x:Key="AccentLowBrush" Color="#223B82F6" />
+
+  <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource Color.Background.Deep}" />
+  <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource Color.Background.Panel}" />
+  <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource Color.Background.Card}" />
+  <SolidColorBrush x:Key="CardBgBrush" Color="{StaticResource Color.Background.Card}" />
+
+  <SolidColorBrush x:Key="TextBrush" Color="{StaticResource Color.Neutral.SoftWhite}" />
+  <SolidColorBrush x:Key="SecondaryTextBrush" Color="{StaticResource Color.Neutral.OffWhite}" />
+  <SolidColorBrush x:Key="DisabledTextBrush" Color="#99FFFFFF" />
 </ResourceDictionary>

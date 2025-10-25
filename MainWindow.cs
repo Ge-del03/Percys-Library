@@ -150,6 +150,8 @@ namespace ComicReader
                 OnPropertyChanged(nameof(IsReaderViewActive));
                 OnPropertyChanged(nameof(IsHomeViewActive));
                 OnPropertyChanged(nameof(IsSettingsViewActive));
+                // Animación de transición breve al cambiar la vista principal
+                try { AnimateMainContentChange(); } catch { }
             }
         }
 
@@ -164,6 +166,9 @@ namespace ComicReader
         {
             // Carga el XAML de la ventana. Sin esta llamada, la UI queda en blanco.
             InitializeComponent();
+
+            // Arrancar animaciones visuales de cabecera (sorpresa sutil)
+            this.Loaded += (s, e) => StartHeaderShimmer();
 
             // Inicialización adicional específica de la app
             InitializeComponents();
@@ -213,6 +218,66 @@ namespace ComicReader
             // En modo DEBUG, abrir la Configuración automáticamente una vez para pruebas rápidas
             // (DEBUG auto-open removed)
             // Loader HUD removed; no timer initialized.
+        }
+
+        // Crea y aplica un LinearGradientBrush animado en la cabecera para dar una sensación viva.
+        private void StartHeaderShimmer()
+        {
+            try
+            {
+                var border = this.FindName("CustomTitleBar") as System.Windows.Controls.Border;
+                if (border == null) return;
+
+                // Crear un gradiente animable
+                var g = new LinearGradientBrush();
+                g.StartPoint = new System.Windows.Point(0, 0);
+                g.EndPoint = new System.Windows.Point(1, 0);
+                var gs1 = new GradientStop((System.Windows.Media.Color)Application.Current.Resources["Color.Primary.Blue"], 0.0);
+                var gs2 = new GradientStop(System.Windows.Media.Colors.Transparent, 0.5);
+                var gs3 = new GradientStop((System.Windows.Media.Color)Application.Current.Resources["Color.Primary.Purple"], 1.0);
+                g.GradientStops.Add(gs1);
+                g.GradientStops.Add(gs2);
+                g.GradientStops.Add(gs3);
+
+                border.Background = g;
+
+                // Animar el offset de los gradient stops para crear un suave barrido
+                var anim1 = new System.Windows.Media.Animation.DoubleAnimation
+                {
+                    From = -0.3,
+                    To = 1.3,
+                    Duration = new Duration(TimeSpan.FromSeconds(6)),
+                    RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever,
+                    AutoReverse = true,
+                    EasingFunction = new System.Windows.Media.Animation.SineEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseInOut }
+                };
+                var anim2 = anim1.Clone();
+                anim2.BeginTime = TimeSpan.FromSeconds(1.2);
+
+                gs1.BeginAnimation(GradientStop.OffsetProperty, anim1);
+                gs3.BeginAnimation(GradientStop.OffsetProperty, anim2);
+            }
+            catch { }
+        }
+
+        private void AnimateMainContentChange()
+        {
+            try
+            {
+                var content = this.FindName("MainContentArea") as System.Windows.Controls.ContentControl;
+                if (content == null) return;
+                // Aplicar una animación de fundido rápido
+                var fade = new System.Windows.Media.Animation.DoubleAnimation
+                {
+                    From = 0.0,
+                    To = 1.0,
+                    Duration = new Duration(TimeSpan.FromMilliseconds(220)),
+                    EasingFunction = new System.Windows.Media.Animation.QuadraticEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut }
+                };
+                content.Opacity = 0.0;
+                content.BeginAnimation(System.Windows.UIElement.OpacityProperty, fade);
+            }
+            catch { }
         }
 
         private async void MainWindow_Closing(object sender, CancelEventArgs e)
