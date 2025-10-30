@@ -153,7 +153,7 @@
               </Track.IncreaseRepeatButton>
               <Track.Thumb>
                 <!-- Thumb funcional pero visualmente oculto: mantiene arrastre sin mostrar el gran punto azul -->
-                <Thumb Width="14" Height="14" Cursor="Hand">
+                <Thumb Width="14" Height="14" Cursor="Hand" Focusable="False" FocusVisualStyle="{x:Null}">
                   <Thumb.Template>
                     <ControlTemplate TargetType="Thumb">
                       <!-- Usamos un borde transparente para mantener el área de interacción sin el color azul -->

@@ -233,22 +233,77 @@ namespace ComicReader
             {
                 // Si estamos en modo inmersivo, no limitar; ahí sí puede cubrir la barra de tareas
                 if (_isImmersive) return;
+                // Cuando la ventana está maximizada queremos cubrir TODO el monitor (incluida la barra de tareas)
+                // y no usar WorkArea. Esto permite que la aplicación ocupe la pantalla completa cuando el usuario
+                // presiona maximizar (tal como pidió el usuario).
                 var wa = SystemParameters.WorkArea;
                 if (this.WindowState == WindowState.Maximized)
                 {
-                    this.MaxHeight = wa.Height;
-                    this.MaxWidth = wa.Width;
-                    this.Top = wa.Top;
-                    this.Left = wa.Left;
+                    try
+                    {
+                        var m = GetCurrentMonitorBounds();
+                        this.MaxHeight = m.Height;
+                        this.MaxWidth = m.Width;
+                        this.Top = m.Top;
+                        this.Left = m.Left;
+                        // Poner la ventana como topmost mientras está maximizada para cubrir la barra de tareas
+                        this.Topmost = true;
+                    }
+                    catch
+                    {
+                        // Fallback a WorkArea si falla la consulta del monitor
+                        this.MaxHeight = wa.Height;
+                        this.MaxWidth = wa.Width;
+                        this.Top = wa.Top;
+                        this.Left = wa.Left;
+                    }
                 }
                 else
                 {
                     // Restablecer límites cuando no está maximizada
                     this.MaxHeight = double.PositiveInfinity;
                     this.MaxWidth = double.PositiveInfinity;
+                    // Asegurar que ya no estamos topmost cuando no esté maximizada
+                    this.Topmost = false;
                 }
             }
             catch { }
+        }
+
+        // P/Invoke para obtener el rectángulo completo del monitor (incluye la región ocupada por la barra de tareas)
+        [StructLayout(LayoutKind.Sequential)]
+        private struct RECT { public int left; public int top; public int right; public int bottom; }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct MONITORINFO
+        {
+            public int cbSize;
+            public RECT rcMonitor;
+            public RECT rcWork;
+            public uint dwFlags;
+        }
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
+
+        private System.Windows.Rect GetCurrentMonitorBounds()
+        {
+            var helper = new WindowInteropHelper(this);
+            IntPtr h = helper.Handle;
+            const uint MONITOR_DEFAULTTONEAREST = 2;
+            var hMon = MonitorFromWindow(h, MONITOR_DEFAULTTONEAREST);
+            var info = new MONITORINFO();
+            info.cbSize = Marshal.SizeOf(typeof(MONITORINFO));
+            if (GetMonitorInfo(hMon, ref info))
+            {
+                var r = info.rcMonitor;
+                return new System.Windows.Rect(r.left, r.top, r.right - r.left, r.bottom - r.top);
+            }
+            // Fallback: usar parámetros de pantalla principal
+            return new System.Windows.Rect(0, 0, SystemParameters.PrimaryScreenWidth, SystemParameters.PrimaryScreenHeight);
         }
 
         // Crea y aplica un LinearGradientBrush animado en la cabecera para dar una sensación viva.

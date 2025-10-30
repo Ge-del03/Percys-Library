@@ -107,6 +107,7 @@ namespace ComicReader.Services
         private int _pageCacheLimit = 60; // configurable luego
         private readonly object _lruLock = new();
         private ILogService _log;
+    private readonly ComicReader.Core.Abstractions.IImageCache _multiLevelCache;
         private int _prefetchWindow = 2;
         private object _lock = new object(); // Para sincronizar acceso a recursos compartidos
         // Tipo real del archivo comprimido detectado por firma para manejar CBR mal renombrados
@@ -131,6 +132,7 @@ namespace ComicReader.Services
             _log?.Log("Initializing ComicPageLoader (empty constructor)");
             ApplySettingsParameters();
             try { SetPrefetchWindow(_prefetchWindow); } catch { }
+            _multiLevelCache = ComicReader.Core.Services.ServiceLocator.TryGet<ComicReader.Core.Abstractions.IImageCache>();
         }
 
         public ComicPageLoader(string filePath)
@@ -139,6 +141,7 @@ namespace ComicReader.Services
             InitLog();
             _log?.Log($"Initializing ComicPageLoader for: {_filePath}");
             ApplySettingsParameters();
+            _multiLevelCache = ComicReader.Core.Services.ServiceLocator.TryGet<ComicReader.Core.Abstractions.IImageCache>();
         }
 
         // Limpia el cómic actual (ruta y páginas) sin disponer la instancia
@@ -606,12 +609,28 @@ namespace ComicReader.Services
     public async Task<BitmapImage> GetPageImageAsync(int pageNumber, int targetWidth = 0)
     {
         if (pageNumber < 0 || pageNumber >= _pages.Count) return CreatePlaceholderImage("Error", 200, 200);
-
-        // If full image cached, return immediately
+        // If full image cached in memory, return immediately
         if (_pageCache.TryGetValue(pageNumber, out var cached) && cached.img != null)
         {
             _pageCache[pageNumber] = (cached.img, DateTime.UtcNow);
             return cached.img;
+        }
+
+        // Try multi-level cache (disk -> memory) before doing any decoding
+        if (_multiLevelCache != null)
+        {
+            try
+            {
+                var cacheKey = $"full_{_filePath}_{pageNumber}_{targetWidth}";
+                var diskImg = await _multiLevelCache.Get(cacheKey).ConfigureAwait(false);
+                if (diskImg != null)
+                {
+                    _pageCache[pageNumber] = (diskImg, DateTime.UtcNow);
+                    EnforcePageCacheLimit(pageNumber);
+                    return diskImg;
+                }
+            }
+            catch { /* ignore cache errors */ }
         }
 
         // If we have a thumbnail cached, use it as quick response and enqueue full high-priority load
@@ -662,6 +681,22 @@ namespace ComicReader.Services
             return cached.img;
         }
 
+        // Try multi-level cache (disk -> memory) before doing any decoding
+        if (_multiLevelCache != null && !cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                var cacheKey = $"full_{_filePath}_{pageNumber}_{targetWidth}";
+                var diskImg = await _multiLevelCache.Get(cacheKey).ConfigureAwait(false);
+                if (diskImg != null)
+                {
+                    _pageCache[pageNumber] = (diskImg, DateTime.UtcNow);
+                    EnforcePageCacheLimit(pageNumber);
+                    return diskImg;
+                }
+            }
+            catch { /* ignore cache errors */ }
+        }
         // If we have a thumbnail cached, use it as quick response and enqueue full high-priority load
         if (_thumbCache.TryGetValue(pageNumber, out var tcached) && tcached.img != null)
         {
@@ -706,6 +741,21 @@ namespace ComicReader.Services
                 _thumbCache[pageNumber] = (cached.img, DateTime.UtcNow);
                 return cached.img;
             }
+            // Try multi-level cache for thumbnails
+            if (_multiLevelCache != null)
+            {
+                try
+                {
+                    var cacheKey = $"thumb_{_filePath}_{pageNumber}_{width}_{height}";
+                    var diskThumb = await _multiLevelCache.Get(cacheKey).ConfigureAwait(false);
+                    if (diskThumb != null)
+                    {
+                        _thumbCache[pageNumber] = (diskThumb, DateTime.UtcNow);
+                        return diskThumb;
+                    }
+                }
+                catch { }
+            }
             // Si se pasa height==0, mantenemos la relación de aspecto usando solo width
             var targetWidth = Math.Max(80, width);
             BitmapImage image = null;
@@ -717,6 +767,16 @@ namespace ComicReader.Services
             catch { /* ignore */ }
             if (image == null) image = CreatePlaceholderImage("Sin imagen", width, height);
             _thumbCache[pageNumber] = (image, DateTime.UtcNow);
+            // Persist thumbnail to multi-level cache (background)
+            if (_multiLevelCache != null)
+            {
+                try
+                {
+                    var cacheKey = $"thumb_{_filePath}_{pageNumber}_{width}_{height}";
+                    _ = _multiLevelCache.Set(cacheKey, image);
+                }
+                catch { }
+            }
             EnforceThumbCacheLimit(pageNumber);
             return image;
         }
@@ -731,6 +791,21 @@ namespace ComicReader.Services
                 _thumbCache[pageNumber] = (cached.img, DateTime.UtcNow);
                 return cached.img;
             }
+            // Try multi-level cache for thumbnails
+            if (_multiLevelCache != null && !cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    var cacheKey = $"thumb_{_filePath}_{pageNumber}_{width}_{height}";
+                    var diskThumb = await _multiLevelCache.Get(cacheKey).ConfigureAwait(false);
+                    if (diskThumb != null)
+                    {
+                        _thumbCache[pageNumber] = (diskThumb, DateTime.UtcNow);
+                        return diskThumb;
+                    }
+                }
+                catch { }
+            }
             var targetWidth = Math.Max(80, width);
             BitmapImage image = null;
             try
@@ -741,6 +816,16 @@ namespace ComicReader.Services
             catch { /* ignore */ }
             if (image == null) image = CreatePlaceholderImage("Sin imagen", width, height);
             _thumbCache[pageNumber] = (image, DateTime.UtcNow);
+            // Persist thumbnail to multi-level cache (background)
+            if (_multiLevelCache != null)
+            {
+                try
+                {
+                    var cacheKey = $"thumb_{_filePath}_{pageNumber}_{width}_{height}";
+                    _ = _multiLevelCache.Set(cacheKey, image);
+                }
+                catch { }
+            }
             EnforceThumbCacheLimit(pageNumber);
             return image;
         }
@@ -1317,19 +1402,18 @@ namespace ComicReader.Services
                         await _prefetchSemaphore.WaitAsync().ConfigureAwait(false);
                         try
                         {
-                            if (!_thumbCache.ContainsKey(idx))
+                            // ensure a thumbnail is available as a quick response
+                            if (!_thumbCache.ContainsKey(k))
                             {
-                                try { await GetPageThumbnailAsync(idx, 300, 0, _internalCts.Token).ConfigureAwait(false); } catch { }
+                                try { await GetPageThumbnailAsync(k, 300, 0, _internalCts.Token).ConfigureAwait(false); } catch { }
                             }
-                                if (!_pageCache.ContainsKey(idx))
-                            {
-                                var bmp = await Task.Run(() => LoadImageFromSource(idx, 1200), _internalCts.Token).ConfigureAwait(false);
-                                if (bmp != null) _pageCache[idx] = (bmp, DateTime.UtcNow);
-                            }
-                            return _pageCache.TryGetValue(idx, out var v) ? v.img : CreatePlaceholderImage("Sin imagen", 200, 200);
+                            // Enqueue a full high-priority load which will also persist to multi-level cache
+                            try { _ = StartFullLoadForPageAsync(k, 1200, _internalCts.Token); } catch { }
+
+                            return _pageCache.TryGetValue(k, out var v) ? v.img : CreatePlaceholderImage("Sin imagen", 200, 200);
                         }
                         catch { return CreatePlaceholderImage("Sin imagen", 200, 200); }
-                        finally { _prefetchSemaphore.Release(); _ongoingPageLoads.TryRemove(idx, out Task<BitmapImage> _dummy); }
+                        finally { _prefetchSemaphore.Release(); _ongoingPageLoads.TryRemove(k, out Task<BitmapImage> _dummy); }
                     }, _internalCts?.Token ?? CancellationToken.None));
                     try { await task.ConfigureAwait(false); } catch { }
                     }
@@ -1381,6 +1465,16 @@ namespace ComicReader.Services
                             sw.Stop();
                             if (bmp == null) bmp = CreatePlaceholderImage("Sin imagen", 200, 200);
                             _pageCache[k] = (bmp, DateTime.UtcNow);
+                            // Persist full decoded image to multi-level cache to avoid future blurry reloads
+                            try
+                            {
+                                if (_multiLevelCache != null)
+                                {
+                                    var cacheKey = $"full_{_filePath}_{k}_{targetWidth}";
+                                    _ = _multiLevelCache.Set(cacheKey, bmp);
+                                }
+                            }
+                            catch { }
                             try { FullImageReady?.Invoke(k, bmp); } catch { }
                             EnforcePageCacheLimit(k);
                             if (_quickCachedAt.TryRemove(k, out var quickTs))
