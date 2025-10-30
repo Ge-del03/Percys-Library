@@ -1859,3 +1859,294 @@
 2025-10-25 13:10:01.501 [Info] Decode concurrency cap set to 4
 2025-10-25 13:10:01.503 [Info] Prefetch window set to 2
 2025-10-25 13:10:24.067 [Info] Decode concurrency cap set to 4
+2025-10-27 20:16:49.287 [Info] Logger inicializado
+2025-10-27 20:16:50.052 [Info] Applied programmatic theme: NeonCyber
+2025-10-27 20:16:51.346 [Error] UnhandledException (AppDomain.CurrentDomain): 'No se puede establecer el miembro desconocido 'System.Windows.DynamicResourceExtension.FallbackValue'.' (número de línea: '55'; posición de línea: '33').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.Load(XamlReader xamlReader, IXamlObjectWriterFactory writerFactory, Boolean skipJournaledProperties, Object rootObject, XamlObjectWriterSettings settings, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.LoadBaml(XamlReader xamlReader, Boolean skipJournaledProperties, Object rootObject, XamlAccessLevel accessLevel, Uri baseUri)
+   at System.Windows.Markup.XamlReader.LoadBaml(Stream stream, ParserContext parserContext, Object parent, Boolean closeStream)
+   at System.Windows.Application.LoadComponent(Object component, Uri resourceLocator)
+   at ComicReader.App.InitializeComponent() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\App.xaml:line 1
+   at ComicReader.App.Main()
+2025-10-27 20:20:53.291 [Info] Logger inicializado
+2025-10-27 20:20:53.650 [Info] Applied programmatic theme: NeonCyber
+2025-10-27 20:20:54.284 [Error] UnhandledException (AppDomain.CurrentDomain): 'La propiedad 'Value' se ha establecido ya en 'Setter'.' (número de línea: '243'; posición de línea: '8').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.Load(XamlReader xamlReader, IXamlObjectWriterFactory writerFactory, Boolean skipJournaledProperties, Object rootObject, XamlObjectWriterSettings settings, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.LoadBaml(XamlReader xamlReader, Boolean skipJournaledProperties, Object rootObject, XamlAccessLevel accessLevel, Uri baseUri)
+   at System.Windows.Markup.XamlReader.LoadBaml(Stream stream, ParserContext parserContext, Object parent, Boolean closeStream)
+   at System.Windows.Application.LoadComponent(Object component, Uri resourceLocator)
+   at ComicReader.App.InitializeComponent() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\App.xaml:line 1
+   at ComicReader.App.Main()
+2025-10-27 20:21:53.039 [Info] Logger inicializado
+2025-10-27 20:21:53.363 [Info] Applied programmatic theme: NeonCyber
+2025-10-27 20:21:53.753 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-27 20:21:53.755 [Info] Decode concurrency cap set to 4
+2025-10-27 20:21:53.757 [Info] Prefetch window set to 2
+2025-10-27 20:21:54.486 [Error] Unhandled exception caught by App_DispatcherUnhandledException.: 'Se produjo una excepción al establecer la propiedad 'System.Windows.FrameworkElement.Style'.' (número de línea: '149'; posición de línea: '57').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.Load(XamlReader xamlReader, IXamlObjectWriterFactory writerFactory, Boolean skipJournaledProperties, Object rootObject, XamlObjectWriterSettings settings, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.LoadBaml(XamlReader xamlReader, Boolean skipJournaledProperties, Object rootObject, XamlAccessLevel accessLevel, Uri baseUri)
+   at System.Windows.Markup.XamlReader.LoadBaml(Stream stream, ParserContext parserContext, Object parent, Boolean closeStream)
+   at System.Windows.Application.LoadComponent(Object component, Uri resourceLocator)
+   at ComicReader.MainWindow.InitializeComponent() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.xaml:line 1
+   at ComicReader.MainWindow..ctor() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.cs:line 168
+   at ComicReader.App.OnStartup(StartupEventArgs e) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 30
+   at System.Windows.Application.<.ctor>b__1_0(Object unused)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+2025-10-27 20:33:36.543 [Info] Logger inicializado
+2025-10-27 20:33:37.077 [Info] Applied programmatic theme: NeonCyber
+2025-10-27 20:33:37.458 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-27 20:33:37.461 [Info] Decode concurrency cap set to 4
+2025-10-27 20:33:37.465 [Info] Prefetch window set to 2
+2025-10-27 20:33:37.814 [Error] Fallo al crear MainWindow: 'Se produjo una excepción al establecer la propiedad 'System.Windows.FrameworkElement.Style'.' (número de línea: '149'; posición de línea: '57').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.Load(XamlReader xamlReader, IXamlObjectWriterFactory writerFactory, Boolean skipJournaledProperties, Object rootObject, XamlObjectWriterSettings settings, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.LoadBaml(XamlReader xamlReader, Boolean skipJournaledProperties, Object rootObject, XamlAccessLevel accessLevel, Uri baseUri)
+   at System.Windows.Markup.XamlReader.LoadBaml(Stream stream, ParserContext parserContext, Object parent, Boolean closeStream)
+   at System.Windows.Application.LoadComponent(Object component, Uri resourceLocator)
+   at ComicReader.MainWindow.InitializeComponent() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.xaml:line 1
+   at ComicReader.MainWindow..ctor() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.cs:line 168
+   at ComicReader.App.OnStartup(StartupEventArgs e) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 33
+2025-10-27 20:33:37.877 [Error] Wrote detailed XAML exception to C:\Users\O11CE\AppData\Local\Temp\percy-xaml-exception.txt
+2025-10-27 20:33:37.939 [Error] Unhandled exception caught by App_DispatcherUnhandledException.: 'Se produjo una excepción al establecer la propiedad 'System.Windows.FrameworkElement.Style'.' (número de línea: '149'; posición de línea: '57').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.Load(XamlReader xamlReader, IXamlObjectWriterFactory writerFactory, Boolean skipJournaledProperties, Object rootObject, XamlObjectWriterSettings settings, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.LoadBaml(XamlReader xamlReader, Boolean skipJournaledProperties, Object rootObject, XamlAccessLevel accessLevel, Uri baseUri)
+   at System.Windows.Markup.XamlReader.LoadBaml(Stream stream, ParserContext parserContext, Object parent, Boolean closeStream)
+   at System.Windows.Application.LoadComponent(Object component, Uri resourceLocator)
+   at ComicReader.MainWindow.InitializeComponent() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.xaml:line 1
+   at ComicReader.MainWindow..ctor() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.cs:line 168
+   at ComicReader.App.OnStartup(StartupEventArgs e) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 33
+   at System.Windows.Application.<.ctor>b__1_0(Object unused)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+2025-10-27 20:36:05.467 [Info] Logger inicializado
+2025-10-27 20:36:05.966 [Info] Applied programmatic theme: NeonCyber
+2025-10-27 20:36:06.493 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-27 20:36:06.501 [Info] Decode concurrency cap set to 4
+2025-10-27 20:36:06.503 [Info] Prefetch window set to 2
+2025-10-27 20:36:07.021 [Error] Fallo al crear MainWindow: 'Se produjo una excepción al establecer la propiedad 'System.Windows.FrameworkElement.Style'.' (número de línea: '149'; posición de línea: '57').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.Load(XamlReader xamlReader, IXamlObjectWriterFactory writerFactory, Boolean skipJournaledProperties, Object rootObject, XamlObjectWriterSettings settings, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.LoadBaml(XamlReader xamlReader, Boolean skipJournaledProperties, Object rootObject, XamlAccessLevel accessLevel, Uri baseUri)
+   at System.Windows.Markup.XamlReader.LoadBaml(Stream stream, ParserContext parserContext, Object parent, Boolean closeStream)
+   at System.Windows.Application.LoadComponent(Object component, Uri resourceLocator)
+   at ComicReader.MainWindow.InitializeComponent() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.xaml:line 1
+   at ComicReader.MainWindow..ctor() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.cs:line 168
+   at ComicReader.App.OnStartup(StartupEventArgs e) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 33
+2025-10-27 20:36:07.063 [Error] Wrote detailed XAML exception to C:\Users\O11CE\AppData\Local\Temp\percy-xaml-exception.txt
+2025-10-27 20:36:07.114 [Error] Unhandled exception caught by App_DispatcherUnhandledException.: 'Se produjo una excepción al establecer la propiedad 'System.Windows.FrameworkElement.Style'.' (número de línea: '149'; posición de línea: '57').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.Load(XamlReader xamlReader, IXamlObjectWriterFactory writerFactory, Boolean skipJournaledProperties, Object rootObject, XamlObjectWriterSettings settings, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.LoadBaml(XamlReader xamlReader, Boolean skipJournaledProperties, Object rootObject, XamlAccessLevel accessLevel, Uri baseUri)
+   at System.Windows.Markup.XamlReader.LoadBaml(Stream stream, ParserContext parserContext, Object parent, Boolean closeStream)
+   at System.Windows.Application.LoadComponent(Object component, Uri resourceLocator)
+   at ComicReader.MainWindow.InitializeComponent() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.xaml:line 1
+   at ComicReader.MainWindow..ctor() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.cs:line 168
+   at ComicReader.App.OnStartup(StartupEventArgs e) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 33
+   at System.Windows.Application.<.ctor>b__1_0(Object unused)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+2025-10-27 20:38:34.783 [Info] Logger inicializado
+2025-10-27 20:38:35.362 [Info] Applied programmatic theme: NeonCyber
+2025-10-27 20:38:36.272 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-27 20:38:36.283 [Info] Decode concurrency cap set to 4
+2025-10-27 20:38:36.301 [Info] Prefetch window set to 2
+2025-10-27 20:38:37.286 [Error] Fallo al crear MainWindow: 'Se produjo una excepción al establecer la propiedad 'System.Windows.FrameworkElement.Style'.' (número de línea: '149'; posición de línea: '63').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.Load(XamlReader xamlReader, IXamlObjectWriterFactory writerFactory, Boolean skipJournaledProperties, Object rootObject, XamlObjectWriterSettings settings, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.LoadBaml(XamlReader xamlReader, Boolean skipJournaledProperties, Object rootObject, XamlAccessLevel accessLevel, Uri baseUri)
+   at System.Windows.Markup.XamlReader.LoadBaml(Stream stream, ParserContext parserContext, Object parent, Boolean closeStream)
+   at System.Windows.Application.LoadComponent(Object component, Uri resourceLocator)
+   at ComicReader.MainWindow.InitializeComponent() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.xaml:line 1
+   at ComicReader.MainWindow..ctor() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.cs:line 168
+   at ComicReader.App.OnStartup(StartupEventArgs e) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 33
+2025-10-27 20:38:37.357 [Error] Wrote detailed XAML exception to C:\Users\O11CE\AppData\Local\Temp\percy-xaml-exception.txt
+2025-10-27 20:38:37.403 [Error] Unhandled exception caught by App_DispatcherUnhandledException.: 'Se produjo una excepción al establecer la propiedad 'System.Windows.FrameworkElement.Style'.' (número de línea: '149'; posición de línea: '63').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.Load(XamlReader xamlReader, IXamlObjectWriterFactory writerFactory, Boolean skipJournaledProperties, Object rootObject, XamlObjectWriterSettings settings, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.LoadBaml(XamlReader xamlReader, Boolean skipJournaledProperties, Object rootObject, XamlAccessLevel accessLevel, Uri baseUri)
+   at System.Windows.Markup.XamlReader.LoadBaml(Stream stream, ParserContext parserContext, Object parent, Boolean closeStream)
+   at System.Windows.Application.LoadComponent(Object component, Uri resourceLocator)
+   at ComicReader.MainWindow.InitializeComponent() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.xaml:line 1
+   at ComicReader.MainWindow..ctor() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\MainWindow.cs:line 168
+   at ComicReader.App.OnStartup(StartupEventArgs e) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\App.cs:line 33
+   at System.Windows.Application.<.ctor>b__1_0(Object unused)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+2025-10-27 20:39:40.259 [Info] Logger inicializado
+2025-10-27 20:39:40.529 [Info] Applied programmatic theme: NeonCyber
+2025-10-27 20:39:40.987 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-27 20:39:40.991 [Info] Decode concurrency cap set to 4
+2025-10-27 20:39:40.995 [Info] Prefetch window set to 2
+2025-10-27 20:40:44.282 [Info] Logger inicializado
+2025-10-27 20:40:44.637 [Info] Applied programmatic theme: NeonCyber
+2025-10-27 20:40:45.158 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-27 20:40:45.182 [Info] Decode concurrency cap set to 4
+2025-10-27 20:40:45.185 [Info] Prefetch window set to 2
+2025-10-27 20:41:25.907 [Info] Decode concurrency cap set to 4
+2025-10-27 20:49:55.135 [Info] Logger inicializado
+2025-10-27 20:49:55.562 [Info] Applied programmatic theme: Retro80s
+2025-10-27 20:49:55.999 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-27 20:49:56.016 [Info] Decode concurrency cap set to 4
+2025-10-27 20:49:56.038 [Info] Prefetch window set to 2
+2025-10-27 22:25:33.567 [Info] Logger inicializado
+2025-10-27 22:25:33.984 [Info] Applied programmatic theme: Retro80s
+2025-10-27 22:25:34.713 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-27 22:25:34.715 [Info] Decode concurrency cap set to 4
+2025-10-27 22:25:34.718 [Info] Prefetch window set to 2
+2025-10-27 22:26:05.554 [Info] [Perf] 2025-10-28T02:26:05.5549151Z - LoadComicAsync took 94ms
+2025-10-27 22:26:05.556 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate incursión 2.cbr with 27 pages.
+2025-10-27 22:26:05.561 [Info] Storage read latency heuristic: 0.5ms
+2025-10-27 22:26:05.564 [Info] Decode concurrency cap set to 4
+2025-10-27 22:26:07.328 [Info] [Perf] 2025-10-28T02:26:07.3281805Z - Enqueue full load page 9
+2025-10-27 22:26:07.336 [Info] Decode concurrency cap set to 4
+2025-10-27 22:26:07.338 [Info] [Perf] 2025-10-28T02:26:07.3380111Z - Enqueue prefetch page 8
+2025-10-27 22:26:07.339 [Info] Decode concurrency cap set to 4
+2025-10-27 22:26:07.344 [Info] [Perf] 2025-10-28T02:26:07.3442462Z - Enqueue prefetch page 10
+2025-10-27 22:26:07.348 [Info] [Perf] 2025-10-28T02:26:07.3485538Z - Enqueue prefetch page 7
+2025-10-27 22:26:07.359 [Info] [Perf] 2025-10-28T02:26:07.3598422Z - Enqueue prefetch page 11
+2025-10-27 22:26:08.810 [Info] [Perf] 2025-10-28T02:26:08.8102119Z - Decode_CreateBitmapImage took 139ms
+2025-10-27 22:26:08.817 [Info] Swap thumbnail->full for page 9 took 1492ms (decode 1480ms)
+2025-10-27 22:26:08.823 [Info] [Perf] 2025-10-28T02:26:08.8231231Z - FullLoad page 9 took 1490ms
+2025-10-27 22:26:11.075 [Info] [Perf] 2025-10-28T02:26:11.0753672Z - Enqueue full load page 13
+2025-10-27 22:26:11.182 [Info] [Perf] 2025-10-28T02:26:11.1826123Z - Enqueue full load page 12
+2025-10-27 22:26:11.288 [Info] [Perf] 2025-10-28T02:26:11.2881725Z - Enqueue full load page 10
+2025-10-27 22:26:11.326 [Info] [Perf] 2025-10-28T02:26:11.3261827Z - Enqueue prefetch page 11
+2025-10-27 22:26:11.326 [Info] Decode concurrency cap set to 4
+2025-10-27 22:26:11.370 [Info] [Perf] 2025-10-28T02:26:11.3707481Z - Enqueue prefetch page 8
+2025-10-27 22:26:12.227 [Info] [Perf] 2025-10-28T02:26:12.2278113Z - Decode_CreateBitmapImage took 171ms
+2025-10-27 22:26:12.232 [Info] [Perf] 2025-10-28T02:26:12.2325538Z - Prefetch page 8 took 3146ms
+2025-10-27 22:27:35.536 [Info] Logger inicializado
+2025-10-27 22:27:35.762 [Info] Applied programmatic theme: Retro80s
+2025-10-27 22:27:36.110 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-27 22:27:36.120 [Info] Decode concurrency cap set to 4
+2025-10-27 22:27:36.125 [Info] Prefetch window set to 2
+2025-10-27 22:28:00.579 [Info] Logger inicializado
+2025-10-27 22:28:00.978 [Info] Applied programmatic theme: Retro80s
+2025-10-27 22:28:01.388 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-27 22:28:01.390 [Info] Decode concurrency cap set to 4
+2025-10-27 22:28:01.393 [Info] Prefetch window set to 2
+2025-10-27 22:33:01.448 [Info] Logger inicializado
+2025-10-27 22:33:01.817 [Info] Applied programmatic theme: Retro80s
+2025-10-27 22:33:02.411 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-27 22:33:02.415 [Info] Decode concurrency cap set to 4
+2025-10-27 22:33:02.418 [Info] Prefetch window set to 2
+2025-10-28 12:49:48.496 [Info] Logger inicializado
+2025-10-28 12:49:49.150 [Info] Applied programmatic theme: Retro80s
+2025-10-28 12:49:49.963 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-28 12:49:49.979 [Info] Decode concurrency cap set to 4
+2025-10-28 12:49:49.994 [Info] Prefetch window set to 2
+2025-10-28 12:50:14.371 [Info] Decode concurrency cap set to 4
+2025-10-28 12:50:14.375 [Info] Decode concurrency cap set to 4
+2025-10-28 12:50:27.891 [Info] Decode concurrency cap set to 4
+2025-10-30 12:56:55.625 [Info] Logger inicializado
+2025-10-30 12:56:56.517 [Info] Applied programmatic theme: Vaporwave
+2025-10-30 12:56:57.656 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-30 12:56:57.661 [Info] Decode concurrency cap set to 4
+2025-10-30 12:56:57.670 [Info] Prefetch window set to 2
+2025-10-30 12:57:21.989 [Info] Decode concurrency cap set to 4
+2025-10-30 12:57:30.931 [Info] Decode concurrency cap set to 4
+2025-10-30 13:03:12.292 [Info] Logger inicializado
+2025-10-30 13:03:12.637 [Info] Applied programmatic theme: Vaporwave
+2025-10-30 13:03:13.095 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-30 13:03:13.098 [Info] Decode concurrency cap set to 4
+2025-10-30 13:03:13.101 [Info] Prefetch window set to 2
+2025-10-30 13:04:56.111 [Info] Logger inicializado
+2025-10-30 13:04:56.422 [Info] Applied programmatic theme: Vaporwave
+2025-10-30 13:04:57.222 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-30 13:04:57.229 [Info] Decode concurrency cap set to 4
+2025-10-30 13:04:57.238 [Info] Prefetch window set to 2
+2025-10-30 13:38:20.786 [Info] Logger inicializado
+2025-10-30 13:38:21.226 [Info] Applied programmatic theme: Vaporwave
+2025-10-30 13:38:21.739 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-30 13:38:21.741 [Info] Decode concurrency cap set to 4
+2025-10-30 13:38:21.743 [Info] Prefetch window set to 2
+2025-10-30 13:41:28.453 [Info] Logger inicializado
+2025-10-30 13:41:28.831 [Info] Applied programmatic theme: Vaporwave
+2025-10-30 13:41:29.301 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-30 13:41:29.304 [Info] Decode concurrency cap set to 4
+2025-10-30 13:41:29.308 [Info] Prefetch window set to 2
+2025-10-30 14:16:21.243 [Info] Logger inicializado
+2025-10-30 14:16:21.700 [Info] Applied programmatic theme: Vaporwave
+2025-10-30 14:16:22.562 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-30 14:16:22.564 [Info] Decode concurrency cap set to 4
+2025-10-30 14:16:22.566 [Info] Prefetch window set to 2
+2025-10-30 14:28:11.533 [Info] Logger inicializado
+2025-10-30 14:28:11.857 [Info] Applied programmatic theme: Vaporwave
+2025-10-30 14:28:12.258 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-30 14:28:12.261 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:12.263 [Info] Prefetch window set to 2
+2025-10-30 14:28:24.154 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:24.164 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:24.166 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:25.239 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:30.207 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:31.651 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:33.255 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:34.168 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:34.695 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:35.319 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:35.921 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:36.587 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:37.204 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:37.821 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:39.672 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:45.164 [Info] [Perf] 2025-10-30T18:28:45.1648824Z - LoadComicAsync took 95ms
+2025-10-30 14:28:45.166 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\The Vigil #3 (2023) HDM.cbr with 24 pages.
+2025-10-30 14:28:45.168 [Info] Storage read latency heuristic: 0.4ms
+2025-10-30 14:28:45.170 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:45.667 [Info] [Perf] 2025-10-30T18:28:45.6673158Z - Enqueue full load page 21
+2025-10-30 14:28:45.677 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:45.683 [Info] [Perf] 2025-10-30T18:28:45.6839863Z - Enqueue prefetch page 20
+2025-10-30 14:28:45.690 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:45.713 [Info] [Perf] 2025-10-30T18:28:45.7139081Z - Enqueue prefetch page 22
+2025-10-30 14:28:45.752 [Info] [Perf] 2025-10-30T18:28:45.7529596Z - Enqueue prefetch page 19
+2025-10-30 14:28:45.832 [Info] [Perf] 2025-10-30T18:28:45.8324016Z - Enqueue prefetch page 23
+2025-10-30 14:28:47.122 [Info] [Perf] 2025-10-30T18:28:47.1220636Z - Decode_CreateBitmapImage took 127ms
+2025-10-30 14:28:47.125 [Info] [Perf] 2025-10-30T18:28:47.1250332Z - Prefetch page 20 took 1404ms
+2025-10-30 14:28:47.424 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:47.501 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:47.548 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:47.619 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:48.318 [Info] [Perf] 2025-10-30T18:28:48.3183768Z - Decode_CreateBitmapImage took 59ms
+2025-10-30 14:28:48.320 [Info] Swap thumbnail->full for page 21 took 2657ms (decode 1187ms)
+2025-10-30 14:28:48.322 [Info] [Perf] 2025-10-30T18:28:48.3219976Z - FullLoad page 21 took 1193ms
+2025-10-30 14:28:48.646 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:48.695 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:48.727 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:49.477 [Info] [Perf] 2025-10-30T18:28:49.4775028Z - Decode_CreateBitmapImage took 27ms
+2025-10-30 14:28:49.484 [Info] [Perf] 2025-10-30T18:28:49.4840370Z - Prefetch page 22 took 910ms
+2025-10-30 14:28:50.551 [Info] [Perf] 2025-10-30T18:28:50.5515791Z - Decode_CreateBitmapImage took 130ms
+2025-10-30 14:28:50.552 [Info] [Perf] 2025-10-30T18:28:50.5529447Z - Prefetch page 19 took 817ms
+2025-10-30 14:28:51.787 [Info] [Perf] 2025-10-30T18:28:51.7875514Z - Decode_CreateBitmapImage took 108ms
+2025-10-30 14:28:51.788 [Info] [Perf] 2025-10-30T18:28:51.7889421Z - Prefetch page 23 took 983ms
+2025-10-30 14:28:51.896 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:55.921 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:55.933 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:56.619 [Info] Decode concurrency cap set to 4
+2025-10-30 14:28:57.552 [Info] Decode concurrency cap set to 4
+2025-10-30 14:29:00.017 [Info] Decode concurrency cap set to 4
+2025-10-30 14:29:00.833 [Info] Decode concurrency cap set to 4
+2025-10-30 14:29:03.901 [Info] Decode concurrency cap set to 4
+2025-10-30 14:29:34.253 [Info] Logger inicializado
+2025-10-30 14:29:34.686 [Info] Applied programmatic theme: Vaporwave
+2025-10-30 14:29:35.119 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-30 14:29:35.121 [Info] Decode concurrency cap set to 4
+2025-10-30 14:29:35.123 [Info] Prefetch window set to 2
+2025-10-30 14:29:49.951 [Info] Decode concurrency cap set to 4
+2025-10-30 14:29:52.754 [Info] Decode concurrency cap set to 4
+2025-10-30 14:30:22.266 [Info] Decode concurrency cap set to 4
+2025-10-30 15:16:59.910 [Info] Logger inicializado
+2025-10-30 15:17:00.261 [Info] Applied programmatic theme: Vaporwave
+2025-10-30 15:17:00.673 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-30 15:17:00.675 [Info] Decode concurrency cap set to 4
+2025-10-30 15:17:00.679 [Info] Prefetch window set to 2
+2025-10-30 15:17:05.143 [Info] Decode concurrency cap set to 4
+2025-10-30 15:17:05.208 [Info] Decode concurrency cap set to 4
+2025-10-30 15:17:05.220 [Info] Decode concurrency cap set to 4
+2025-10-30 15:17:12.384 [Info] Decode concurrency cap set to 4
+2025-10-30 15:17:12.386 [Info] Decode concurrency cap set to 4

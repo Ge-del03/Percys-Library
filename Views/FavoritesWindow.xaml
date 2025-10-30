@@ -47,6 +47,16 @@
             <Setter Property="Padding" Value="20"/>
             <Setter Property="Margin" Value="10"/>
         </Style>
+        <!-- Chip (tag) style -->
+        <Style x:Key="TagChip" TargetType="Border">
+            <Setter Property="Background" Value="#FFF1F5F9"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="6,2"/>
+            <Setter Property="Margin" Value="2"/>
+        </Style>
+
+        <!-- Card shadow effect (light) -->
+        <DropShadowEffect x:Key="CardShadow" Color="#22000000" BlurRadius="12" ShadowDepth="2"/>
     </Window.Resources>
 
     <Grid>
@@ -158,76 +168,71 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Header de Colección -->
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Name="CollectionTitleText" Text="Selecciona una colección" 
-                                   FontSize="20" FontWeight="Bold" Foreground="#FF374151" VerticalAlignment="Center"/>
-                        <Button Style="{StaticResource ModernButtonStyle}"
-                                Background="#FF3B82F6" Foreground="White"
-                                Click="AddToCollection_Click" Margin="20,0,0,0">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="📖" FontSize="14" Margin="0,0,5,0"/>
-                                <TextBlock Text="Agregar Cómic"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Style="{StaticResource ModernButtonStyle}"
-                                Background="#FF2563EB" Foreground="White"
-                                Click="AddFolderToCollection_Click" Margin="5,0,0,0">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="📂" FontSize="14" Margin="0,0,5,0"/>
-                                <TextBlock Text="Agregar Carpeta"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Style="{StaticResource ModernButtonStyle}"
-                                Background="#FFEF4444" Foreground="White"
-                                Click="RemoveSelected_Click" Margin="5,0,0,0">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="🗑️" FontSize="14" Margin="0,0,5,0"/>
-                                <TextBlock Text="Quitar seleccionados"/>
-                            </StackPanel>
-                        </Button>
-                        <TextBlock Text="Resultados: " Margin="20,0,4,0" VerticalAlignment="Center" Foreground="#FF6B7280"/>
-                        <TextBlock VerticalAlignment="Center" Foreground="#FF374151" FontWeight="SemiBold"
-                                   Text="{Binding ElementName=FavoritesListBox, Path=Items.Count}"/>
-                    </StackPanel>
+                    <!-- Header: título + toolbar (búsqueda + filtros) -->
+                    <DockPanel Grid.Row="0" Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                            <TextBlock Name="CollectionTitleText" Text="Selecciona una colección"
+                                       FontSize="20" FontWeight="Bold" Foreground="#FF374151" VerticalAlignment="Center"/>
+                        </StackPanel>
 
-                    <!-- Filtros y Búsqueda -->
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
-                        <TextBox Name="SearchTextBox" Width="300" Padding="10" FontSize="14"
-                                 BorderBrush="#FFD1D5DB" BorderThickness="1" VerticalAlignment="Center"
-                                 TextChanged="SearchTextBox_TextChanged">
-                            <TextBox.Style>
-                                <Style TargetType="TextBox">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="TextBox">
-                                                <Border Background="White" BorderBrush="#FFD1D5DB" 
-                                                        BorderThickness="1" CornerRadius="6">
-                                                    <ScrollViewer x:Name="PART_ContentHost" Margin="10"/>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </TextBox.Style>
-                        </TextBox>
-                        <TextBlock Text="🔍 Buscar en colección" Foreground="#FF9CA3AF" 
-                                   VerticalAlignment="Center" Margin="10,0,0,0"/>
-                    </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                            <TextBox Name="SearchTextBox" Width="300" Padding="10" FontSize="14"
+                                     BorderBrush="#FFD1D5DB" BorderThickness="1" VerticalAlignment="Center"
+                                     TextChanged="SearchTextBox_TextChanged" Margin="0,0,8,0">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="TextBox">
+                                                    <Border Background="White" BorderBrush="#FFD1D5DB"
+                                                            BorderThickness="1" CornerRadius="6">
+                                                        <ScrollViewer x:Name="PART_ContentHost" Margin="10"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
 
-                    <!-- Lista de Cómics en Colección -->
-                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-                        <ListBox Name="FavoritesListBox" BorderThickness="0" Background="Transparent"
-                                 SelectionMode="Extended" AllowDrop="True"
-                                 DragOver="FavoritesListBox_DragOver" Drop="FavoritesListBox_Drop">
+                            <ComboBox Name="TagFilterComboBox" Width="160" Margin="6,0,6,0" VerticalAlignment="Center"
+                                      SelectionChanged="TagFilterComboBox_SelectionChanged" IsEditable="False"/>
+
+                            <Button Style="{StaticResource ModernButtonStyle}" Background="#FF3B82F6" Foreground="White" Click="AddToCollection_Click">
+                                <StackPanel Orientation="Horizontal"><TextBlock Text="📖"/> <TextBlock Text="Agregar" Margin="6,0,0,0"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource ModernButtonStyle}" Background="#FFEF4444" Foreground="White" Click="RemoveSelected_Click" Margin="6,0,0,0">
+                                <StackPanel Orientation="Horizontal"><TextBlock Text="🗑️"/> <TextBlock Text="Quitar" Margin="6,0,0,0"/></StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </DockPanel>
+
+                    <!-- Main: grid con lista (izq) y vista previa (derecha) -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="360"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Lista principal -->
+                        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+                            <ListBox Name="FavoritesListBox" BorderThickness="0" Background="Transparent"
+                                     SelectionMode="Extended" AllowDrop="True"
+                                     DragOver="FavoritesListBox_DragOver" Drop="FavoritesListBox_Drop">
+                            <!-- Use WrapPanel to create responsive card layout -->
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True" Orientation="Horizontal" ItemWidth="300" ItemHeight="140"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="#FFF9FAFB" CornerRadius="10" Padding="15" Margin="0,5"
-                                            BorderBrush="#FFE5E7EB" BorderThickness="1">
+                                    <Border Background="#FFFFFFFF" CornerRadius="10" Padding="12" Margin="8"
+                                            BorderBrush="#FFE6E9EE" BorderThickness="1"
+                                            Effect="{StaticResource CardShadow}">
                                         <Border.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="Abrir" Click="OpenFavorite_Click"/>
@@ -236,37 +241,53 @@
                                                 <MenuItem Header="Quitar de colección" Click="RemoveFromCollection_Click"/>
                                             </ContextMenu>
                                         </Border.ContextMenu>
-                                        <Grid>
+                                        <Grid Width="280">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="90"/>
                                                 <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <!-- Miniatura -->
-                                            <Border Grid.Column="0" Width="60" Height="80" CornerRadius="6" Background="#FFE5E7EB">
-                                                <Image Source="{Binding Thumbnail}" Stretch="UniformToFill"/>
+                                            <!-- Thumbnail -->
+                                            <Border Grid.Column="0" Width="72" Height="100" CornerRadius="6" Background="#FFF0F4F8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <Image Source="{Binding Thumbnail}" Stretch="UniformToFill" Width="72" Height="100"/>
                                             </Border>
 
-                                            <!-- Información -->
-                                            <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="#FF111827"/>
+                                            <!-- Meta -->
+                                            <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="14" Foreground="#FF0F1724" TextTrimming="CharacterEllipsis"/>
                                                 <TextBlock Text="{Binding Author}" FontSize="12" Foreground="#FF6B7280" Margin="0,2,0,0"/>
-                                                <TextBlock Text="{Binding DateAdded, StringFormat='{}Agregado: {0:dd/MM/yyyy}'}" FontSize="11" Foreground="#FF9CA3AF" Margin="0,5,0,0"/>
-                                                <ProgressBar Minimum="0" Maximum="100" Height="6" Margin="0,6,50,0" Value="{Binding Progress, Mode=OneWay}" Background="#FFE5E7EB" Foreground="#FF3B82F6"/>
-                                                <TextBlock Text="{Binding RatingStars}" FontSize="14" Margin="0,6,0,0"/>
+                                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0" VerticalAlignment="Center">
+                                                    <ProgressBar Value="{Binding Progress}" Maximum="100" Height="8" Width="140" Background="#FFF1F5F9" Foreground="#FF3B82F6"/>
+                                                    <TextBlock Text="{Binding RatingStars}" FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                                </StackPanel>
+
+                                                <!-- Tags as chips -->
+                                                <ItemsControl ItemsSource="{Binding Tags}" Margin="0,8,0,0">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <StackPanel Orientation="Horizontal"/>
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border Style="{StaticResource TagChip}">
+                                                                <TextBlock Text="{Binding}" FontSize="11" Foreground="#FF374151"/>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
                                             </StackPanel>
 
-                                            <!-- Acciones -->
-                                            <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                                <Button Style="{StaticResource ModernButtonStyle}" Background="#FF10B981" Foreground="White" Width="40" Height="35" Click="OpenFavorite_Click" ToolTip="Abrir cómic">
-                                                    <TextBlock Text="📖" FontSize="14"/>
+                                            <!-- Actions overlay (corner) -->
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-6,-6,0">
+                                                <Button Style="{StaticResource ModernButtonStyle}" Background="#FF10B981" Foreground="White" Width="36" Height="30" Click="OpenFavorite_Click" ToolTip="Abrir cómic">
+                                                    <TextBlock Text="📖" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Button>
-                                                <Button Style="{StaticResource ModernButtonStyle}" Background="#FF60A5FA" Foreground="White" Width="40" Height="35" Click="ShowInFolderFromItem_Click" ToolTip="Mostrar en carpeta" Margin="5,0,0,0">
-                                                    <TextBlock Text="📂" FontSize="14"/>
+                                                <Button Style="{StaticResource ModernButtonStyle}" Background="#FF60A5FA" Foreground="White" Width="36" Height="30" Click="ShowInFolderFromItem_Click" ToolTip="Mostrar en carpeta" Margin="6,0,0,0">
+                                                    <TextBlock Text="📂" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Button>
-                                                <Button Style="{StaticResource ModernButtonStyle}" Background="#FFEF4444" Foreground="White" Width="40" Height="35" Click="RemoveFromCollection_Click" ToolTip="Quitar de colección" Margin="5,0,0,0">
-                                                    <TextBlock Text="🗑️" FontSize="14"/>
+                                                <Button Style="{StaticResource ModernButtonStyle}" Background="#FFEF4444" Foreground="White" Width="36" Height="30" Click="RemoveFromCollection_Click" ToolTip="Quitar de colección" Margin="6,0,0,0">
+                                                    <TextBlock Text="🗑️" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Button>
                                             </StackPanel>
                                         </Grid>
@@ -274,7 +295,47 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-                    </ScrollViewer>
+                        </ScrollViewer>
+
+                        <!-- Vista previa derecha -->
+                        <Border Grid.Column="1" Background="#FFF8FAFC" CornerRadius="10" Padding="14" Margin="12,0,0,0">
+                            <ContentControl Content="{Binding SelectedItem, ElementName=FavoritesListBox}">
+                                <ContentControl.ContentTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <Border Height="220" Background="#FFF0F4F8" CornerRadius="8" HorizontalAlignment="Center">
+                                                <Image Source="{Binding Thumbnail}" Stretch="UniformToFill" Height="220"/>
+                                            </Border>
+                                            <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="Bold" Margin="0,12,0,0"/>
+                                            <TextBlock Text="{Binding Author}" Foreground="#FF6B7280" Margin="0,4,0,0"/>
+                                            <TextBlock Text="{Binding DateAdded, StringFormat='Agregado: {0:dd/MM/yyyy}'}" Foreground="#FF9CA3AF" Margin="0,6,0,0"/>
+
+                                            <TextBlock Text="Etiquetas" FontWeight="SemiBold" Margin="0,10,0,6"/>
+                                            <ItemsControl ItemsSource="{Binding Tags}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Style="{StaticResource TagChip}">
+                                                            <TextBlock Text="{Binding}" FontSize="12"/>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,14,0,0">
+                                                <Button Style="{StaticResource ModernButtonStyle}" Background="#FF10B981" Foreground="White" Width="120" Click="OpenFavorite_Click">Abrir</Button>
+                                                <Button Style="{StaticResource ModernButtonStyle}" Background="#FF60A5FA" Foreground="White" Width="120" Click="ShowInFolderFromItem_Click" Margin="8,0,0,0">Mostrar</Button>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ContentControl.ContentTemplate>
+                            </ContentControl>
+                        </Border>
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>

@@ -13,37 +13,63 @@ namespace ComicReader.Views
         public SettingsWindow()
         {
             InitializeComponent();
-
-            _vm = this.Resources["SettingsVM"] as SettingsViewModel;
-            if (this.DataContext == null) this.DataContext = _vm;
-
-            // after load, sync visibility with SelectedSection
-            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
-            {
-                UpdateSectionVisibility(_vm?.SelectedSection);
-                if (_vm != null)
+                // Try to obtain the VM from resources or DataContext; fallback to a new instance so UI code is safe
+                _vm = this.Resources["SettingsVM"] as SettingsViewModel ?? this.DataContext as SettingsViewModel;
+                if (_vm == null)
                 {
-                    _vm.PropertyChanged += (s, e) =>
-                    {
-                        if (e.PropertyName == nameof(SettingsViewModel.SelectedSection))
-                            UpdateSectionVisibility(_vm.SelectedSection);
-                    };
+                    _vm = new SettingsViewModel();
+                    // register in resources so XAML bindings that reference StaticResource will still work
+                    try { this.Resources["SettingsVM"] = _vm; } catch { }
+                    this.DataContext = _vm;
                 }
-            }));
+
+                // after load, sync visibility with SelectedSection (defensive: guard nulls)
+                Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
+                {
+                    try { UpdateSectionVisibility(_vm?.SelectedSection); } catch { }
+                    if (_vm != null)
+                    {
+                        try
+                        {
+                            _vm.PropertyChanged += (s, e) =>
+                            {
+                                try
+                                {
+                                    if (e.PropertyName == nameof(SettingsViewModel.SelectedSection))
+                                        UpdateSectionVisibility(_vm.SelectedSection);
+                                }
+                                catch { }
+                            };
+                        }
+                        catch { }
+                    }
+                }));
         }
 
         private void UpdateSectionVisibility(string section)
         {
             try
             {
-                Panel_General.Visibility = section == "General" ? Visibility.Visible : Visibility.Collapsed;
-                Panel_Apariencia.Visibility = section == "Apariencia" ? Visibility.Visible : Visibility.Collapsed;
-                Panel_Lectura.Visibility = section == "Lectura" ? Visibility.Visible : Visibility.Collapsed;
-                Panel_Controles.Visibility = section == "Controles" ? Visibility.Visible : Visibility.Collapsed;
-                Panel_Rendimiento.Visibility = section == "Rendimiento" ? Visibility.Visible : Visibility.Collapsed;
-                Panel_Seguridad.Visibility = section == "Seguridad" ? Visibility.Visible : Visibility.Collapsed;
-                Panel_Personalizacion.Visibility = section == "Personalizacion" ? Visibility.Visible : Visibility.Collapsed;
-                Panel_Acerca.Visibility = section == "Acerca" ? Visibility.Visible : Visibility.Collapsed;
+                // Use FindName to avoid relying on generated fields which may be out-of-sync in some build states
+                void SetVis(string name, string key)
+                {
+                    try
+                    {
+                        var el = this.FindName(name) as FrameworkElement;
+                        if (el != null)
+                            el.Visibility = (section == key) ? Visibility.Visible : Visibility.Collapsed;
+                    }
+                    catch { }
+                }
+
+                SetVis("Panel_General", "General");
+                SetVis("Panel_Apariencia", "Apariencia");
+                SetVis("Panel_Lectura", "Lectura");
+                SetVis("Panel_Controles", "Controles");
+                SetVis("Panel_Rendimiento", "Rendimiento");
+                SetVis("Panel_Seguridad", "Seguridad");
+                SetVis("Panel_Personalizacion", "Personalizacion");
+                SetVis("Panel_Acerca", "Acerca");
             }
             catch { /* safe-ignore UI update errors */ }
         }

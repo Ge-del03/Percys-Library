@@ -151,3 +151,7 @@ C:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\ComicRead
 C:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\ref\ComicReader.dll
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\ShortcutsWindow.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\ShortcutsWindow.g.cs
+C:\Users\O11CE\OneDrive\Desktop\Percy Library\bin\Debug\net8.0-windows\Styles\ReadingMode.xaml
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\ShelvesWindow.baml
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\FavoritesSection.g.cs
+C:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\FavoritesSection.baml

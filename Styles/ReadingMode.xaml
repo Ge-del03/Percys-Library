@@ -94,7 +94,9 @@
     </Style>
 
     <!-- Small icon button used in the reader top bar; theme-aware and compact -->
-    <Style x:Key="ReaderIconButtonStyle" TargetType="Button" BasedOn="{DynamicResource ReadingSmallButton}">
+    <!-- ReadingSmallButton is defined above in this same ResourceDictionary, so use StaticResource
+        for BasedOn (DynamicResource is not valid for Style.BasedOn and causes XAML parse errors). -->
+    <Style x:Key="ReaderIconButtonStyle" TargetType="Button" BasedOn="{StaticResource ReadingSmallButton}">
         <Setter Property="Width" Value="34" />
         <Setter Property="Height" Value="34" />
         <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}" />

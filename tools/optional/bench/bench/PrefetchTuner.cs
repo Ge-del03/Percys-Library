@@ -1,3 +1,4 @@
+#if BENCH
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -276,3 +277,4 @@ class PrefetchTuner
             return sortedSamples[idx];
     }
 }
+#endif

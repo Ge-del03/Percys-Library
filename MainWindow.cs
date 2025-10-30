@@ -12,6 +12,7 @@ using Microsoft.Win32;
 using ComicReader.Views;
 using ComicReader.Services;
 using ComicReader.Models;
+using ComicReader.ViewModels;
 using System.Windows.Input;
 using ComicReader.Core.Abstractions;
 using System.Linq;
@@ -218,6 +219,36 @@ namespace ComicReader
             // En modo DEBUG, abrir la Configuración automáticamente una vez para pruebas rápidas
             // (DEBUG auto-open removed)
             // Loader HUD removed; no timer initialized.
+            // Ajustar límites al área de trabajo cuando cambie el estado
+            this.StateChanged += (s, e) => ApplyWorkAreaBounds();
+            this.Loaded += (s, e) => ApplyWorkAreaBounds();
+        }
+
+        // Asegurar que al maximizar no se cubra la barra de tareas (usar WorkArea)
+        // Se aplica en Loaded/StateChanged para no duplicar overrides existentes.
+
+        private void ApplyWorkAreaBounds()
+        {
+            try
+            {
+                // Si estamos en modo inmersivo, no limitar; ahí sí puede cubrir la barra de tareas
+                if (_isImmersive) return;
+                var wa = SystemParameters.WorkArea;
+                if (this.WindowState == WindowState.Maximized)
+                {
+                    this.MaxHeight = wa.Height;
+                    this.MaxWidth = wa.Width;
+                    this.Top = wa.Top;
+                    this.Left = wa.Left;
+                }
+                else
+                {
+                    // Restablecer límites cuando no está maximizada
+                    this.MaxHeight = double.PositiveInfinity;
+                    this.MaxWidth = double.PositiveInfinity;
+                }
+            }
+            catch { }
         }
 
         // Crea y aplica un LinearGradientBrush animado en la cabecera para dar una sensación viva.
@@ -1320,6 +1351,35 @@ namespace ComicReader
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             ShowSettingsView();
+        }
+
+        private void ToggleFavorites_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Use the shared instance from App so all windows/controls bind to the same VM
+                var app = System.Windows.Application.Current as App;
+                var sharedVm = app?.FavoritesViewModel;
+
+                // Ensure the control receives the shared ViewModel
+                var favSection = this.FindName("FavoritesSection") as System.Windows.Controls.UserControl;
+                if (favSection != null && sharedVm != null) favSection.DataContext = sharedVm;
+
+                var panel = this.FindName("FavoritesPanel") as FrameworkElement;
+                var col = this.FindName("FavoritesCol") as System.Windows.Controls.ColumnDefinition;
+                if (panel == null || col == null) return;
+                if (panel.Visibility == Visibility.Collapsed)
+                {
+                    panel.Visibility = Visibility.Visible;
+                    col.Width = new GridLength(320);
+                }
+                else
+                {
+                    panel.Visibility = Visibility.Collapsed;
+                    col.Width = new GridLength(0);
+                }
+            }
+            catch { }
         }
 
         private async void ToggleContinuous_Click(object sender, RoutedEventArgs e)

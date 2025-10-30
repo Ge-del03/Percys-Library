@@ -24,7 +24,19 @@ namespace ComicReader.Views
             #pragma warning disable
             InitializeComponent();
             #pragma warning restore
-            Collections = FavoritesStorage.Load();
+
+            // Prefer the shared CollectionViewModel exposed by App so multiple views share state.
+            var app = System.Windows.Application.Current as App;
+            if (app?.FavoritesViewModel != null)
+            {
+                Collections = app.FavoritesViewModel.Collections;
+                // Use shared VM as DataContext so commands and bindings are available
+                this.DataContext = app.FavoritesViewModel;
+            }
+            else
+            {
+                Collections = FavoritesStorage.Load();
+            }
             CurrentCollectionItems = new ObservableCollection<FavoriteComic>();
             FilteredItems = new ObservableCollection<FavoriteComic>();
 
@@ -59,6 +71,25 @@ namespace ComicReader.Views
                     CurrentCollectionItems.Add(item);
                 }
                 
+                // Populate tag filter combobox with distinct tags from the collection
+                try
+                {
+                    var combo = GetTagFilterComboBox();
+                    if (combo != null)
+                    {
+                        combo.Items.Clear();
+                        combo.Items.Add("(Todos)");
+                        var distinct = CurrentCollectionItems.SelectMany(i => i.Tags ?? System.Linq.Enumerable.Empty<string>())
+                                                           .Where(t => !string.IsNullOrWhiteSpace(t))
+                                                           .Select(t => t.Trim())
+                                                           .Distinct(StringComparer.OrdinalIgnoreCase)
+                                                           .OrderBy(t => t);
+                        foreach (var t in distinct) combo.Items.Add(t);
+                        combo.SelectedIndex = 0;
+                    }
+                }
+                catch { }
+
                 ApplyFilter();
             }
             else
@@ -75,20 +106,35 @@ namespace ComicReader.Views
             ApplyFilter();
         }
 
+        private void TagFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ApplyFilter();
+        }
+
         private void ApplyFilter()
         {
             FilteredItems.Clear();
             var searchText = GetSearchTextBox().Text?.ToLower() ?? "";
+            // Consider tag filter if present
+            var tagFilter = (FindName("TagFilterComboBox") as System.Windows.Controls.ComboBox)?.SelectedItem as string;
+            if (tagFilter == "(Todos)") tagFilter = null;
+            tagFilter = tagFilter?.ToLower();
 
             var filteredComics = CurrentCollectionItems.Where(c =>
             {
                 if (string.IsNullOrEmpty(searchText)) return true;
                 var title = c.Title ?? string.Empty;
                 var author = c.Author ?? string.Empty;
-                var tags = c.Tags ?? Array.Empty<string>();
-                return title.ToLower().Contains(searchText)
-                       || author.ToLower().Contains(searchText)
-                       || tags.Any(tag => (tag ?? string.Empty).ToLower().Contains(searchText));
+                System.Collections.Generic.IEnumerable<string> tags = c.Tags ?? System.Linq.Enumerable.Empty<string>();
+                var matchesText = title.ToLower().Contains(searchText)
+                                  || author.ToLower().Contains(searchText)
+                                  || tags.Any(tag => (tag ?? string.Empty).ToLower().Contains(searchText));
+                var matchesTag = true;
+                if (!string.IsNullOrWhiteSpace(tagFilter))
+                {
+                    matchesTag = tags.Any(tag => string.Equals(tag?.Trim(), tagFilter, StringComparison.OrdinalIgnoreCase));
+                }
+                return matchesText && matchesTag;
             });
 
             foreach (var comic in filteredComics)
@@ -145,7 +191,7 @@ namespace ComicReader.Views
                         Title = Path.GetFileNameWithoutExtension(filename),
                         FilePath = filename,
                         DateAdded = DateTime.Now,
-                        Tags = new[] { "Sin categorizar" }
+                        Tags = new System.Collections.ObjectModel.ObservableCollection<string>(new[] { "Sin categorizar" })
                     };
 
                     _selectedCollection.Items.Add(comic);
@@ -186,7 +232,7 @@ namespace ComicReader.Views
                             Title = Path.GetFileNameWithoutExtension(filename),
                             FilePath = filename,
                             DateAdded = DateTime.Now,
-                            Tags = new[] { "Sin categorizar" }
+                            Tags = new System.Collections.ObjectModel.ObservableCollection<string>(new[] { "Sin categorizar" })
                         };
                         _selectedCollection.Items.Add(comic);
                         CurrentCollectionItems.Add(comic);
@@ -314,6 +360,8 @@ namespace ComicReader.Views
                     
                     foreach (var collection in importedCollections)
                     {
+                        // Ensure Items is an ObservableCollection after deserialization
+                        collection.Items = new ObservableCollection<FavoriteComic>(collection.Items ?? System.Linq.Enumerable.Empty<FavoriteComic>());
                         Collections.Add(collection);
                     }
                     
@@ -393,15 +441,15 @@ namespace ComicReader.Views
                 Description = col.Description,
                 Color = col.Color,
                 DateCreated = DateTime.Now,
-                Items = new ObservableCollection<FavoriteComic>(col.Items.Select(i => new FavoriteComic
-                {
+                    Items = new ObservableCollection<FavoriteComic>(col.Items.Select(i => new FavoriteComic
+                    {
                     Id = Guid.NewGuid(),
                     Title = i.Title,
                     Author = i.Author,
                     FilePath = i.FilePath,
                     DateAdded = DateTime.Now,
                     Rating = i.Rating,
-                    Tags = i.Tags?.ToArray() ?? new string[0],
+                        Tags = new System.Collections.ObjectModel.ObservableCollection<string>(i.Tags ?? System.Linq.Enumerable.Empty<string>()),
                     Notes = i.Notes
                 }))
             };
@@ -423,7 +471,7 @@ namespace ComicReader.Views
             {
                 if (_selectedCollection == null) return;
                 if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
-                var files = ((string[])e.Data.GetData(DataFormats.FileDrop)) ?? Array.Empty<string>();
+                var files = ((string[])e.Data.GetData(DataFormats.FileDrop)) ?? System.Linq.Enumerable.Empty<string>();
                 var exts = new[] { ".cbz", ".cbr", ".cb7", ".cbt", ".zip", ".rar", ".7z", ".tar", ".pdf", ".epub",
                                     ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".heic", ".tif", ".tiff", ".avif" };
                 foreach (var path in files.SelectMany(p => Directory.Exists(p)
@@ -438,7 +486,7 @@ namespace ComicReader.Views
                         Title = System.IO.Path.GetFileNameWithoutExtension(path),
                         FilePath = path,
                         DateAdded = DateTime.Now,
-                        Tags = new[] { "Sin categorizar" }
+                        Tags = new System.Collections.ObjectModel.ObservableCollection<string>(new[] { "Sin categorizar" })
                     };
                     _selectedCollection.Items.Add(item);
                     CurrentCollectionItems.Add(item);
@@ -496,6 +544,7 @@ namespace ComicReader.Views
         {
             if (FindName("CollectionTitleText") is TextBlock tb) tb.Text = text;
         }
+        private System.Windows.Controls.ComboBox GetTagFilterComboBox() => (System.Windows.Controls.ComboBox)FindName("TagFilterComboBox");
     }
 
     // Diálogo para crear nueva colección

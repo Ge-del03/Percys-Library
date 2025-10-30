@@ -52,7 +52,7 @@
 	<!-- Primary button: accent filled -->
 	<Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseRoundedButton}">
 		<Setter Property="Background" Value="{DynamicResource AccentBrush}" />
-		<Setter Property="Foreground" Value="{DynamicResource AccentForegroundBrush, FallbackValue=White}" />
+		<Setter Property="Foreground" Value="{DynamicResource AccentForegroundBrush}" />
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="Button">
@@ -62,7 +62,7 @@
 								<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
 							</Border>
 							<!-- Ripple effect layer -->
-							<Ellipse x:Name="Ripple" Fill="{DynamicResource AccentForegroundBrush, FallbackValue=#80FFFFFF}" Opacity="0" IsHitTestVisible="False" Width="10" Height="10" RenderTransformOrigin="0.5,0.5">
+							<Ellipse x:Name="Ripple" Fill="{DynamicResource AccentForegroundBrush}" Opacity="0" IsHitTestVisible="False" Width="10" Height="10" RenderTransformOrigin="0.5,0.5">
 								<Ellipse.RenderTransform>
 									<ScaleTransform ScaleX="1" ScaleY="1" />
 								</Ellipse.RenderTransform>
@@ -116,7 +116,7 @@
 					</Border>
 					<ControlTemplate.Triggers>
 						<Trigger Property="IsMouseOver" Value="True">
-							<Setter TargetName="bd" Property="Background" Value="{DynamicResource AccentLowBrush, FallbackValue={StaticResource PanelBackgroundBrush}}" />
+							<Setter TargetName="bd" Property="Background" Value="{DynamicResource AccentLowBrush}" />
 						</Trigger>
 						<Trigger Property="IsPressed" Value="True">
 							<Setter TargetName="bd" Property="Opacity" Value="0.9" />
@@ -142,7 +142,7 @@
 					</Border>
 					<ControlTemplate.Triggers>
 						<Trigger Property="IsMouseOver" Value="True">
-							<Setter TargetName="bd" Property="Background" Value="{DynamicResource AccentLowBrush, FallbackValue=#22000000}" />
+							<Setter TargetName="bd" Property="Background" Value="{DynamicResource AccentLowBrush}" />
 						</Trigger>
 						<Trigger Property="IsPressed" Value="True">
 							<Setter TargetName="bd" Property="Opacity" Value="0.85" />
@@ -166,7 +166,7 @@
 	</Style>
 
 	<!-- Toggle style used for reader toggle button to indicate active state -->
-	<Style x:Key="ReaderToggleButtonStyle" TargetType="ToggleButton" BasedOn="{StaticResource BaseRoundedButton}">
+	<Style x:Key="ReaderToggleButtonStyle" TargetType="ToggleButton">
 		<Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}" />
 		<Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
 		<Setter Property="Width" Value="38" />
@@ -180,7 +180,7 @@
 					<ControlTemplate.Triggers>
 						<Trigger Property="IsChecked" Value="True">
 							<Setter TargetName="bd" Property="Background" Value="{DynamicResource AccentBrush}" />
-							<Setter Property="Foreground" Value="{DynamicResource AccentForegroundBrush, FallbackValue=White}" />
+							<Setter Property="Foreground" Value="{DynamicResource AccentForegroundBrush}" />
 						</Trigger>
 						<Trigger Property="IsMouseOver" Value="True">
 							<Setter TargetName="bd" Property="Opacity" Value="0.95" />
@@ -205,7 +205,11 @@
 					</Setter>
 				</Style>
 
-					<!-- Thumbnail card used in the ThumbList with hover elevation and selection glow -->
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<!-- Thumbnail card used in the ThumbList with hover elevation and selection glow -->
 					<Style x:Key="ThumbCardStyle" TargetType="Border">
 						<Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
 						<Setter Property="CornerRadius" Value="8" />
@@ -244,9 +248,9 @@
 
 					<!-- Modern TextBox for dialogs and forms (dark-friendly) -->
 					<Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
-						<Setter Property="Background" Value="{DynamicResource InputBackgroundBrush, FallbackValue={DynamicResource PanelBackgroundBrush}}" />
+						<Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
 						<Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-						<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush, FallbackValue={StaticResource DisabledTextBrush}}" />
+						<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
 						<Setter Property="BorderThickness" Value="1" />
 						<Setter Property="Padding" Value="8,6" />
 						<Setter Property="SnapsToDevicePixels" Value="True" />
@@ -272,33 +276,30 @@
 
 					<!-- Compact ComboBox style aligned with app theme -->
 					<Style x:Key="ModernComboBoxStyle" TargetType="ComboBox">
-						<Setter Property="Background" Value="{DynamicResource ComboBoxBackgroundBrush, FallbackValue={DynamicResource PanelBackgroundBrush}}" />
-						<Setter Property="Foreground" Value="{DynamicResource ComboBoxForegroundBrush, FallbackValue={DynamicResource TextBrush}}" />
-						<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush, FallbackValue={DynamicResource BorderBrush}}" />
+						<Setter Property="Background" Value="{DynamicResource ComboBoxBackgroundBrush}" />
+						<Setter Property="Foreground" Value="{DynamicResource ComboBoxForegroundBrush}" />
+						<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush}" />
 						<Setter Property="BorderThickness" Value="1" />
 						<Setter Property="Padding" Value="6,4" />
 						<Setter Property="SnapsToDevicePixels" Value="True" />
 						<Setter Property="ItemContainerStyle">
 							<Setter.Value>
 								<Style TargetType="ComboBoxItem">
-									<Setter Property="Background" Value="{DynamicResource ComboBoxPopupBackgroundBrush, FallbackValue={DynamicResource PanelBackgroundBrush}}" />
-									<Setter Property="Foreground" Value="{DynamicResource ComboBoxForegroundBrush, FallbackValue={DynamicResource TextBrush}}" />
+									<Setter Property="Background" Value="{DynamicResource ComboBoxPopupBackgroundBrush}" />
+									<Setter Property="Foreground" Value="{DynamicResource ComboBoxForegroundBrush}" />
 									<Setter Property="Padding" Value="8,4" />
 									<Style.Triggers>
 										<Trigger Property="IsMouseOver" Value="True">
-											<Setter Property="Background" Value="{DynamicResource ComboBoxItemHoverBrush, FallbackValue={StaticResource AccentLowBrush}}" />
+											<Setter Property="Background" Value="{DynamicResource ComboBoxItemHoverBrush}" />
 										</Trigger>
 										<Trigger Property="IsSelected" Value="True">
-											<Setter Property="Background" Value="{DynamicResource ComboBoxItemSelectedBrush, FallbackValue={StaticResource AccentBrush}}" />
-											<Setter Property="Foreground" Value="{DynamicResource ComboBoxItemSelectedTextBrush, FallbackValue={StaticResource AccentForegroundBrush}}" />
+											<Setter Property="Background" Value="{DynamicResource ComboBoxItemSelectedBrush}" />
+											<Setter Property="Foreground" Value="{DynamicResource ComboBoxItemSelectedTextBrush}" />
 										</Trigger>
 									</Style.Triggers>
 								</Style>
 							</Setter.Value>
 						</Setter>
 					</Style>
-			</Setter.Value>
-		</Setter>
-	</Style>
 
-</ResourceDictionary>
+		</ResourceDictionary>

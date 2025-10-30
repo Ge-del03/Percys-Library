@@ -167,7 +167,7 @@ namespace ComicReader.Legacy.Services
                     var tags = collections
                         .SelectMany(c => c.Items)
                         .Where(item => !string.IsNullOrWhiteSpace(item.FilePath) && readPaths.Contains(item.FilePath))
-                        .SelectMany(item => item.Tags ?? Array.Empty<string>())
+                        .SelectMany(item => item.Tags ?? Enumerable.Empty<string>())
                         .Where(t => !string.IsNullOrWhiteSpace(t))
                         .Select(t => t.Trim())
                         .ToList();

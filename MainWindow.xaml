@@ -40,7 +40,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Barra de Título Personalizada (sin Effect para compatibilidad) -->
+        <!-- Barra de Título Personalizada (siempre visible) -->
     <Border Grid.Row="0" x:Name="CustomTitleBar" 
                 Background="{DynamicResource HeaderBackgroundBrush}" 
                 MouseLeftButtonDown="DragWindow_MouseLeftButtonDown"
@@ -64,6 +64,8 @@
 
         <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right"
                 shell:WindowChrome.IsHitTestVisibleInChrome="True">
+            <Button Content="★" ToolTip="Favoritos" Click="ToggleFavorites_Click" Style="{StaticResource WindowControlButton}"
+                shell:WindowChrome.IsHitTestVisibleInChrome="True" Margin="0,0,6,0"/>
             <Button Content="📖" ToolTip="Entrar al modo lectura" Click="EnterReadingMode_Click" Style="{StaticResource WindowControlButton}"
                 shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
             <Button Content="⚙" ToolTip="Configuración" Click="OpenSettingsDialog_Click" Style="{StaticResource WindowControlButton}"
@@ -97,9 +99,25 @@
 
         <!-- Área de Contenido Principal -->
     <!-- Barra superior de controles del lector -->
-    <Border Grid.Row="1" x:Name="ReaderTopBar" Style="{DynamicResource ReaderTopBarStyle}"
+    <Border Grid.Row="1" x:Name="ReaderTopBar"
         Panel.ZIndex="1000"
         IsEnabled="{Binding IsReaderViewActive, RelativeSource={RelativeSource AncestorType=Window}}">
+        <Border.Style>
+            <Style TargetType="Border" BasedOn="{StaticResource ReaderTopBarStyle}">
+                <Setter Property="Visibility" Value="Collapsed"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsReaderViewActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                        <Setter Property="Visibility" Value="Visible"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsHomeViewActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsSettingsViewActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
         
         <DockPanel>
             <!-- Izquierda: navegación -->
@@ -146,18 +164,19 @@
                     <Path Style="{StaticResource NavIconStyle}" Data="M7 14H5v5h5v-2H7v-3zm10 5h-3v2h5v-5h-2v3zM7 5h3V3H5v5h2V5zm10 0v3h2V3h-5v2h3z" Fill="{DynamicResource TextBrush}"/>
                 </Button>
                 <!-- Toggle lectura continua / paginada -->
-                <Button x:Name="ToggleContinuousButton" ToolTip="Alternar modo de lectura" Click="ToggleContinuous_Click" Style="{DynamicResource ReaderToggleButtonStyle}" Margin="6,0">
+                <ToggleButton x:Name="ToggleContinuousButton" ToolTip="Alternar modo de lectura" Click="ToggleContinuous_Click" Style="{DynamicResource ReaderToggleButtonStyle}" Margin="6,0">
                     <Path Style="{StaticResource NavIconStyle}" Data="M6 2h8l4 4v14H6z" Fill="{DynamicResource TextBrush}"/>
-                </Button>
+                </ToggleButton>
             </StackPanel>
         </DockPanel>
     </Border>
 
     <!-- Contenido principal con panel de miniaturas -->
-    <Grid Grid.Row="2">
+    <Grid Grid.Row="2" x:Name="ContentGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="ThumbCol" Width="0"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition x:Name="FavoritesCol" Width="0"/>
         </Grid.ColumnDefinitions>
 
         <!-- Panel lateral de miniaturas (sin ScrollViewer externo para mantener virtualización) -->
@@ -201,6 +220,11 @@
         <!-- Área de contenido -->
         <ContentControl Grid.Column="1" x:Name="MainContentArea" Content="{Binding CurrentView}"
                         ClipToBounds="True"/>
+
+        <!-- Panel de Favoritos (colapsado por defecto) -->
+        <Border Grid.Column="2" x:Name="FavoritesPanel" Background="{DynamicResource PanelBackgroundBrush}" Visibility="Collapsed" Width="320">
+            <local:FavoritesSection x:Name="FavoritesSection" />
+        </Border>
     </Grid>
 
         

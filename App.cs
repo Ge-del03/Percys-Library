@@ -1,9 +1,11 @@
 using System.Windows;
 using ComicReader.Services;
+using System.Globalization;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using ComicReader.Core.Services;
+using ComicReader.ViewModels;
 using ComicReader.Core.Adapters;
 using ComicReader.Core.Abstractions;
 
@@ -26,9 +28,41 @@ namespace ComicReader
             }
             catch { }
 
+            // Limpieza y validaciones antes de instanciar MainWindow
+            try
+            {
+                DeduplicateMergedDictionaries();
+                EnsureEssentialResources();
+            }
+            catch (Exception ex)
+            {
+                // No deberíamos bloquear el arranque por esta validación; loguear y seguir
+                try { Logger.LogException("Error durante validación previa al arranque", ex); } catch { }
+            }
+
             // Crear y mostrar MainWindow manualmente ahora que removimos StartupUri
-            var main = new MainWindow();
-            main.Show();
+            MainWindow main = null;
+            try
+            {
+                main = new MainWindow();
+                main.Show();
+            }
+            catch (Exception ex)
+            {
+                // Registrar excepción completa (incluyendo inner exceptions) para diagnóstico
+                try
+                {
+                    Logger.LogException("Fallo al crear MainWindow", ex);
+                    ComicReader.Utils.DevLogger.Error("Fallo al crear MainWindow: " + ex.ToString());
+                }
+                catch { }
+
+                // Mostrar mensaje amigable al usuario con información mínima
+                try { System.Windows.MessageBox.Show($"Error crítico al iniciar la interfaz: {ex.Message}\nRevisa el log para más detalles.", "Error crítico", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error); } catch { }
+
+                // Re-lanzar para que el manejador global lo capture también
+                throw;
+            }
 
             try
             {
@@ -47,6 +81,7 @@ namespace ComicReader
             {
                 try { Logger.LogException("Error al abrir archivo por asociación", ex); } catch { }
             }
+
             // Abrir último cómic si el usuario lo solicita en la configuración
             try
             {
@@ -61,6 +96,79 @@ namespace ComicReader
                 }
             }
             catch { }
+        }
+
+        /// <summary>
+        /// Remove duplicated ResourceDictionary entries (by Source) to avoid loading the same RD twice
+        /// </summary>
+        private static void DeduplicateMergedDictionaries()
+        {
+            try
+            {
+                var dicts = Application.Current.Resources.MergedDictionaries;
+                var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                for (int i = dicts.Count - 1; i >= 0; i--)
+                {
+                    var rd = dicts[i];
+                    var key = rd?.Source?.OriginalString;
+                    if (string.IsNullOrWhiteSpace(key))
+                        continue;
+                    if (seen.Contains(key))
+                    {
+                        dicts.RemoveAt(i);
+                        Logger.Log($"Removed duplicate ResourceDictionary: {key}", LogLevel.Info);
+                    }
+                    else
+                    {
+                        seen.Add(key);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                try { Logger.LogException("Error deduplicating merged dictionaries", ex); } catch { }
+            }
+        }
+
+        /// <summary>
+        /// Ensure some essential resource keys exist; if not, try to load ThemeTokens as fallback.
+        /// This is defensive and will not throw; logs info for debugging.
+        /// </summary>
+        private static void EnsureEssentialResources()
+        {
+            try
+            {
+                var appRes = Application.Current.Resources;
+                var required = new[] { "TextBrush", "PanelBackgroundBrush", "AccentBrush", "ReaderToggleButtonStyle" };
+                bool missing = false;
+                foreach (var k in required)
+                {
+                    if (!appRes.Contains(k))
+                    {
+                        Logger.Log($"Missing resource key: {k}", LogLevel.Warning);
+                        missing = true;
+                    }
+                }
+                if (missing)
+                {
+                    try
+                    {
+                        var tokenUri = new Uri("Themes/ThemeTokens.xaml", UriKind.Relative);
+                        var rd = new ResourceDictionary() { Source = tokenUri };
+                        // Insert at the beginning so tokens are available for other RDs
+                        Application.Current.Resources.MergedDictionaries.Insert(0, rd);
+                        Logger.Log("Loaded fallback ThemeTokens.xaml because required keys were missing.", LogLevel.Info);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogException("Failed to load fallback ThemeTokens.xaml", ex);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                try { Logger.LogException("Error ensuring essential resources", ex); } catch { }
+            }
         }
 
         private void RunThemeValidationAndExit()
@@ -198,51 +306,128 @@ namespace ComicReader
             base.OnExit(e);
         }
 
+        // Shared ViewModel for the Favorites/Collections UI so controls and windows can bind to the same instance
+        public CollectionViewModel FavoritesViewModel { get; } = new CollectionViewModel();
+
         public static void ApplyTheme(string themeName)
         {
             try
             {
-                // If the theme maps to a ThemeMode we manage programmatically, prefer that
+                // 1) If the theme maps to a ThemeMode we manage programmatically, prefer that
                 try
                 {
-                    if (!string.IsNullOrWhiteSpace(themeName) && Enum.TryParse<ComicReader.Services.ThemeMode>(themeName, out var tm))
+                    if (!string.IsNullOrWhiteSpace(themeName) && Enum.TryParse<ComicReader.Services.ThemeMode>(themeName, true, out var tm))
                     {
                         ComicReader.Themes.ThemeManager.ApplyTheme(tm);
                         Logger.Log($"Applied programmatic theme: {themeName}", LogLevel.Info);
                         return;
                     }
+
+                    // 1b) Try to match the human-friendly names from ThemeManager.GetAvailableThemes()
+                    var avail = ComicReader.Themes.ThemeManager.GetAvailableThemes();
+                    var match = avail.FirstOrDefault(t => string.Equals(t.Name, themeName, StringComparison.OrdinalIgnoreCase)
+                                                       || t.Name.IndexOf(themeName ?? string.Empty, StringComparison.OrdinalIgnoreCase) >= 0);
+                    if (match != null)
+                    {
+                        ComicReader.Themes.ThemeManager.ApplyTheme(match.Mode);
+                        Logger.Log($"Applied programmatic theme via ThemeInfo match: {match.Name} ({match.Mode})", LogLevel.Info);
+                        return;
+                    }
+                }
+                catch (Exception exEnum)
+                {
+                    // no crash here - we'll fall back to trying XAML files
+                    Logger.LogException("Error while trying to map theme to ThemeMode", exEnum);
+                }
+
+                // 2) Remove previously loaded Theme resource dictionaries (heuristic)
+                try
+                {
+                    var oldThemeDictionaries = Application.Current.Resources.MergedDictionaries
+                        .Where(rd => rd.Source != null && rd.Source.OriginalString.IndexOf("theme", StringComparison.OrdinalIgnoreCase) >= 0)
+                        .ToList();
+
+                    foreach (var rd in oldThemeDictionaries)
+                    {
+                        Application.Current.Resources.MergedDictionaries.Remove(rd);
+                    }
                 }
                 catch { }
 
-                var oldThemeDictionaries = Application.Current.Resources.MergedDictionaries
-                    .Where(rd => rd.Source != null && rd.Source.OriginalString.Contains("Theme.xaml"))
-                    .ToList();
+                // 3) Try a few filename normalizations to find an on-disk XAML theme in Themes/.
+                bool loaded = false;
+                var candidates = new List<string>();
+                string raw = themeName ?? string.Empty;
+                string sanitized = new string(raw.Normalize(System.Text.NormalizationForm.FormD)
+                    .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != System.Globalization.UnicodeCategory.NonSpacingMark)
+                    .ToArray()).Replace(" ", string.Empty);
 
-                foreach (var rd in oldThemeDictionaries)
+                candidates.Add($"Themes/{raw}Theme.xaml");
+                candidates.Add($"Themes/{sanitized}Theme.xaml");
+                candidates.Add($"Themes/{raw}theme.xaml");
+                candidates.Add($"Themes/{sanitized}theme.xaml");
+                candidates.Add($"Themes/{raw}.xaml");
+                candidates.Add($"Themes/{sanitized}.xaml");
+
+                // Also try to match any file in the Themes directory that contains the name (case-insensitive)
+                try
                 {
-                    Application.Current.Resources.MergedDictionaries.Remove(rd);
+                    var themesDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Themes");
+                    if (System.IO.Directory.Exists(themesDir))
+                    {
+                        var files = System.IO.Directory.GetFiles(themesDir, "*.xaml", System.IO.SearchOption.TopDirectoryOnly);
+                        foreach (var f in files)
+                        {
+                            var filename = System.IO.Path.GetFileNameWithoutExtension(f);
+                            if (!candidates.Any(c => c.EndsWith(filename + ".xaml", StringComparison.OrdinalIgnoreCase)))
+                            {
+                                if (filename.IndexOf(raw ?? string.Empty, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                    filename.IndexOf(sanitized ?? string.Empty, StringComparison.OrdinalIgnoreCase) >= 0)
+                                {
+                                    candidates.Add("Themes/" + filename + ".xaml");
+                                }
+                            }
+                        }
+                    }
+                }
+                catch { }
+
+                foreach (var cand in candidates.Distinct(StringComparer.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        var themeUri = new Uri(cand, UriKind.Relative);
+                        var themeRd = new ResourceDictionary() { Source = themeUri };
+                        Application.Current.Resources.MergedDictionaries.Add(themeRd);
+                        Logger.Log($"Applied theme XAML: {cand}", LogLevel.Info);
+                        loaded = true;
+                        break;
+                    }
+                    catch (Exception exCandidate)
+                    {
+                        // ignore candidate-specific failures and try next
+                        Logger.LogException($"Failed to load theme candidate: {cand}", exCandidate);
+                    }
                 }
 
-                var themeUri = new Uri($"Themes/{themeName}Theme.xaml", UriKind.Relative);
-                ResourceDictionary theme = new ResourceDictionary() { Source = themeUri };
-                Application.Current.Resources.MergedDictionaries.Add(theme);
-
-                Logger.Log($"Applied theme: {themeName}", LogLevel.Info);
+                if (!loaded)
+                {
+                    Logger.Log($"No matching theme found for '{themeName}', falling back to programmatic Dark theme.", LogLevel.Warning);
+                    ComicReader.Themes.ThemeManager.ApplyTheme(ComicReader.Services.ThemeMode.Dark);
+                    Logger.Log("Applied fallback programmatic theme: Dark", LogLevel.Info);
+                }
             }
             catch (Exception ex)
             {
-                Logger.LogException($"Failed to apply theme: {themeName}. Attempting to load fallback theme.", ex);
+                Logger.LogException($"Unexpected error while applying theme: {themeName}", ex);
                 try
                 {
-                    var fallbackThemeUri = new Uri("Themes/DarkTheme.xaml", UriKind.Relative);
-                    ResourceDictionary fallbackTheme = new ResourceDictionary() { Source = fallbackThemeUri };
-                    Application.Current.Resources.MergedDictionaries.Add(fallbackTheme);
-                    Logger.Log("Loaded fallback theme: DarkTheme.", LogLevel.Info);
+                    ComicReader.Themes.ThemeManager.ApplyTheme(ComicReader.Services.ThemeMode.Dark);
+                    Logger.Log("Applied fallback programmatic theme: Dark after error.", LogLevel.Info);
                 }
                 catch (Exception fallbackEx)
                 {
-                    Logger.LogException("Failed to load fallback theme. Application may not display correctly.", fallbackEx);
-                    MessageBox.Show("Error crítico al cargar el tema. La aplicación puede no mostrarse correctamente.", "Error de Tema", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Logger.LogException("Failed to apply fallback Dark theme after unexpected error.", fallbackEx);
                 }
             }
         }

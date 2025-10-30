@@ -4,7 +4,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace ComicReader.Models
+#if false // Legacy duplicate models - excluded from build. Kept for reference.
+
+namespace ComicReader.Legacy.Models
 {
     // Modelo para una colección de cómics
     public class ComicCollection : INotifyPropertyChanged
@@ -245,3 +247,5 @@ namespace ComicReader.Models
         }
     }
 }
+
+#endif
