@@ -119,7 +119,9 @@
             </Style>
         </Border.Style>
         
-        <DockPanel>
+        <Grid>
+            <Rectangle Fill="{StaticResource ComicHalftoneBrush}" Opacity="0.35"/>
+            <DockPanel>
             <!-- Izquierda: navegación -->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
                 <Button ToolTip="Inicio" Click="HomeButton_Click" Style="{DynamicResource ReaderIconButtonStyle}" Margin="2,0">
@@ -168,7 +170,8 @@
                     <Path Style="{StaticResource NavIconStyle}" Data="M6 2h8l4 4v14H6z" Fill="{DynamicResource TextBrush}"/>
                 </ToggleButton>
             </StackPanel>
-        </DockPanel>
+            </DockPanel>
+        </Grid>
     </Border>
 
     <!-- Contenido principal con panel de miniaturas -->

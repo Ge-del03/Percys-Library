@@ -3,15 +3,40 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
   <!-- Estilos ligeros para la barra del lector y el toggle -->
+  <!-- Brushes y estilo cómic para la barra del lector -->
+  <LinearGradientBrush x:Key="ComicReaderTopBarGradient" StartPoint="0,0" EndPoint="1,0">
+    <GradientStop Color="{DynamicResource PanelBackgroundColor}" Offset="0"/>
+    <GradientStop Color="{DynamicResource AccentColor}" Offset="0.4"/>
+    <GradientStop Color="{DynamicResource PrimaryColor}" Offset="1"/>
+  </LinearGradientBrush>
+
+  <!-- Patrón de semitono suave para overlays -->
+  <DrawingBrush x:Key="ComicHalftoneBrush" ViewportUnits="Absolute" TileMode="Tile" Viewport="0,0,8,8" Stretch="None" Opacity="0.12">
+    <DrawingBrush.Drawing>
+      <GeometryDrawing Brush="White">
+        <GeometryDrawing.Geometry>
+          <GeometryGroup>
+            <GeometryGroup.Children>
+              <EllipseGeometry Center="2,2" RadiusX="1" RadiusY="1"/>
+              <EllipseGeometry Center="6,6" RadiusX="1" RadiusY="1"/>
+            </GeometryGroup.Children>
+          </GeometryGroup>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
+    </DrawingBrush.Drawing>
+  </DrawingBrush>
+
   <Style x:Key="ReaderTopBarStyle" TargetType="Border">
-    <Setter Property="Background" Value="{DynamicResource HeaderBackgroundBrush}"/>
-    <Setter Property="Padding" Value="8"/>
-    <Setter Property="CornerRadius" Value="6"/>
+    <Setter Property="Background" Value="{StaticResource ComicReaderTopBarGradient}"/>
+    <Setter Property="Padding" Value="10,8"/>
+    <Setter Property="CornerRadius" Value="14"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+    <Setter Property="BorderThickness" Value="3"/>
     <Setter Property="SnapsToDevicePixels" Value="True"/>
     <Setter Property="Visibility" Value="Collapsed"/>
     <Setter Property="Effect">
       <Setter.Value>
-        <DropShadowEffect Color="#000000" BlurRadius="10" Opacity="0.18" ShadowDepth="2"/>
+        <DropShadowEffect Color="#000000" BlurRadius="16" Opacity="0.22" ShadowDepth="3"/>
       </Setter.Value>
     </Setter>
     <Style.Triggers>
