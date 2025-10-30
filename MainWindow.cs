@@ -1861,6 +1861,22 @@ namespace ComicReader
                     slider.IsEnabled = true;
                 }
             }
+            // Actualizar barra de progreso visual
+            if (this.FindName("ReaderProgressBar") is ProgressBar rpb)
+            {
+                if (noComic)
+                {
+                    rpb.Value = 0;
+                    rpb.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    int pageCount = Math.Max(1, _comicLoader.Pages.Count);
+                    double percent = ((_currentPageIndex + 1) * 100.0) / pageCount;
+                    rpb.Value = Math.Max(0, Math.Min(100, percent));
+                    rpb.Visibility = Visibility.Visible;
+                }
+            }
             // Mantener sincronizada la selección del panel de miniaturas si está visible
             if (_thumbnailsVisible)
             {

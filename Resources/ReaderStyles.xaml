@@ -194,6 +194,50 @@
     </Setter>
   </Style>
 
+  <!-- ProgressBar cómic para el lector: degradado + stripes suaves -->
+  <LinearGradientBrush x:Key="ComicProgressFill" StartPoint="0,0" EndPoint="1,0">
+    <GradientStop Color="{DynamicResource AccentColor}" Offset="0"/>
+    <GradientStop Color="{DynamicResource PrimaryColor}" Offset="1"/>
+  </LinearGradientBrush>
+  <DrawingBrush x:Key="ComicProgressStripes" ViewportUnits="Absolute" Viewport="0,0,12,12" TileMode="Tile" Stretch="None" Opacity="0.18">
+    <DrawingBrush.Drawing>
+      <GeometryDrawing Brush="White">
+        <GeometryDrawing.Geometry>
+          <GeometryGroup>
+            <GeometryGroup.Children>
+              <RectangleGeometry Rect="0,6,12,2"/>
+              <RectangleGeometry Rect="6,0,2,12"/>
+            </GeometryGroup.Children>
+          </GeometryGroup>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
+    </DrawingBrush.Drawing>
+  </DrawingBrush>
+  <Style x:Key="ReaderProgressBarStyle" TargetType="ProgressBar">
+    <Setter Property="Height" Value="12"/>
+    <Setter Property="SnapsToDevicePixels" Value="True"/>
+    <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}"/>
+    <Setter Property="Foreground" Value="{StaticResource ComicProgressFill}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ProgressBar">
+          <Border x:Name="PART_Track" Background="{TemplateBinding Background}" CornerRadius="8" Padding="2">
+            <Grid ClipToBounds="True">
+              <Rectangle x:Name="PART_Indicator" Fill="{TemplateBinding Foreground}" RadiusX="6" RadiusY="6" HorizontalAlignment="Left"/>
+              <!-- overlay de stripes -->
+              <Rectangle Fill="{StaticResource ComicProgressStripes}"/>
+            </Grid>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsIndeterminate" Value="True">
+              <Setter TargetName="PART_Indicator" Property="Width" Value="40"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
   <!-- Dialog button style for small dialogs -->
   <Style x:Key="ModernDialogButtonStyle" TargetType="Button" BasedOn="{StaticResource ReaderToggleButtonStyle}">
     <Setter Property="Padding" Value="8,4"/>
