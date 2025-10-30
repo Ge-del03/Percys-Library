@@ -8788,3 +8788,223 @@
 2025-10-30 18:18:04.442 [Info] Decode concurrency cap set to 4
 2025-10-30 18:18:06.040 [Info] Decode concurrency cap set to 4
 2025-10-30 18:18:08.211 [Info] Decode concurrency cap set to 4
+2025-10-30 18:20:52.968 [Info] Decode concurrency cap set to 4
+2025-10-30 18:21:11.678 [Info] [Perf] 2025-10-30T22:21:11.6788264Z - LoadComicAsync took 49ms
+2025-10-30 18:21:11.680 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\The Vigil #3 (2023) HDM.cbr with 24 pages.
+2025-10-30 18:21:11.684 [Info] Storage read latency heuristic: 0.7ms
+2025-10-30 18:21:11.690 [Info] Decode concurrency cap set to 4
+2025-10-30 18:21:11.825 [Info] [Perf] 2025-10-30T22:21:11.8251458Z - Enqueue full load page 18
+2025-10-30 18:21:11.844 [Info] Decode concurrency cap set to 4
+2025-10-30 18:21:11.961 [Info] [Perf] 2025-10-30T22:21:11.9614084Z - Enqueue prefetch page 17
+2025-10-30 18:21:11.969 [Info] [Perf] 2025-10-30T22:21:11.9690288Z - Enqueue prefetch page 19
+2025-10-30 18:21:11.986 [Info] [Perf] 2025-10-30T22:21:11.9867261Z - Enqueue prefetch page 16
+2025-10-30 18:21:11.988 [Info] [Perf] 2025-10-30T22:21:11.9888118Z - Enqueue prefetch page 20
+2025-10-30 18:21:14.765 [Info] [Perf] 2025-10-30T22:21:14.7654335Z - Enqueue full load page 19
+2025-10-30 18:21:14.768 [Info] Decode concurrency cap set to 4
+2025-10-30 18:21:14.931 [Info] [Perf] 2025-10-30T22:21:14.9311911Z - Enqueue prefetch page 18
+2025-10-30 18:21:14.933 [Info] [Perf] 2025-10-30T22:21:14.9338708Z - Enqueue prefetch page 20
+2025-10-30 18:21:14.937 [Info] [Perf] 2025-10-30T22:21:14.9379494Z - Enqueue prefetch page 17
+2025-10-30 18:21:15.253 [Info] [Perf] 2025-10-30T22:21:15.2533052Z - Decode_CreateBitmapImage took 2008ms
+2025-10-30 18:21:15.268 [Info] [Perf] 2025-10-30T22:21:15.2683957Z - FullLoad page 18 took 3406ms
+2025-10-30 18:21:15.536 [Info] [Perf] 2025-10-30T22:21:15.5366176Z - Enqueue full load page 20
+2025-10-30 18:21:15.537 [Info] [Perf] 2025-10-30T22:21:15.5378195Z - Enqueue full load page 23
+2025-10-30 18:21:15.617 [Info] Decode concurrency cap set to 4
+2025-10-30 18:21:15.617 [Info] [Perf] 2025-10-30T22:21:15.6179196Z - Enqueue prefetch page 19
+2025-10-30 18:21:15.635 [Info] [Perf] 2025-10-30T22:21:15.6355065Z - Enqueue prefetch page 21
+2025-10-30 18:21:15.645 [Info] [Perf] 2025-10-30T22:21:15.6455582Z - Enqueue prefetch page 18
+2025-10-30 18:21:16.383 [Info] [Perf] 2025-10-30T22:21:16.3830386Z - Decode_CreateBitmapImage took 122ms
+2025-10-30 18:21:16.385 [Info] [Perf] 2025-10-30T22:21:16.3851589Z - FullLoad page 19 took 871ms
+2025-10-30 18:21:16.661 [Info] [Perf] 2025-10-30T22:21:16.6616307Z - Enqueue full load page 21
+2025-10-30 18:21:16.704 [Info] Decode concurrency cap set to 4
+2025-10-30 18:21:16.705 [Info] [Perf] 2025-10-30T22:21:16.7050827Z - Enqueue prefetch page 22
+2025-10-30 18:21:17.155 [Info] [Perf] 2025-10-30T22:21:17.1551516Z - Enqueue full load page 22
+2025-10-30 18:21:17.207 [Info] Decode concurrency cap set to 4
+2025-10-30 18:21:17.207 [Info] [Perf] 2025-10-30T22:21:17.2073089Z - Enqueue prefetch page 20
+2025-10-30 18:21:17.392 [Info] [Perf] 2025-10-30T22:21:17.3921357Z - Decode_CreateBitmapImage took 146ms
+2025-10-30 18:21:17.394 [Info] [Perf] 2025-10-30T22:21:17.3942059Z - FullLoad page 20 took 1005ms
+2025-10-30 18:21:17.624 [Info] [Perf] 2025-10-30T22:21:17.6242683Z - Enqueue full load page 23
+2025-10-30 18:21:17.824 [Info] Decode concurrency cap set to 4
+2025-10-30 18:21:18.560 [Info] [Perf] 2025-10-30T22:21:18.5607099Z - Decode_CreateBitmapImage took 133ms
+2025-10-30 18:21:18.587 [Info] [Perf] 2025-10-30T22:21:18.5876604Z - FullLoad page 23 took 1191ms
+2025-10-30 18:21:19.604 [Info] [Perf] 2025-10-30T22:21:19.6044535Z - Decode_CreateBitmapImage took 140ms
+2025-10-30 18:21:19.606 [Info] [Perf] 2025-10-30T22:21:19.6067738Z - FullLoad page 21 took 1017ms
+2025-10-30 18:21:19.630 [Info] [Perf] 2025-10-30T22:21:19.6305308Z - FullLoad page 22 took 20ms
+2025-10-30 18:21:19.638 [Info] [Perf] 2025-10-30T22:21:19.6386145Z - FullLoad page 23 took 5ms
+2025-10-30 18:21:19.890 [Info] [Perf] 2025-10-30T22:21:19.8903392Z - Enqueue full load page 17
+2025-10-30 18:21:19.925 [Info] [Perf] 2025-10-30T22:21:19.9257140Z - Prefetch page 17 took 37ms
+2025-10-30 18:21:20.065 [Info] Initializing ComicPageLoader for: C:\Users\O11CE\OneDrive\Desktop\comic\The Vigil #3 (2023) HDM.cbr
+2025-10-30 18:21:20.112 [Info] Decode concurrency cap set to 4
+2025-10-30 18:21:20.131 [Info] [Perf] 2025-10-30T22:21:20.1312317Z - LoadComicAsync took 2ms
+2025-10-30 18:21:20.132 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\The Vigil #3 (2023) HDM.cbr with 24 pages.
+2025-10-30 18:21:20.141 [Info] Storage read latency heuristic: 0.6ms
+2025-10-30 18:21:20.292 [Info] Disposing ComicPageLoader and cancelling internal operations.
+2025-10-30 18:21:20.293 [Info] ComicPageLoader disposed.
+2025-10-30 18:21:20.798 [Info] [Perf] 2025-10-30T22:21:20.7983831Z - Decode_CreateBitmapImage took 127ms
+2025-10-30 18:21:20.800 [Info] [Perf] 2025-10-30T22:21:20.8001693Z - FullLoad page 17 took 873ms
+2025-10-30 18:21:21.052 [Info] [Perf] 2025-10-30T22:21:21.0527869Z - Enqueue full load page 19
+2025-10-30 18:21:21.062 [Info] [Perf] 2025-10-30T22:21:21.0621015Z - Prefetch page 19 took 9ms
+2025-10-30 18:21:21.801 [Info] [Perf] 2025-10-30T22:21:21.8011304Z - Decode_CreateBitmapImage took 111ms
+2025-10-30 18:21:21.804 [Info] [Perf] 2025-10-30T22:21:21.8047124Z - FullLoad page 19 took 741ms
+2025-10-30 18:21:22.062 [Info] [Perf] 2025-10-30T22:21:22.0627655Z - Enqueue full load page 16
+2025-10-30 18:21:22.068 [Info] [Perf] 2025-10-30T22:21:22.0686462Z - Prefetch page 16 took 5ms
+2025-10-30 18:26:27.600 [Info] Logger inicializado
+2025-10-30 18:26:27.847 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-30 18:26:28.186 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-30 18:26:28.190 [Info] Decode concurrency cap set to 4
+2025-10-30 18:26:28.193 [Info] Prefetch window set to 2
+2025-10-30 18:26:37.950 [Info] [Perf] 2025-10-30T22:26:37.9501828Z - LoadComicAsync took 62ms
+2025-10-30 18:26:37.951 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 011 (2024) (HDM).cbr with 27 pages.
+2025-10-30 18:26:37.955 [Info] Storage read latency heuristic: 0.4ms
+2025-10-30 18:26:37.956 [Info] Decode concurrency cap set to 4
+2025-10-30 18:26:38.048 [Info] Initializing ComicPageLoader for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 011 (2024) (HDM).cbr
+2025-10-30 18:26:38.049 [Info] Initializing ComicPageLoader for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 011 (2024) (HDM).cbr
+2025-10-30 18:26:38.050 [Info] Decode concurrency cap set to 4
+2025-10-30 18:26:38.051 [Info] Decode concurrency cap set to 4
+2025-10-30 18:26:38.056 [Info] [Perf] 2025-10-30T22:26:38.0562366Z - LoadComicAsync took 2ms
+2025-10-30 18:26:38.056 [Info] [Perf] 2025-10-30T22:26:38.0562369Z - LoadComicAsync took 3ms
+2025-10-30 18:26:38.057 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 011 (2024) (HDM).cbr with 27 pages.
+2025-10-30 18:26:38.058 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 011 (2024) (HDM).cbr with 27 pages.
+2025-10-30 18:26:38.061 [Info] Storage read latency heuristic: 0.8ms
+2025-10-30 18:26:38.063 [Info] Storage read latency heuristic: 0.5ms
+2025-10-30 18:26:38.272 [Info] Disposing ComicPageLoader and cancelling internal operations.
+2025-10-30 18:26:38.286 [Info] Disposing ComicPageLoader and cancelling internal operations.
+2025-10-30 18:26:38.290 [Info] ComicPageLoader disposed.
+2025-10-30 18:26:38.291 [Info] ComicPageLoader disposed.
+2025-10-30 18:26:39.481 [Info] [Perf] 2025-10-30T22:26:39.4818469Z - Enqueue full load page 0
+2025-10-30 18:26:39.489 [Info] Decode concurrency cap set to 4
+2025-10-30 18:26:39.496 [Info] Decode concurrency cap set to 4
+2025-10-30 18:26:40.400 [Info] [Perf] 2025-10-30T22:26:40.4006381Z - Enqueue prefetch page 1
+2025-10-30 18:26:40.404 [Info] [Perf] 2025-10-30T22:26:40.4042458Z - Enqueue prefetch page 2
+2025-10-30 18:26:40.716 [Info] [Perf] 2025-10-30T22:26:40.7168414Z - Decode_CreateBitmapImage took 75ms
+2025-10-30 18:26:40.720 [Info] [Perf] 2025-10-30T22:26:40.7203067Z - FullLoad page 0 took 1234ms
+2025-10-30 18:26:40.977 [Info] [Perf] 2025-10-30T22:26:40.9773147Z - Enqueue full load page 1
+2025-10-30 18:26:42.919 [Info] [Perf] 2025-10-30T22:26:42.9198860Z - Prefetch page 1 took 1944ms
+2025-10-30 18:26:43.344 [Info] [Perf] 2025-10-30T22:26:43.3441755Z - Decode_CreateBitmapImage took 207ms
+2025-10-30 18:26:44.274 [Info] [Perf] 2025-10-30T22:26:44.2742643Z - FullLoad page 1 took 1309ms
+2025-10-30 18:26:44.440 [Info] [Perf] 2025-10-30T22:26:44.4409336Z - Enqueue full load page 3
+2025-10-30 18:26:44.483 [Info] [Perf] 2025-10-30T22:26:44.4832854Z - Enqueue full load page 4
+2025-10-30 18:26:45.467 [Info] Decode concurrency cap set to 4
+2025-10-30 18:26:45.474 [Info] [Perf] 2025-10-30T22:26:45.4742844Z - Enqueue prefetch page 0
+2025-10-30 18:26:45.672 [Info] [Perf] 2025-10-30T22:26:45.6727809Z - Enqueue prefetch page 2
+2025-10-30 18:26:45.907 [Info] [Perf] 2025-10-30T22:26:45.9071872Z - Decode_CreateBitmapImage took 209ms
+2025-10-30 18:26:45.909 [Info] [Perf] 2025-10-30T22:26:45.9099041Z - FullLoad page 3 took 1448ms
+2025-10-30 18:26:46.305 [Info] [Perf] 2025-10-30T22:26:46.3050137Z - Decode_CreateBitmapImage took 207ms
+2025-10-30 18:26:46.306 [Info] [Perf] 2025-10-30T22:26:46.3065547Z - FullLoad page 4 took 392ms
+2025-10-30 18:26:46.566 [Info] [Perf] 2025-10-30T22:26:46.5660589Z - Enqueue full load page 2
+2025-10-30 18:26:46.584 [Info] [Perf] 2025-10-30T22:26:46.5849228Z - Prefetch page 2 took 18ms
+2025-10-30 18:26:46.921 [Info] [Perf] 2025-10-30T22:26:46.9217386Z - Decode_CreateBitmapImage took 217ms
+2025-10-30 18:26:46.923 [Info] [Perf] 2025-10-30T22:26:46.9236571Z - FullLoad page 2 took 337ms
+2025-10-30 18:26:47.169 [Info] [Perf] 2025-10-30T22:26:47.1695843Z - Enqueue full load page 0
+2025-10-30 18:26:47.175 [Info] [Perf] 2025-10-30T22:26:47.1752105Z - Prefetch page 0 took 5ms
+2025-10-30 18:26:47.366 [Info] [Perf] 2025-10-30T22:26:47.3660688Z - Decode_CreateBitmapImage took 135ms
+2025-10-30 18:26:47.369 [Info] [Perf] 2025-10-30T22:26:47.3690035Z - FullLoad page 0 took 192ms
+2025-10-30 18:26:47.624 [Info] [Perf] 2025-10-30T22:26:47.6242131Z - Enqueue full load page 2
+2025-10-30 18:26:47.626 [Info] [Perf] 2025-10-30T22:26:47.6261647Z - Prefetch page 2 took 2ms
+2025-10-30 18:26:47.944 [Info] [Perf] 2025-10-30T22:26:47.9441255Z - Decode_CreateBitmapImage took 199ms
+2025-10-30 18:26:47.947 [Info] [Perf] 2025-10-30T22:26:47.9471480Z - FullLoad page 2 took 316ms
+2025-10-30 18:26:49.495 [Info] [Perf] 2025-10-30T22:26:49.4950083Z - Enqueue full load page 5
+2025-10-30 18:26:49.534 [Info] Decode concurrency cap set to 4
+2025-10-30 18:26:49.534 [Info] [Perf] 2025-10-30T22:26:49.5342939Z - Enqueue prefetch page 1
+2025-10-30 18:26:49.537 [Info] [Perf] 2025-10-30T22:26:49.5379749Z - Enqueue prefetch page 3
+2025-10-30 18:26:49.541 [Info] [Perf] 2025-10-30T22:26:49.5417484Z - Enqueue prefetch page 0
+2025-10-30 18:26:49.885 [Info] [Perf] 2025-10-30T22:26:49.8853195Z - Decode_CreateBitmapImage took 209ms
+2025-10-30 18:26:49.887 [Info] [Perf] 2025-10-30T22:26:49.8872300Z - FullLoad page 5 took 390ms
+2025-10-30 18:26:50.141 [Info] [Perf] 2025-10-30T22:26:50.1414581Z - Enqueue full load page 1
+2025-10-30 18:26:50.184 [Info] [Perf] 2025-10-30T22:26:50.1845103Z - Prefetch page 1 took 43ms
+2025-10-30 18:26:50.419 [Info] [Perf] 2025-10-30T22:26:50.4192184Z - Decode_CreateBitmapImage took 110ms
+2025-10-30 18:26:50.421 [Info] [Perf] 2025-10-30T22:26:50.4216043Z - FullLoad page 1 took 222ms
+2025-10-30 18:26:50.430 [Info] [Perf] 2025-10-30T22:26:50.4303371Z - Enqueue full load page 3
+2025-10-30 18:26:50.430 [Info] [Perf] 2025-10-30T22:26:50.4305300Z - Enqueue full load page 6
+2025-10-30 18:26:50.487 [Info] [Perf] 2025-10-30T22:26:50.4875891Z - Enqueue prefetch page 2
+2025-10-30 18:26:50.487 [Info] Decode concurrency cap set to 4
+2025-10-30 18:26:50.490 [Info] [Perf] 2025-10-30T22:26:50.4903368Z - Enqueue prefetch page 4
+2025-10-30 18:26:50.497 [Info] [Perf] 2025-10-30T22:26:50.4979013Z - Enqueue prefetch page 1
+2025-10-30 18:26:50.754 [Info] [Perf] 2025-10-30T22:26:50.7540684Z - Decode_CreateBitmapImage took 180ms
+2025-10-30 18:26:50.762 [Info] [Perf] 2025-10-30T22:26:50.7623086Z - FullLoad page 3 took 327ms
+2025-10-30 18:26:51.286 [Info] [Perf] 2025-10-30T22:26:51.2860977Z - Decode_CreateBitmapImage took 268ms
+2025-10-30 18:26:51.287 [Info] [Perf] 2025-10-30T22:26:51.2877460Z - FullLoad page 6 took 494ms
+2025-10-30 18:26:51.543 [Info] [Perf] 2025-10-30T22:26:51.5432558Z - Enqueue full load page 3
+2025-10-30 18:26:51.546 [Info] [Perf] 2025-10-30T22:26:51.5466749Z - Prefetch page 3 took 3ms
+2025-10-30 18:26:51.802 [Info] [Perf] 2025-10-30T22:26:51.8025596Z - Decode_CreateBitmapImage took 120ms
+2025-10-30 18:26:51.804 [Info] [Perf] 2025-10-30T22:26:51.8042908Z - FullLoad page 3 took 256ms
+2025-10-30 18:26:52.057 [Info] [Perf] 2025-10-30T22:26:52.0571473Z - Enqueue full load page 0
+2025-10-30 18:26:52.063 [Info] [Perf] 2025-10-30T22:26:52.0633623Z - Prefetch page 0 took 6ms
+2025-10-30 18:26:52.215 [Info] [Perf] 2025-10-30T22:26:52.2153081Z - Decode_CreateBitmapImage took 100ms
+2025-10-30 18:26:52.216 [Info] [Perf] 2025-10-30T22:26:52.2166566Z - FullLoad page 0 took 151ms
+2025-10-30 18:26:52.470 [Info] [Perf] 2025-10-30T22:26:52.4707105Z - Enqueue full load page 2
+2025-10-30 18:26:52.480 [Info] [Perf] 2025-10-30T22:26:52.4800705Z - Prefetch page 2 took 9ms
+2025-10-30 18:26:52.771 [Info] [Perf] 2025-10-30T22:26:52.7718443Z - Decode_CreateBitmapImage took 173ms
+2025-10-30 18:26:52.773 [Info] [Perf] 2025-10-30T22:26:52.7734090Z - FullLoad page 2 took 287ms
+2025-10-30 18:26:53.025 [Info] [Perf] 2025-10-30T22:26:53.0256002Z - Enqueue full load page 4
+2025-10-30 18:26:53.051 [Info] [Perf] 2025-10-30T22:26:53.0515241Z - Prefetch page 4 took 25ms
+2025-10-30 18:26:53.334 [Info] [Perf] 2025-10-30T22:26:53.3344250Z - Decode_CreateBitmapImage took 129ms
+2025-10-30 18:26:53.336 [Info] [Perf] 2025-10-30T22:26:53.3360831Z - FullLoad page 4 took 275ms
+2025-10-30 18:26:53.588 [Info] [Perf] 2025-10-30T22:26:53.5887298Z - Enqueue full load page 1
+2025-10-30 18:26:53.595 [Info] [Perf] 2025-10-30T22:26:53.5950358Z - Prefetch page 1 took 6ms
+2025-10-30 18:26:53.664 [Info] Decode concurrency cap set to 4
+2025-10-30 18:26:53.664 [Info] [Perf] 2025-10-30T22:26:53.6640794Z - Enqueue prefetch page 1
+2025-10-30 18:26:53.666 [Info] [Perf] 2025-10-30T22:26:53.6662578Z - Enqueue prefetch page 0
+2025-10-30 18:26:53.887 [Info] [Perf] 2025-10-30T22:26:53.8875684Z - Decode_CreateBitmapImage took 179ms
+2025-10-30 18:26:53.903 [Info] [Perf] 2025-10-30T22:26:53.9037262Z - FullLoad page 1 took 307ms
+2025-10-30 18:26:54.160 [Info] [Perf] 2025-10-30T22:26:54.1602080Z - Enqueue full load page 1
+2025-10-30 18:26:54.162 [Info] [Perf] 2025-10-30T22:26:54.1621793Z - Prefetch page 1 took 2ms
+2025-10-30 18:26:54.406 [Info] [Perf] 2025-10-30T22:26:54.4067618Z - Decode_CreateBitmapImage took 142ms
+2025-10-30 18:26:54.408 [Info] [Perf] 2025-10-30T22:26:54.4084679Z - FullLoad page 1 took 243ms
+2025-10-30 18:26:54.515 [Info] [Perf] 2025-10-30T22:26:54.5150479Z - Enqueue prefetch page 4
+2025-10-30 18:26:54.515 [Info] Decode concurrency cap set to 4
+2025-10-30 18:26:54.517 [Info] [Perf] 2025-10-30T22:26:54.5174155Z - Enqueue prefetch page 5
+2025-10-30 18:26:54.663 [Info] [Perf] 2025-10-30T22:26:54.6633614Z - Enqueue full load page 0
+2025-10-30 18:26:54.669 [Info] [Perf] 2025-10-30T22:26:54.6689984Z - Prefetch page 0 took 5ms
+2025-10-30 18:26:54.840 [Info] [Perf] 2025-10-30T22:26:54.8402520Z - Decode_CreateBitmapImage took 113ms
+2025-10-30 18:26:54.842 [Info] [Perf] 2025-10-30T22:26:54.8421177Z - FullLoad page 0 took 171ms
+2025-10-30 18:26:55.098 [Info] [Perf] 2025-10-30T22:26:55.0986719Z - Enqueue full load page 4
+2025-10-30 18:26:55.103 [Info] [Perf] 2025-10-30T22:26:55.1037656Z - Prefetch page 4 took 5ms
+2025-10-30 18:26:55.385 [Info] [Perf] 2025-10-30T22:26:55.3858664Z - Decode_CreateBitmapImage took 133ms
+2025-10-30 18:26:55.387 [Info] [Perf] 2025-10-30T22:26:55.3875397Z - FullLoad page 4 took 282ms
+2025-10-30 18:26:55.646 [Info] [Perf] 2025-10-30T22:26:55.6467359Z - Enqueue full load page 5
+2025-10-30 18:26:55.652 [Info] [Perf] 2025-10-30T22:26:55.6520812Z - Prefetch page 5 took 5ms
+2025-10-30 18:26:55.994 [Info] [Perf] 2025-10-30T22:26:55.9943112Z - Decode_CreateBitmapImage took 151ms
+2025-10-30 18:26:55.995 [Info] [Perf] 2025-10-30T22:26:55.9958868Z - FullLoad page 5 took 342ms
+2025-10-30 18:26:56.551 [Info] [Perf] 2025-10-30T22:26:56.5519505Z - Enqueue full load page 7
+2025-10-30 18:26:56.552 [Info] [Perf] 2025-10-30T22:26:56.5521432Z - Enqueue full load page 4
+2025-10-30 18:26:56.651 [Info] [Perf] 2025-10-30T22:26:56.6514767Z - Enqueue prefetch page 3
+2025-10-30 18:26:56.651 [Info] Decode concurrency cap set to 4
+2025-10-30 18:26:56.666 [Info] [Perf] 2025-10-30T22:26:56.6665779Z - Enqueue prefetch page 2
+2025-10-30 18:26:57.091 [Info] [Perf] 2025-10-30T22:26:57.0910808Z - Decode_CreateBitmapImage took 266ms
+2025-10-30 18:26:57.092 [Info] [Perf] 2025-10-30T22:26:57.0929280Z - FullLoad page 7 took 519ms
+2025-10-30 18:26:57.464 [Info] [Perf] 2025-10-30T22:26:57.4647424Z - Decode_CreateBitmapImage took 206ms
+2025-10-30 18:26:57.493 [Info] [Perf] 2025-10-30T22:26:57.4930284Z - FullLoad page 4 took 397ms
+2025-10-30 18:26:57.689 [Info] [Perf] 2025-10-30T22:26:57.6898986Z - Enqueue full load page 8
+2025-10-30 18:26:57.738 [Info] Decode concurrency cap set to 4
+2025-10-30 18:26:57.738 [Info] [Perf] 2025-10-30T22:26:57.7388517Z - Enqueue prefetch page 4
+2025-10-30 18:26:57.830 [Info] [Perf] 2025-10-30T22:26:57.8301344Z - Enqueue prefetch page 3
+2025-10-30 18:26:58.267 [Info] [Perf] 2025-10-30T22:26:58.2673858Z - Decode_CreateBitmapImage took 287ms
+2025-10-30 18:26:58.270 [Info] [Perf] 2025-10-30T22:26:58.2700062Z - FullLoad page 8 took 570ms
+2025-10-30 18:26:58.514 [Info] [Perf] 2025-10-30T22:26:58.5145722Z - Enqueue full load page 3
+2025-10-30 18:26:58.524 [Info] [Perf] 2025-10-30T22:26:58.5244680Z - Prefetch page 3 took 9ms
+2025-10-30 18:26:58.828 [Info] [Perf] 2025-10-30T22:26:58.8288492Z - Decode_CreateBitmapImage took 160ms
+2025-10-30 18:26:58.830 [Info] [Perf] 2025-10-30T22:26:58.8306119Z - FullLoad page 3 took 299ms
+2025-10-30 18:26:59.085 [Info] [Perf] 2025-10-30T22:26:59.0850074Z - Enqueue full load page 2
+2025-10-30 18:26:59.115 [Info] [Perf] 2025-10-30T22:26:59.1159506Z - Prefetch page 2 took 31ms
+2025-10-30 18:26:59.412 [Info] [Perf] 2025-10-30T22:26:59.4121324Z - Decode_CreateBitmapImage took 184ms
+2025-10-30 18:26:59.415 [Info] [Perf] 2025-10-30T22:26:59.4157295Z - FullLoad page 2 took 298ms
+2025-10-30 18:26:59.679 [Info] [Perf] 2025-10-30T22:26:59.6794248Z - Enqueue full load page 4
+2025-10-30 18:26:59.686 [Info] [Perf] 2025-10-30T22:26:59.6863691Z - Prefetch page 4 took 7ms
+2025-10-30 18:27:00.040 [Info] [Perf] 2025-10-30T22:27:00.0402472Z - Decode_CreateBitmapImage took 191ms
+2025-10-30 18:27:00.043 [Info] [Perf] 2025-10-30T22:27:00.0438953Z - Enqueue full load page 6
+2025-10-30 18:27:00.045 [Info] [Perf] 2025-10-30T22:27:00.0456995Z - Enqueue full load page 9
+2025-10-30 18:27:00.076 [Info] [Perf] 2025-10-30T22:27:00.0767163Z - FullLoad page 4 took 388ms
+2025-10-30 18:27:00.115 [Info] [Perf] 2025-10-30T22:27:00.1157958Z - Enqueue prefetch page 5
+2025-10-30 18:27:00.115 [Info] Decode concurrency cap set to 4
+2025-10-30 18:27:00.144 [Info] [Perf] 2025-10-30T22:27:00.1448504Z - Enqueue prefetch page 7
+2025-10-30 18:27:00.344 [Info] [Perf] 2025-10-30T22:27:00.3446950Z - Enqueue prefetch page 8
+2025-10-30 18:27:00.705 [Info] [Perf] 2025-10-30T22:27:00.7051060Z - Decode_CreateBitmapImage took 328ms
+2025-10-30 18:27:00.712 [Info] [Perf] 2025-10-30T22:27:00.7122344Z - FullLoad page 6 took 570ms
+2025-10-30 18:27:01.289 [Info] [Perf] 2025-10-30T22:27:01.2897340Z - Decode_CreateBitmapImage took 268ms
+2025-10-30 18:27:01.291 [Info] [Perf] 2025-10-30T22:27:01.2913245Z - FullLoad page 9 took 568ms
+2025-10-30 18:27:01.548 [Info] [Perf] 2025-10-30T22:27:01.5485464Z - Enqueue full load page 3
+2025-10-30 18:27:01.940 [Info] [Perf] 2025-10-30T22:27:01.9406227Z - Prefetch page 3 took 392ms
+2025-10-30 18:27:02.187 [Info] [Perf] 2025-10-30T22:27:02.1876355Z - Decode_CreateBitmapImage took 114ms
+2025-10-30 18:27:02.248 [Info] [Perf] 2025-10-30T22:27:02.2482675Z - FullLoad page 3 took 306ms
+2025-10-30 18:27:02.500 [Info] [Perf] 2025-10-30T22:27:02.5009456Z - Enqueue full load page 5
+2025-10-30 18:27:02.505 [Info] [Perf] 2025-10-30T22:27:02.5055232Z - Prefetch page 5 took 4ms

@@ -70,9 +70,10 @@
   
   
   <ItemGroup>
-    <PackageReference Include="SharpCompress" Version="0.32.2" />
+    <!-- Dependencias actualizadas a versiones recientes y soportadas -->
+    <PackageReference Include="SharpCompress" Version="0.33.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
-  <PackageReference Include="VersOne.Epub" Version="3.3.4" />
+    <PackageReference Include="VersOne.Epub" Version="3.3.4" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <PackageReference Include="Docnet.Core" Version="2.6.0" />
   </ItemGroup>

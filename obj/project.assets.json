@@ -95,13 +95,13 @@
           }
         }
       },
-      "SharpCompress/0.32.2": {
+      "SharpCompress/0.33.0": {
         "type": "package",
         "compile": {
-          "lib/net6.0/SharpCompress.dll": {}
+          "lib/net7.0/SharpCompress.dll": {}
         },
         "runtime": {
-          "lib/net6.0/SharpCompress.dll": {}
+          "lib/net7.0/SharpCompress.dll": {}
         }
       },
       "SixLabors.ImageSharp/3.1.11": {
@@ -221,20 +221,19 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "SharpCompress/0.32.2": {
-      "sha512": "MSt6TKAg2c0uFFDtf7oACB4DfvXKq5Cvot2e0wjy5nAiVujpIRQ8laiIqCU/VMRGyytasGzg+nODKTkkDjbr/g==",
+    "SharpCompress/0.33.0": {
+      "sha512": "FlHfpTAADzaSlVCBF33iKJk9UhOr3Xj+r5LXbW2GzqYr0SrhiOf6shLX2LC2fqs7g7d+YlwKbBXqWFtb+e7icw==",
       "type": "package",
-      "path": "sharpcompress/0.32.2",
+      "path": "sharpcompress/0.33.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "LICENSE.txt",
-        "lib/net461/SharpCompress.dll",
+        "lib/net462/SharpCompress.dll",
         "lib/net6.0/SharpCompress.dll",
-        "lib/netcoreapp3.1/SharpCompress.dll",
+        "lib/net7.0/SharpCompress.dll",
         "lib/netstandard2.0/SharpCompress.dll",
         "lib/netstandard2.1/SharpCompress.dll",
-        "sharpcompress.0.32.2.nupkg.sha512",
+        "sharpcompress.0.33.0.nupkg.sha512",
         "sharpcompress.nuspec"
       ]
     },
@@ -312,7 +311,7 @@
   "projectFileDependencyGroups": {
     "net8.0-windows7.0": [
       "Docnet.Core >= 2.6.0",
-      "SharpCompress >= 0.32.2",
+      "SharpCompress >= 0.33.0",
       "SixLabors.ImageSharp >= 3.1.11",
       "System.Drawing.Common >= 7.0.0",
       "VersOne.Epub >= 3.3.4"
@@ -374,7 +373,7 @@
           },
           "SharpCompress": {
             "target": "Package",
-            "version": "[0.32.2, )"
+            "version": "[0.33.0, )"
           },
           "SixLabors.ImageSharp": {
             "target": "Package",

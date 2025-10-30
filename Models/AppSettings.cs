@@ -45,17 +45,20 @@ namespace ComicReader.Services
         public bool ShowLoadingIndicators { get => _showLoadingIndicators; set => SetProperty(ref _showLoadingIndicators, value); }
 
         // Performance / prefetch tuning
-        private bool _enableEagerPreload = false;
-        public bool EnableEagerPreload { get => _enableEagerPreload; set => SetProperty(ref _enableEagerPreload, value); }
+    // Habilitar precarga completa por defecto para mejorar experiencia: evita imágenes borrosas al navegar.
+    private bool _enableEagerPreload = true;
+    public bool EnableEagerPreload { get => _enableEagerPreload; set => SetProperty(ref _enableEagerPreload, value); }
 
         private int _eagerPreloadConcurrency = 3;
         public int EagerPreloadConcurrency { get => _eagerPreloadConcurrency; set => SetProperty(ref _eagerPreloadConcurrency, value); }
 
-        private bool _enableEagerPreloadInMemory = false;
-        public bool EnableEagerPreloadInMemory { get => _enableEagerPreloadInMemory; set => SetProperty(ref _enableEagerPreloadInMemory, value); }
+    // Mantener en memoria las páginas precargadas por defecto para evitar swaps borrosos.
+    private bool _enableEagerPreloadInMemory = true;
+    public bool EnableEagerPreloadInMemory { get => _enableEagerPreloadInMemory; set => SetProperty(ref _enableEagerPreloadInMemory, value); }
 
-        private int _eagerPreloadMemoryLimitPages = 20;
-        public int EagerPreloadMemoryLimitPages { get => _eagerPreloadMemoryLimitPages; set => SetProperty(ref _eagerPreloadMemoryLimitPages, value); }
+    // Por defecto permitir un número razonable de páginas en RAM; el usuario puede ajustarlo en Settings.
+    private int _eagerPreloadMemoryLimitPages = 50;
+    public int EagerPreloadMemoryLimitPages { get => _eagerPreloadMemoryLimitPages; set => SetProperty(ref _eagerPreloadMemoryLimitPages, value); }
 
         private long _eagerPreloadDiskMaxBytes = 100_000_000;
         public long EagerPreloadDiskMaxBytes { get => _eagerPreloadDiskMaxBytes; set => SetProperty(ref _eagerPreloadDiskMaxBytes, value); }
