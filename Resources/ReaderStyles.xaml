@@ -80,6 +80,93 @@
     </Setter>
   </Style>
 
+  <!-- Botón de icono estilo cómic para la barra del lector -->
+  <Style x:Key="ReaderIconButtonStyle" TargetType="Button">
+    <Setter Property="Width" Value="36"/>
+    <Setter Property="Height" Value="36"/>
+    <Setter Property="Padding" Value="6"/>
+    <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+    <Setter Property="BorderThickness" Value="2"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="SnapsToDevicePixels" Value="True"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="bd"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="10">
+            <Border.Effect>
+              <DropShadowEffect Color="#000000" BlurRadius="10" ShadowDepth="2" Opacity="0.18"/>
+            </Border.Effect>
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="bd" Property="Background" Value="{DynamicResource OverlayBackgroundBrush}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+              <Setter TargetName="bd" Property="Background" Value="{DynamicResource AccentLowBrush}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter Property="Opacity" Value="0.45"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Slider estilo cómic para navegación de páginas -->
+  <Style x:Key="ReaderSliderStyle" TargetType="Slider">
+    <Setter Property="Height" Value="16"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Slider">
+          <Grid Margin="0,0,0,0">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Track x:Name="PART_Track" Grid.Column="1">
+              <Track.DecreaseRepeatButton>
+                <RepeatButton Command="Slider.DecreaseLarge" Opacity="0">
+                  <RepeatButton.Template>
+                    <ControlTemplate TargetType="RepeatButton">
+                      <Border Background="{DynamicResource ControlBackgroundBrush}" CornerRadius="6" Height="6"/>
+                    </ControlTemplate>
+                  </RepeatButton.Template>
+                </RepeatButton>
+              </Track.DecreaseRepeatButton>
+              <Track.IncreaseRepeatButton>
+                <RepeatButton Command="Slider.IncreaseLarge" Opacity="0">
+                  <RepeatButton.Template>
+                    <ControlTemplate TargetType="RepeatButton">
+                      <Border Background="{DynamicResource ControlBackgroundBrush}" CornerRadius="6" Height="6"/>
+                    </ControlTemplate>
+                  </RepeatButton.Template>
+                </RepeatButton>
+              </Track.IncreaseRepeatButton>
+              <Track.Thumb>
+                <Thumb Width="14" Height="14" Cursor="Hand">
+                  <Thumb.Template>
+                    <ControlTemplate TargetType="Thumb">
+                      <Border Width="14" Height="14" CornerRadius="7" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="2"/>
+                    </ControlTemplate>
+                  </Thumb.Template>
+                </Thumb>
+              </Track.Thumb>
+            </Track>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
   <!-- Modern ProgressBar style: rounded, subtle gradient -->
   <Style x:Key="ModernProgressBarStyle" TargetType="ProgressBar">
     <Setter Property="SnapsToDevicePixels" Value="True"/>

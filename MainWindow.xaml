@@ -142,7 +142,7 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Text="Pág" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,6,0" VerticalAlignment="Center"/>
                 <TextBlock x:Name="PageIndicator" Text="— / —" Foreground="{DynamicResource TextBrush}" FontWeight="Bold" VerticalAlignment="Center"/>
-                <Slider x:Name="PageSlider" Width="220" Minimum="1" Maximum="1" Value="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="PageSlider_ValueChanged" Margin="12,0,0,0"/>
+                <Slider x:Name="PageSlider" Width="220" Minimum="1" Maximum="1" Value="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="PageSlider_ValueChanged" Margin="12,0,0,0" Style="{DynamicResource ReaderSliderStyle}"/>
                 <!-- Barra de progreso del lector (visual, fina y centrada) -->
                 <ProgressBar x:Name="ReaderProgressBar" Width="260" Height="6" Minimum="0" Maximum="100" Value="0" Margin="12,6,0,0" VerticalAlignment="Center" Background="{DynamicResource PanelBackgroundBrush}" Foreground="{DynamicResource AccentBrush}" Visibility="Collapsed"/>
             </StackPanel>
