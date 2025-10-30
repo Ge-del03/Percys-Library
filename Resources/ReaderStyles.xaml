@@ -152,10 +152,12 @@
                 </RepeatButton>
               </Track.IncreaseRepeatButton>
               <Track.Thumb>
+                <!-- Thumb funcional pero visualmente oculto: mantiene arrastre sin mostrar el gran punto azul -->
                 <Thumb Width="14" Height="14" Cursor="Hand">
                   <Thumb.Template>
                     <ControlTemplate TargetType="Thumb">
-                      <Border Width="14" Height="14" CornerRadius="7" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="2"/>
+                      <!-- Usamos un borde transparente para mantener el área de interacción sin el color azul -->
+                      <Border Width="14" Height="14" CornerRadius="7" Background="Transparent" BorderBrush="Transparent" BorderThickness="0"/>
                     </ControlTemplate>
                   </Thumb.Template>
                 </Thumb>
@@ -220,12 +222,18 @@
     <Setter Property="Foreground" Value="{StaticResource ComicProgressFill}"/>
     <Setter Property="Template">
       <Setter.Value>
-        <ControlTemplate TargetType="ProgressBar">
+          <ControlTemplate TargetType="ProgressBar">
           <Border x:Name="PART_Track" Background="{TemplateBinding Background}" CornerRadius="8" Padding="2">
             <Grid ClipToBounds="True">
-              <Rectangle x:Name="PART_Indicator" Fill="{TemplateBinding Foreground}" RadiusX="6" RadiusY="6" HorizontalAlignment="Left"/>
-              <!-- overlay de stripes -->
-              <Rectangle Fill="{StaticResource ComicProgressStripes}"/>
+              <!-- PART_Indicator como contenedor del área rellena -->
+              <Grid x:Name="PART_Indicator" HorizontalAlignment="Left" VerticalAlignment="Stretch">
+                <!-- relleno de la barra (se escala según Value) -->
+                <Rectangle Fill="{TemplateBinding Foreground}" RadiusX="6" RadiusY="6" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                <!-- stripes sólo dentro del área rellena -->
+                <Rectangle Fill="{StaticResource ComicProgressStripes}" RadiusX="6" RadiusY="6" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                <!-- indicador circular dentro del relleno -->
+                <Ellipse x:Name="PART_ProgressThumb" Width="12" Height="12" HorizontalAlignment="Right" VerticalAlignment="Center" Fill="{DynamicResource AccentBrush}" Stroke="{DynamicResource PanelBackgroundBrush}" StrokeThickness="2" />
+              </Grid>
             </Grid>
           </Border>
           <ControlTemplate.Triggers>
