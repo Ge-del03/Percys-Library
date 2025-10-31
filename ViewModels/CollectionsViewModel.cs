@@ -71,6 +71,22 @@ namespace ComicReader.ViewModels
             catch { }
         }
 
+        public void UpdateFromRequest(Guid id, CollectionCreateRequest req)
+        {
+            if (req == null) return;
+            try
+            {
+                var updated = _service.Update(id, req);
+                if (updated != null)
+                {
+                    var idx = Collections.IndexOf(Collections.First(x => x.Id == id));
+                    Collections[idx] = updated;
+                    OnPropertyChanged(nameof(Collections));
+                }
+            }
+            catch { }
+        }
+
         private void Rename(CollectionDto c)
         {
             if (c == null) return;
@@ -96,6 +112,17 @@ namespace ComicReader.ViewModels
             if (c == null) return;
             _service.Delete(c.Id);
             Collections.Remove(c);
+        }
+
+        // Public wrappers for view code-behind (distinct names to avoid conflict)
+        public void DuplicateCollection(CollectionDto c)
+        {
+            Duplicate(c);
+        }
+
+        public void DeleteCollection(CollectionDto c)
+        {
+            Delete(c);
         }
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;

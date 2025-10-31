@@ -235,3 +235,5 @@ c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\Con
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\tests\ReadingStats.Tests\bin\Debug\net8.0-windows7.0\Themes\CollectionsResources.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\NewCollectionDialog.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\NewCollectionDialog.g.cs
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\EditCollectionDialog.baml
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\EditCollectionDialog.g.cs

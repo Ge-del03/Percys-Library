@@ -112,5 +112,20 @@ namespace ComicReader.Services
                 return it;
             }
         }
+
+        public CollectionDto Update(Guid id, CollectionCreateRequest req)
+        {
+            lock (_sync)
+            {
+                var it = _cache.FirstOrDefault(x => x.Id == id);
+                if (it == null) return null;
+                if (!string.IsNullOrWhiteSpace(req.Name)) it.Name = req.Name;
+                it.Description = req.Description;
+                it.CoverPath = req.CoverPath;
+                // Note: Count and Items are managed elsewhere; preserve existing items
+                Save();
+                return it;
+            }
+        }
     }
 }

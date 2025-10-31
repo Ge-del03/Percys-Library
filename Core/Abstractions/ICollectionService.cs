@@ -7,6 +7,7 @@ namespace ComicReader.Core.Abstractions
     {
         IEnumerable<CollectionDto> GetAll();
         CollectionDto Create(CollectionCreateRequest req);
+        CollectionDto Update(Guid id, CollectionCreateRequest req);
         CollectionDto Rename(Guid id, string newName);
         CollectionDto Duplicate(Guid id);
         void Delete(Guid id);
