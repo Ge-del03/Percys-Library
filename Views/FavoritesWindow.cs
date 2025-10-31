@@ -278,13 +278,46 @@ namespace ComicReader.Views
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    _selectedCollection?.Items.Remove(comic);
+                    // capture for undo
+                    var col = _selected_collection_safe();
+                    var idx = col?.Items.IndexOf(comic) ?? -1;
+
+                    col?.Items.Remove(comic);
                     CurrentCollectionItems.Remove(comic);
                     FilteredItems.Remove(comic);
                     SetCollectionTitle(_selectedCollection != null 
                         ? $"{_selectedCollection.Name} ({_selectedCollection.ItemCount} cómics)" 
                         : "Selecciona una colección");
                     FavoritesStorage.Save(Collections);
+
+                    // show actionable toast to undo removal
+                    try
+                    {
+                        ComicReader.Services.ToastService.Show($"'{comic.Title}' eliminado", "Deshacer", () =>
+                        {
+                            try
+                            {
+                                // restore into collection at previous index if possible
+                                if (col != null)
+                                {
+                                    if (idx >= 0 && idx <= col.Items.Count)
+                                        col.Items.Insert(idx, comic);
+                                    else
+                                        col.Items.Add(comic);
+                                }
+                                // restore view lists
+                                System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                                {
+                                    CurrentCollectionItems.Add(comic);
+                                    if (!FilteredItems.Contains(comic)) FilteredItems.Add(comic);
+                                    SetCollectionTitle(col != null ? $"{col.Name} ({col.ItemCount} cómics)" : "Selecciona una colección");
+                                });
+                                FavoritesStorage.Save(Collections);
+                            }
+                            catch { }
+                        });
+                    }
+                    catch { }
                 }
             }
         }
@@ -298,16 +331,57 @@ namespace ComicReader.Views
             if (MessageBox.Show($"¿Quitar {selected.Count} elemento(s) de la colección?", "Confirmar",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                foreach (var item in selected)
+                // capture removed items and their original indices for undo
+                var col = _selected_collection_safe();
+                var removed = selected.Select(it => new { Item = it, Index = col?.Items.IndexOf(it) ?? -1 }).ToList();
+
+                foreach (var r in removed)
                 {
-                    _selectedCollection.Items.Remove(item);
-                    CurrentCollectionItems.Remove(item);
-                    FilteredItems.Remove(item);
+                    if (r.Item != null)
+                    {
+                        col?.Items.Remove(r.Item);
+                        CurrentCollectionItems.Remove(r.Item);
+                        FilteredItems.Remove(r.Item);
+                    }
                 }
+
                 SetCollectionTitle(_selectedCollection != null
                     ? $"{_selectedCollection.Name} ({_selectedCollection.ItemCount} cómics)"
                     : "Selecciona una colección");
                 FavoritesStorage.Save(Collections);
+
+                // show actionable toast to undo bulk removal
+                try
+                {
+                    ComicReader.Services.ToastService.Show($"{removed.Count} elemento(s) eliminados", "Deshacer", () =>
+                    {
+                        try
+                        {
+                            var colLocal = _selected_collection_safe();
+                            // restore in reverse order to preserve indices
+                            foreach (var r in removed.OrderBy(r => r.Index))
+                            {
+                                if (r.Item == null) continue;
+                                if (colLocal != null)
+                                {
+                                    if (r.Index >= 0 && r.Index <= colLocal.Items.Count)
+                                        colLocal.Items.Insert(r.Index, r.Item);
+                                    else
+                                        colLocal.Items.Add(r.Item);
+                                }
+                                System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                                {
+                                    if (!CurrentCollectionItems.Contains(r.Item)) CurrentCollectionItems.Add(r.Item);
+                                    if (!FilteredItems.Contains(r.Item)) FilteredItems.Add(r.Item);
+                                });
+                            }
+                            SetCollectionTitle(colLocal != null ? $"{colLocal.Name} ({colLocal.ItemCount} cómics)" : "Selecciona una colección");
+                            FavoritesStorage.Save(Collections);
+                        }
+                        catch { }
+                    });
+                }
+                catch { }
             }
         }
 
@@ -545,6 +619,20 @@ namespace ComicReader.Views
             if (FindName("CollectionTitleText") is TextBlock tb) tb.Text = text;
         }
         private System.Windows.Controls.ComboBox GetTagFilterComboBox() => (System.Windows.Controls.ComboBox)FindName("TagFilterComboBox");
+        
+        // Safe accessor used by removal/undo handlers to prefer the currently selected listbox item
+        private ComicCollection _selected_collection_safe()
+        {
+            try
+            {
+                var list = GetCollectionsListBox();
+                return (ComicCollection)(list?.SelectedItem ?? _selectedCollection);
+            }
+            catch
+            {
+                return _selectedCollection;
+            }
+        }
     }
 
     // Diálogo para crear nueva colección

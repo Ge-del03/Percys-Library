@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Window x:Class="ComicReader.Views.FavoritesWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -91,36 +90,40 @@
                     <TextBlock Text="📚 COLECCIONES" FontSize="18" FontWeight="Bold" 
                                Foreground="#FF374151" Margin="0,0,0,15"/>
                     
-                    <Button Style="{StaticResource ModernButtonStyle}"
-                            Background="#FF10B981" Foreground="White"
-                            Click="CreateCollection_Click">
+            <Button Style="{StaticResource ModernButtonStyle}"
+                Background="#FF10B981" Foreground="White"
+                Click="CreateCollection_Click"
+                AutomationProperties.Name="Nueva colección">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="➕" FontSize="16" Margin="0,0,8,0"/>
                             <TextBlock Text="Nueva Colección"/>
                         </StackPanel>
                     </Button>
 
-                    <Button Style="{StaticResource ModernButtonStyle}"
-                            Background="#FF3B82F6" Foreground="White"
-                            Click="RenameCollection_Click">
+            <Button Style="{StaticResource ModernButtonStyle}"
+                Background="#FF3B82F6" Foreground="White"
+                Click="RenameCollection_Click"
+                AutomationProperties.Name="Renombrar colección">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="✏️" FontSize="16" Margin="0,0,8,0"/>
                             <TextBlock Text="Renombrar"/>
                         </StackPanel>
                     </Button>
 
-                    <Button Style="{StaticResource ModernButtonStyle}"
-                            Background="#FF8B5CF6" Foreground="White"
-                            Click="DuplicateCollection_Click">
+            <Button Style="{StaticResource ModernButtonStyle}"
+                Background="#FF8B5CF6" Foreground="White"
+                Click="DuplicateCollection_Click"
+                AutomationProperties.Name="Duplicar colección">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="📄" FontSize="16" Margin="0,0,8,0"/>
                             <TextBlock Text="Duplicar"/>
                         </StackPanel>
                     </Button>
 
-                    <Button Style="{StaticResource ModernButtonStyle}"
-                            Background="#FFEF4444" Foreground="White"
-                            Click="DeleteCollection_Click">
+            <Button Style="{StaticResource ModernButtonStyle}"
+                Background="#FFEF4444" Foreground="White"
+                Click="DeleteCollection_Click"
+                AutomationProperties.Name="Eliminar colección">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🗑️" FontSize="16" Margin="0,0,8,0"/>
                             <TextBlock Text="Eliminar Colección"/>
@@ -128,7 +131,8 @@
                     </Button>
 
                     <ListBox Name="CollectionsListBox" BorderThickness="0" Background="Transparent"
-                             SelectionChanged="CollectionsListBox_SelectionChanged" Margin="0,10,0,0">
+                             SelectionChanged="CollectionsListBox_SelectionChanged" Margin="0,10,0,0"
+                             AutomationProperties.Name="Lista de colecciones">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border Background="#FFF3F4F6" CornerRadius="8" Padding="12" Margin="0,2">
@@ -219,9 +223,11 @@
 
                         <!-- Lista principal -->
                         <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+                            <!-- Favorites list -->
                             <ListBox Name="FavoritesListBox" BorderThickness="0" Background="Transparent"
                                      SelectionMode="Extended" AllowDrop="True"
-                                     DragOver="FavoritesListBox_DragOver" Drop="FavoritesListBox_Drop">
+                                     DragOver="FavoritesListBox_DragOver" Drop="FavoritesListBox_Drop"
+                                     AutomationProperties.Name="Lista de favoritos">
                             <!-- Use WrapPanel to create responsive card layout -->
                             <ListBox.ItemsPanel>
                                 <ItemsPanelTemplate>

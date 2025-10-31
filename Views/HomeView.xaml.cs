@@ -811,9 +811,10 @@ namespace ComicReader.Views
 
         private void OpenFavorites_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            var favoritesWindow = new FavoritesWindow();
-            favoritesWindow.Owner = Window.GetWindow(this);
-            favoritesWindow.ShowDialog();
+            // Open the redesigned collections window instead of the legacy FavoritesWindow
+            var collectionsWindow = new CollectionsWindow();
+            collectionsWindow.Owner = Window.GetWindow(this);
+            collectionsWindow.ShowDialog();
         }
 
         // Nuevos métodos para funcionalidades avanzadas

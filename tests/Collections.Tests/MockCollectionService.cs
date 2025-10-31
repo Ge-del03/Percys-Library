@@ -34,6 +34,16 @@ namespace Collections.Tests
 
         public void ImportCollections(string path) => throw new NotSupportedException();
 
+        public void AddRaw(CollectionDto dto, int? index = null)
+        {
+            if (dto == null) return;
+            if (_store.Any(x => x.Id == dto.Id)) return;
+            if (index.HasValue && index.Value >= 0 && index.Value <= _store.Count)
+                _store.Insert(index.Value, dto);
+            else
+                _store.Add(dto);
+        }
+
         public CollectionDto Rename(Guid id, string newName)
         {
             var it = _store.FirstOrDefault(x => x.Id == id);

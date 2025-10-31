@@ -58,6 +58,25 @@ namespace ComicReader.Services
             lock (_sync) { _cache.RemoveAll(x => x.Id == id); Save(); }
         }
 
+        public void AddRaw(CollectionDto dto, int? index = null)
+        {
+            if (dto == null) return;
+            lock (_sync)
+            {
+                // avoid duplicate ids
+                if (_cache.Any(x => x.Id == dto.Id)) return;
+                if (index.HasValue && index.Value >= 0 && index.Value <= _cache.Count)
+                {
+                    _cache.Insert(index.Value, dto);
+                }
+                else
+                {
+                    _cache.Add(dto);
+                }
+                Save();
+            }
+        }
+
         public IEnumerable<CollectionDto> GetAll()
         {
             lock (_sync) return _cache.Select(x => x).ToList();

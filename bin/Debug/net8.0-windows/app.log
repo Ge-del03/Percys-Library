@@ -34588,3 +34588,565 @@
 2025-10-31 11:27:51.461 [Info] Prefetch window set to 2
 2025-10-31 11:28:01.549 [Info] Decode concurrency cap set to 4
 2025-10-31 11:28:10.947 [Info] Decode concurrency cap set to 4
+2025-10-31 12:07:12.565 [Info] Logger inicializado
+2025-10-31 12:07:12.941 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 12:07:13.444 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 12:07:13.446 [Info] Decode concurrency cap set to 4
+2025-10-31 12:07:13.448 [Info] Prefetch window set to 2
+2025-10-31 12:12:35.141 [Info] Logger inicializado
+2025-10-31 12:12:35.382 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 12:12:35.791 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 12:12:35.793 [Info] Decode concurrency cap set to 4
+2025-10-31 12:12:35.796 [Info] Prefetch window set to 2
+2025-10-31 12:16:59.239 [Info] Logger inicializado
+2025-10-31 12:16:59.531 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 12:16:59.977 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 12:16:59.982 [Info] Decode concurrency cap set to 4
+2025-10-31 12:16:59.989 [Info] Prefetch window set to 2
+2025-10-31 12:17:09.617 [Error] Unhandled exception caught by App_DispatcherUnhandledException.: 'Se produjo una excepción al proporcionar un valor en 'System.Windows.StaticResourceExtension'.' (número de línea: '7'; posición de línea: '54').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.Load(XamlReader xamlReader, IXamlObjectWriterFactory writerFactory, Boolean skipJournaledProperties, Object rootObject, XamlObjectWriterSettings settings, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.LoadBaml(XamlReader xamlReader, Boolean skipJournaledProperties, Object rootObject, XamlAccessLevel accessLevel, Uri baseUri)
+   at System.Windows.Markup.XamlReader.LoadBaml(Stream stream, ParserContext parserContext, Object parent, Boolean closeStream)
+   at System.Windows.Application.LoadComponent(Object component, Uri resourceLocator)
+   at ComicReader.Views.CollectionsWindow.InitializeComponent() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\CollectionsWindow.xaml:line 1
+   at ComicReader.Views.CollectionsWindow..ctor() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\CollectionsWindow.xaml.cs:line 14
+   at ComicReader.Views.HomeView.OpenFavorites_Click(Object sender, RoutedEventArgs e) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\HomeView.xaml.cs:line 815
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.Primitives.ButtonBase.OnClick()
+   at System.Windows.Controls.Button.OnClick()
+   at System.Windows.Controls.Primitives.ButtonBase.OnMouseLeftButtonUp(MouseButtonEventArgs e)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.ReRaiseEventAs(DependencyObject sender, RoutedEventArgs args, RoutedEvent newEvent)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.UIElement.RaiseTrustedEvent(RoutedEventArgs args)
+   at System.Windows.Input.InputManager.ProcessStagingArea()
+   at System.Windows.Interop.HwndMouseInputProvider.ReportInput(IntPtr hwnd, InputMode mode, Int32 timestamp, RawMouseActions actions, Int32 x, Int32 y, Int32 wheel)
+   at System.Windows.Interop.HwndMouseInputProvider.FilterMessage(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.InputFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+2025-10-31 12:20:23.514 [Info] Logger inicializado
+2025-10-31 12:20:23.853 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 12:20:24.191 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 12:20:24.194 [Info] Decode concurrency cap set to 4
+2025-10-31 12:20:24.197 [Info] Prefetch window set to 2
+2025-10-31 12:20:35.813 [Error] Unhandled exception caught by App_DispatcherUnhandledException.: 'Se produjo una excepción al proporcionar un valor en 'System.Windows.StaticResourceExtension'.' (número de línea: '7'; posición de línea: '54').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.Load(XamlReader xamlReader, IXamlObjectWriterFactory writerFactory, Boolean skipJournaledProperties, Object rootObject, XamlObjectWriterSettings settings, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.LoadBaml(XamlReader xamlReader, Boolean skipJournaledProperties, Object rootObject, XamlAccessLevel accessLevel, Uri baseUri)
+   at System.Windows.Markup.XamlReader.LoadBaml(Stream stream, ParserContext parserContext, Object parent, Boolean closeStream)
+   at System.Windows.Application.LoadComponent(Object component, Uri resourceLocator)
+   at ComicReader.Views.CollectionsWindow.InitializeComponent() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\CollectionsWindow.xaml:line 1
+   at ComicReader.Views.CollectionsWindow..ctor() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\CollectionsWindow.xaml.cs:line 14
+   at ComicReader.Views.HomeView.OpenFavorites_Click(Object sender, RoutedEventArgs e) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\HomeView.xaml.cs:line 815
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.Primitives.ButtonBase.OnClick()
+   at System.Windows.Controls.Button.OnClick()
+   at System.Windows.Controls.Primitives.ButtonBase.OnMouseLeftButtonUp(MouseButtonEventArgs e)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.ReRaiseEventAs(DependencyObject sender, RoutedEventArgs args, RoutedEvent newEvent)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.UIElement.RaiseTrustedEvent(RoutedEventArgs args)
+   at System.Windows.Input.InputManager.ProcessStagingArea()
+   at System.Windows.Input.InputProviderSite.ReportInput(InputReport inputReport)
+   at System.Windows.Interop.HwndMouseInputProvider.ReportInput(IntPtr hwnd, InputMode mode, Int32 timestamp, RawMouseActions actions, Int32 x, Int32 y, Int32 wheel)
+   at System.Windows.Interop.HwndMouseInputProvider.FilterMessage(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.InputFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+2025-10-31 12:22:16.124 [Info] Logger inicializado
+2025-10-31 12:22:16.544 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 12:22:16.919 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 12:22:16.923 [Info] Decode concurrency cap set to 4
+2025-10-31 12:22:16.930 [Info] Prefetch window set to 2
+2025-10-31 12:22:21.030 [Error] Unhandled exception caught by App_DispatcherUnhandledException.: 'Se produjo una excepción al proporcionar un valor en 'System.Windows.StaticResourceExtension'.' (número de línea: '7'; posición de línea: '54').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.Load(XamlReader xamlReader, IXamlObjectWriterFactory writerFactory, Boolean skipJournaledProperties, Object rootObject, XamlObjectWriterSettings settings, Uri baseUri)
+   at System.Windows.Markup.WpfXamlLoader.LoadBaml(XamlReader xamlReader, Boolean skipJournaledProperties, Object rootObject, XamlAccessLevel accessLevel, Uri baseUri)
+   at System.Windows.Markup.XamlReader.LoadBaml(Stream stream, ParserContext parserContext, Object parent, Boolean closeStream)
+   at System.Windows.Application.LoadComponent(Object component, Uri resourceLocator)
+   at ComicReader.Views.CollectionsWindow.InitializeComponent() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\CollectionsWindow.xaml:line 1
+   at ComicReader.Views.CollectionsWindow..ctor() in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\CollectionsWindow.xaml.cs:line 14
+   at ComicReader.Views.HomeView.OpenFavorites_Click(Object sender, RoutedEventArgs e) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\HomeView.xaml.cs:line 815
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.Primitives.ButtonBase.OnClick()
+   at System.Windows.Controls.Button.OnClick()
+   at System.Windows.Controls.Primitives.ButtonBase.OnMouseLeftButtonUp(MouseButtonEventArgs e)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.ReRaiseEventAs(DependencyObject sender, RoutedEventArgs args, RoutedEvent newEvent)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.UIElement.RaiseTrustedEvent(RoutedEventArgs args)
+   at System.Windows.Input.InputManager.ProcessStagingArea()
+   at System.Windows.Input.InputProviderSite.ReportInput(InputReport inputReport)
+   at System.Windows.Interop.HwndMouseInputProvider.ReportInput(IntPtr hwnd, InputMode mode, Int32 timestamp, RawMouseActions actions, Int32 x, Int32 y, Int32 wheel)
+   at System.Windows.Interop.HwndMouseInputProvider.FilterMessage(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.InputFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+2025-10-31 12:24:02.612 [Info] Logger inicializado
+2025-10-31 12:24:02.902 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 12:24:03.402 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 12:24:03.404 [Info] Decode concurrency cap set to 4
+2025-10-31 12:24:03.405 [Info] Prefetch window set to 2
+2025-10-31 12:24:08.207 [Error] Unhandled exception caught by App_DispatcherUnhandledException.: La invalidación de medición del diseño del elemento 'ComicReader.Controls.VirtualizingWrapPanel' no debería devolver PositiveInfinity como su DesiredSize, aunque Infinity se pase como un tamaño disponible.
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at MS.Internal.Helper.MeasureElementWithSingleChild(UIElement element, Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Border.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Control.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at MS.Internal.Helper.MeasureElementWithSingleChild(UIElement element, Size constraint)
+   at System.Windows.Controls.ScrollContentPresenter.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Grid.MeasureCell(Int32 cell, Boolean forceInfinityV)
+   at System.Windows.Controls.Grid.MeasureCellsGroup(Int32 cellsHead, Size referenceSize, Boolean ignoreDesiredSizeU, Boolean forceInfinityV, Boolean& hasDesiredSizeUChanged)
+   at System.Windows.Controls.Grid.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.ScrollViewer.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Grid.MeasureCell(Int32 cell, Boolean forceInfinityV)
+   at System.Windows.Controls.Grid.MeasureCellsGroup(Int32 cellsHead, Size referenceSize, Boolean ignoreDesiredSizeU, Boolean forceInfinityV, Boolean& hasDesiredSizeUChanged)
+   at System.Windows.Controls.Grid.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at MS.Internal.Helper.MeasureElementWithSingleChild(UIElement element, Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Decorator.MeasureOverride(Size constraint)
+   at System.Windows.Documents.AdornerDecorator.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Border.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Window.MeasureOverrideHelper(Size constraint)
+   at System.Windows.Window.MeasureOverride(Size availableSize)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Interop.HwndSource.SetLayoutSize()
+   at System.Windows.Interop.HwndSource.set_RootVisualInternal(Visual value)
+   at System.Windows.Window.SetRootVisualAndUpdateSTC()
+   at System.Windows.Window.SetupInitialState(Double requestedTop, Double requestedLeft, Double requestedWidth, Double requestedHeight)
+   at System.Windows.Window.CreateSourceWindow(Boolean duringShow)
+   at System.Windows.Window.ShowHelper(Object booleanBox)
+   at System.Windows.Window.Show()
+   at System.Windows.Window.ShowDialog()
+   at ComicReader.Views.HomeView.OpenFavorites_Click(Object sender, RoutedEventArgs e) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\HomeView.xaml.cs:line 817
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.Primitives.ButtonBase.OnClick()
+   at System.Windows.Controls.Button.OnClick()
+   at System.Windows.Controls.Primitives.ButtonBase.OnMouseLeftButtonUp(MouseButtonEventArgs e)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.ReRaiseEventAs(DependencyObject sender, RoutedEventArgs args, RoutedEvent newEvent)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.UIElement.RaiseTrustedEvent(RoutedEventArgs args)
+   at System.Windows.Input.InputManager.ProcessStagingArea()
+   at System.Windows.Input.InputProviderSite.ReportInput(InputReport inputReport)
+   at System.Windows.Interop.HwndMouseInputProvider.ReportInput(IntPtr hwnd, InputMode mode, Int32 timestamp, RawMouseActions actions, Int32 x, Int32 y, Int32 wheel)
+   at System.Windows.Interop.HwndMouseInputProvider.FilterMessage(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.InputFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+2025-10-31 12:25:59.584 [Info] Logger inicializado
+2025-10-31 12:25:59.843 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 12:26:00.263 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 12:26:00.267 [Info] Decode concurrency cap set to 4
+2025-10-31 12:26:00.270 [Info] Prefetch window set to 2
+2025-10-31 12:27:39.700 [Info] Logger inicializado
+2025-10-31 12:27:40.179 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 12:27:40.510 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 12:27:40.514 [Info] Decode concurrency cap set to 4
+2025-10-31 12:27:40.519 [Info] Prefetch window set to 2
+2025-10-31 12:27:43.268 [Error] Unhandled exception caught by App_DispatcherUnhandledException.: Object reference not set to an instance of an object.
+   at ComicReader.Controls.VirtualizingWrapPanel.MeasureOverride(Size availableSize) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Controls\VirtualizingWrapPanel.cs:line 66
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at MS.Internal.Helper.MeasureElementWithSingleChild(UIElement element, Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Border.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Control.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at MS.Internal.Helper.MeasureElementWithSingleChild(UIElement element, Size constraint)
+   at System.Windows.Controls.ScrollContentPresenter.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Grid.MeasureCell(Int32 cell, Boolean forceInfinityV)
+   at System.Windows.Controls.Grid.MeasureCellsGroup(Int32 cellsHead, Size referenceSize, Boolean ignoreDesiredSizeU, Boolean forceInfinityV, Boolean& hasDesiredSizeUChanged)
+   at System.Windows.Controls.Grid.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.ScrollViewer.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Grid.MeasureCell(Int32 cell, Boolean forceInfinityV)
+   at System.Windows.Controls.Grid.MeasureCellsGroup(Int32 cellsHead, Size referenceSize, Boolean ignoreDesiredSizeU, Boolean forceInfinityV, Boolean& hasDesiredSizeUChanged)
+   at System.Windows.Controls.Grid.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at MS.Internal.Helper.MeasureElementWithSingleChild(UIElement element, Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Decorator.MeasureOverride(Size constraint)
+   at System.Windows.Documents.AdornerDecorator.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Border.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Window.MeasureOverrideHelper(Size constraint)
+   at System.Windows.Window.MeasureOverride(Size availableSize)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Interop.HwndSource.SetLayoutSize()
+   at System.Windows.Interop.HwndSource.set_RootVisualInternal(Visual value)
+   at System.Windows.Window.SetRootVisualAndUpdateSTC()
+   at System.Windows.Window.SetupInitialState(Double requestedTop, Double requestedLeft, Double requestedWidth, Double requestedHeight)
+   at System.Windows.Window.CreateSourceWindow(Boolean duringShow)
+   at System.Windows.Window.ShowHelper(Object booleanBox)
+   at System.Windows.Window.Show()
+   at System.Windows.Window.ShowDialog()
+   at ComicReader.Views.HomeView.OpenFavorites_Click(Object sender, RoutedEventArgs e) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\HomeView.xaml.cs:line 817
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.Primitives.ButtonBase.OnClick()
+   at System.Windows.Controls.Button.OnClick()
+   at System.Windows.Controls.Primitives.ButtonBase.OnMouseLeftButtonUp(MouseButtonEventArgs e)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.ReRaiseEventAs(DependencyObject sender, RoutedEventArgs args, RoutedEvent newEvent)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.UIElement.RaiseTrustedEvent(RoutedEventArgs args)
+   at System.Windows.Input.InputManager.ProcessStagingArea()
+   at System.Windows.Input.InputProviderSite.ReportInput(InputReport inputReport)
+   at System.Windows.Interop.HwndMouseInputProvider.ReportInput(IntPtr hwnd, InputMode mode, Int32 timestamp, RawMouseActions actions, Int32 x, Int32 y, Int32 wheel)
+   at System.Windows.Interop.HwndMouseInputProvider.FilterMessage(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.InputFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndSubclass.DispatcherCallbackOperation(Object o)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+2025-10-31 12:30:57.953 [Info] Logger inicializado
+2025-10-31 12:30:58.376 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 12:30:58.727 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 12:30:58.729 [Info] Decode concurrency cap set to 4
+2025-10-31 12:30:58.731 [Info] Prefetch window set to 2
+2025-10-31 12:31:02.300 [Error] Unhandled exception caught by App_DispatcherUnhandledException.: 'Se produjo una excepción al proporcionar un valor en 'System.Windows.StaticResourceExtension'.' (número de línea: '7'; posición de línea: '6').
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, IXamlLineInfo lineInfo, Uri baseUri)
+   at System.Windows.Markup.XamlReader.RewrapException(Exception e, Uri baseUri)
+   at System.Windows.FrameworkTemplate.LoadTemplateXaml(XamlReader templateReader, XamlObjectWriter currentWriter)
+   at System.Windows.FrameworkTemplate.LoadOptimizedTemplateContent(DependencyObject container, IComponentConnector componentConnector, IStyleConnector styleConnector, List`1 affectedChildren, UncommonField`1 templatedNonFeChildrenField)
+   at System.Windows.FrameworkTemplate.LoadContent(DependencyObject container, List`1 affectedChildren)
+   at System.Windows.StyleHelper.ApplyTemplateContent(UncommonField`1 dataField, DependencyObject container, FrameworkElementFactory templateRoot, Int32 lastChildIndex, HybridDictionary childIndexFromChildID, FrameworkTemplate frameworkTemplate)
+   at System.Windows.FrameworkTemplate.ApplyTemplateContent(UncommonField`1 templateDataField, FrameworkElement container)
+   at System.Windows.FrameworkElement.ApplyTemplate()
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.StackPanel.StackMeasureHelper(IStackMeasure measureElement, IStackMeasureScrollData scrollData, Size constraint)
+   at System.Windows.Controls.StackPanel.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at MS.Internal.Helper.MeasureElementWithSingleChild(UIElement element, Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Border.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Control.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at MS.Internal.Helper.MeasureElementWithSingleChild(UIElement element, Size constraint)
+   at System.Windows.Controls.ScrollContentPresenter.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Grid.MeasureCell(Int32 cell, Boolean forceInfinityV)
+   at System.Windows.Controls.Grid.MeasureCellsGroup(Int32 cellsHead, Size referenceSize, Boolean ignoreDesiredSizeU, Boolean forceInfinityV, Boolean& hasDesiredSizeUChanged)
+   at System.Windows.Controls.Grid.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.ScrollViewer.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.StackPanel.StackMeasureHelper(IStackMeasure measureElement, IStackMeasureScrollData scrollData, Size constraint)
+   at System.Windows.Controls.StackPanel.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Border.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Grid.MeasureCell(Int32 cell, Boolean forceInfinityV)
+   at System.Windows.Controls.Grid.MeasureCellsGroup(Int32 cellsHead, Size referenceSize, Boolean ignoreDesiredSizeU, Boolean forceInfinityV, Boolean& hasDesiredSizeUChanged)
+   at System.Windows.Controls.Grid.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at MS.Internal.Helper.MeasureElementWithSingleChild(UIElement element, Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Decorator.MeasureOverride(Size constraint)
+   at System.Windows.Documents.AdornerDecorator.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Controls.Border.MeasureOverride(Size constraint)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Window.MeasureOverrideHelper(Size constraint)
+   at System.Windows.Window.MeasureOverride(Size availableSize)
+   at System.Windows.FrameworkElement.MeasureCore(Size availableSize)
+   at System.Windows.UIElement.Measure(Size availableSize)
+   at System.Windows.Interop.HwndSource.SetLayoutSize()
+   at System.Windows.Interop.HwndSource.set_RootVisualInternal(Visual value)
+   at System.Windows.Window.SetRootVisualAndUpdateSTC()
+   at System.Windows.Window.SetupInitialState(Double requestedTop, Double requestedLeft, Double requestedWidth, Double requestedHeight)
+   at System.Windows.Window.CreateSourceWindow(Boolean duringShow)
+   at System.Windows.Window.ShowHelper(Object booleanBox)
+   at System.Windows.Window.Show()
+   at System.Windows.Window.ShowDialog()
+   at ComicReader.Views.HomeView.OpenFavorites_Click(Object sender, RoutedEventArgs e) in c:\Users\O11CE\OneDrive\Desktop\Percy Library\Views\HomeView.xaml.cs:line 817
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.Controls.Primitives.ButtonBase.OnClick()
+   at System.Windows.Controls.Button.OnClick()
+   at System.Windows.Controls.Primitives.ButtonBase.OnMouseLeftButtonUp(MouseButtonEventArgs e)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.ReRaiseEventAs(DependencyObject sender, RoutedEventArgs args, RoutedEvent newEvent)
+   at System.Windows.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+   at System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   at System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   at System.Windows.UIElement.RaiseTrustedEvent(RoutedEventArgs args)
+   at System.Windows.Input.InputManager.ProcessStagingArea()
+   at System.Windows.Input.InputProviderSite.ReportInput(InputReport inputReport)
+   at System.Windows.Interop.HwndMouseInputProvider.ReportInput(IntPtr hwnd, InputMode mode, Int32 timestamp, RawMouseActions actions, Int32 x, Int32 y, Int32 wheel)
+   at System.Windows.Interop.HwndMouseInputProvider.FilterMessage(IntPtr hwnd, WindowMessage msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.InputFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+2025-10-31 12:32:36.401 [Info] Logger inicializado
+2025-10-31 12:32:36.752 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 12:32:37.204 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 12:32:37.206 [Info] Decode concurrency cap set to 4
+2025-10-31 12:32:37.209 [Info] Prefetch window set to 2
+2025-10-31 12:37:07.765 [Info] Logger inicializado
+2025-10-31 12:37:08.072 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 12:37:08.512 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 12:37:08.514 [Info] Decode concurrency cap set to 4
+2025-10-31 12:37:08.517 [Info] Prefetch window set to 2
+2025-10-31 12:43:59.205 [Info] Logger inicializado
+2025-10-31 12:43:59.500 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 12:44:00.026 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 12:44:00.034 [Info] Decode concurrency cap set to 4
+2025-10-31 12:44:00.039 [Info] Prefetch window set to 2
+2025-10-31 12:47:44.908 [Info] Logger inicializado
+2025-10-31 12:47:45.380 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 12:47:45.994 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 12:47:46.004 [Info] Decode concurrency cap set to 4
+2025-10-31 12:47:46.020 [Info] Prefetch window set to 2
+2025-10-31 13:21:05.091 [Info] Logger inicializado
+2025-10-31 13:21:05.402 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 13:21:05.844 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 13:21:05.846 [Info] Decode concurrency cap set to 4
+2025-10-31 13:21:05.848 [Info] Prefetch window set to 2
+2025-10-31 13:23:59.803 [Info] [Perf] 2025-10-31T17:23:59.8034883Z - LoadComicAsync took 89ms
+2025-10-31 13:23:59.804 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr with 30 pages.
+2025-10-31 13:23:59.807 [Info] Storage read latency heuristic: 0.5ms
+2025-10-31 13:23:59.809 [Info] Decode concurrency cap set to 4
+2025-10-31 13:24:01.649 [Info] Initializing ComicPageLoader for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr
+2025-10-31 13:24:01.649 [Info] Initializing ComicPageLoader for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr
+2025-10-31 13:24:01.652 [Info] Decode concurrency cap set to 4
+2025-10-31 13:24:01.654 [Info] Decode concurrency cap set to 4
+2025-10-31 13:24:01.665 [Info] [Perf] 2025-10-31T17:24:01.6658597Z - LoadComicAsync took 3ms
+2025-10-31 13:24:01.665 [Info] [Perf] 2025-10-31T17:24:01.6658596Z - LoadComicAsync took 9ms
+2025-10-31 13:24:01.667 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr with 30 pages.
+2025-10-31 13:24:01.668 [Info] Successfully loaded comic structure for: C:\Users\O11CE\OneDrive\Desktop\comic\Ultimate Spider-Man 008 (2024) (HDM).cbr with 30 pages.
+2025-10-31 13:24:01.670 [Info] Storage read latency heuristic: 0.5ms
+2025-10-31 13:24:01.670 [Info] Storage read latency heuristic: 0.4ms
+2025-10-31 13:24:01.760 [Info] [Perf] 2025-10-31T17:24:01.7601491Z - Enqueue full load page 0
+2025-10-31 13:24:01.865 [Info] Decode concurrency cap set to 4
+2025-10-31 13:24:01.895 [Info] [Perf] 2025-10-31T17:24:01.8953472Z - Enqueue prefetch page 1
+2025-10-31 13:24:01.905 [Info] Decode concurrency cap set to 4
+2025-10-31 13:24:01.906 [Info] [Perf] 2025-10-31T17:24:01.9069750Z - Enqueue prefetch page 2
+2025-10-31 13:24:01.948 [Info] Disposing ComicPageLoader and cancelling internal operations.
+2025-10-31 13:24:01.949 [Info] [Perf] 2025-10-31T17:24:01.9494385Z - Enqueue full load page 1
+2025-10-31 13:24:01.963 [Info] Disposing ComicPageLoader and cancelling internal operations.
+2025-10-31 13:24:01.990 [Info] ComicPageLoader disposed.
+2025-10-31 13:24:02.021 [Info] ComicPageLoader disposed.
+2025-10-31 13:24:02.287 [Info] [Perf] 2025-10-31T17:24:02.2875805Z - Prefetch page 1 took 378ms
+2025-10-31 13:24:02.530 [Info] [Perf] 2025-10-31T17:24:02.5305095Z - Decode_CreateBitmapImage took 108ms
+2025-10-31 13:24:02.536 [Info] [Perf] 2025-10-31T17:24:02.5361829Z - FullLoad page 0 took 239ms
+2025-10-31 13:24:02.906 [Info] [Perf] 2025-10-31T17:24:02.9065613Z - Decode_CreateBitmapImage took 149ms
+2025-10-31 13:24:02.908 [Info] [Perf] 2025-10-31T17:24:02.9081804Z - FullLoad page 1 took 365ms
+2025-10-31 13:24:03.167 [Info] [Perf] 2025-10-31T17:24:03.1676928Z - Enqueue full load page 2
+2025-10-31 13:24:03.206 [Info] [Perf] 2025-10-31T17:24:03.2060298Z - Prefetch page 2 took 43ms
+2025-10-31 13:24:03.493 [Info] [Perf] 2025-10-31T17:24:03.4934084Z - Decode_CreateBitmapImage took 89ms
+2025-10-31 13:24:03.495 [Info] [Perf] 2025-10-31T17:24:03.4958438Z - FullLoad page 2 took 288ms
+2025-10-31 13:24:03.580 [Info] Decode concurrency cap set to 4
+2025-10-31 13:24:03.587 [Info] [Perf] 2025-10-31T17:24:03.5875796Z - Enqueue prefetch page 0
+2025-10-31 13:24:03.755 [Info] [Perf] 2025-10-31T17:24:03.7555849Z - Enqueue full load page 0
+2025-10-31 13:24:03.822 [Info] [Perf] 2025-10-31T17:24:03.8224851Z - Prefetch page 0 took 66ms
+2025-10-31 13:24:04.094 [Info] [Perf] 2025-10-31T17:24:04.0942652Z - Decode_CreateBitmapImage took 155ms
+2025-10-31 13:24:04.097 [Info] [Perf] 2025-10-31T17:24:04.0973217Z - FullLoad page 0 took 255ms
+2025-10-31 13:24:04.328 [Info] Decode concurrency cap set to 4
+2025-10-31 13:24:04.333 [Info] [Perf] 2025-10-31T17:24:04.3337646Z - Enqueue prefetch page 1
+2025-10-31 13:24:04.350 [Info] [Perf] 2025-10-31T17:24:04.3505726Z - Enqueue prefetch page 3
+2025-10-31 13:24:04.354 [Info] [Perf] 2025-10-31T17:24:04.3545414Z - Enqueue full load page 1
+2025-10-31 13:24:04.366 [Info] [Perf] 2025-10-31T17:24:04.3660729Z - Prefetch page 1 took 11ms
+2025-10-31 13:24:04.735 [Info] [Perf] 2025-10-31T17:24:04.7358955Z - Decode_CreateBitmapImage took 161ms
+2025-10-31 13:24:04.738 [Info] [Perf] 2025-10-31T17:24:04.7379992Z - FullLoad page 1 took 368ms
+2025-10-31 13:24:04.992 [Info] [Perf] 2025-10-31T17:24:04.9925248Z - Enqueue full load page 3
+2025-10-31 13:24:05.019 [Info] Decode concurrency cap set to 4
+2025-10-31 13:24:05.030 [Info] [Perf] 2025-10-31T17:24:05.0309353Z - Enqueue prefetch page 4
+2025-10-31 13:24:05.034 [Info] [Perf] 2025-10-31T17:24:05.0345445Z - Prefetch page 3 took 52ms
+2025-10-31 13:24:05.401 [Info] [Perf] 2025-10-31T17:24:05.4013805Z - Decode_CreateBitmapImage took 111ms
+2025-10-31 13:24:05.426 [Info] [Perf] 2025-10-31T17:24:05.4264202Z - FullLoad page 3 took 348ms
+2025-10-31 13:24:05.701 [Info] [Perf] 2025-10-31T17:24:05.7013060Z - Enqueue full load page 4
+2025-10-31 13:24:05.780 [Info] [Perf] 2025-10-31T17:24:05.7806923Z - Prefetch page 4 took 79ms
+2025-10-31 13:24:05.875 [Info] [Perf] 2025-10-31T17:24:05.8758887Z - Enqueue full load page 4
+2025-10-31 13:24:05.894 [Info] Decode concurrency cap set to 4
+2025-10-31 13:24:06.187 [Info] [Perf] 2025-10-31T17:24:06.1879857Z - Decode_CreateBitmapImage took 152ms
+2025-10-31 13:24:06.192 [Info] Swap thumbnail->full for page 4 took 318ms (decode 397ms)
+2025-10-31 13:24:06.196 [Info] [Perf] 2025-10-31T17:24:06.1960616Z - FullLoad page 4 took 402ms
+2025-10-31 13:24:06.214 [Info] [Perf] 2025-10-31T17:24:06.2146564Z - Enqueue prefetch page 3
+2025-10-31 13:24:06.218 [Info] [Perf] 2025-10-31T17:24:06.2181473Z - Enqueue prefetch page 2
+2025-10-31 13:24:06.517 [Info] [Perf] 2025-10-31T17:24:06.5174838Z - Decode_CreateBitmapImage took 106ms
+2025-10-31 13:24:06.518 [Info] [Perf] 2025-10-31T17:24:06.5189555Z - FullLoad page 4 took 318ms
+2025-10-31 13:24:06.771 [Info] [Perf] 2025-10-31T17:24:06.7715282Z - Enqueue full load page 3
+2025-10-31 13:24:06.966 [Info] Decode concurrency cap set to 4
+2025-10-31 13:24:07.107 [Info] [Perf] 2025-10-31T17:24:07.1073355Z - Enqueue prefetch page 4
+2025-10-31 13:24:07.115 [Info] [Perf] 2025-10-31T17:24:07.1151673Z - Enqueue prefetch page 3
+2025-10-31 13:24:07.125 [Info] [Perf] 2025-10-31T17:24:07.1251268Z - Prefetch page 3 took 353ms
+2025-10-31 13:24:07.440 [Info] [Perf] 2025-10-31T17:24:07.4404738Z - Decode_CreateBitmapImage took 88ms
+2025-10-31 13:24:07.442 [Info] [Perf] 2025-10-31T17:24:07.4420034Z - FullLoad page 3 took 281ms
+2025-10-31 13:24:07.695 [Info] [Perf] 2025-10-31T17:24:07.6950609Z - Enqueue full load page 2
+2025-10-31 13:24:07.723 [Info] [Perf] 2025-10-31T17:24:07.7231332Z - Prefetch page 2 took 28ms
+2025-10-31 13:24:07.976 [Info] [Perf] 2025-10-31T17:24:07.9769029Z - Decode_CreateBitmapImage took 82ms
+2025-10-31 13:24:07.978 [Info] [Perf] 2025-10-31T17:24:07.9785440Z - FullLoad page 2 took 253ms
+2025-10-31 13:24:08.234 [Info] [Perf] 2025-10-31T17:24:08.2340501Z - Enqueue full load page 4
+2025-10-31 13:24:08.393 [Info] Decode concurrency cap set to 4
+2025-10-31 13:24:08.512 [Info] [Perf] 2025-10-31T17:24:08.5126153Z - Enqueue prefetch page 5
+2025-10-31 13:24:08.516 [Info] [Perf] 2025-10-31T17:24:08.5162909Z - Enqueue prefetch page 7
+2025-10-31 13:24:08.521 [Info] [Perf] 2025-10-31T17:24:08.5216440Z - Enqueue prefetch page 4
+2025-10-31 13:24:08.527 [Info] [Perf] 2025-10-31T17:24:08.5277776Z - Prefetch page 4 took 293ms
+2025-10-31 13:24:08.853 [Info] [Perf] 2025-10-31T17:24:08.8537566Z - Decode_CreateBitmapImage took 91ms
+2025-10-31 13:24:08.855 [Info] [Perf] 2025-10-31T17:24:08.8555111Z - FullLoad page 4 took 324ms
+2025-10-31 13:24:09.112 [Info] [Perf] 2025-10-31T17:24:09.1127155Z - Enqueue full load page 3
+2025-10-31 13:24:09.121 [Info] [Perf] 2025-10-31T17:24:09.1217293Z - Prefetch page 3 took 9ms
+2025-10-31 13:24:09.288 [Info] [Perf] 2025-10-31T17:24:09.2889349Z - Enqueue full load page 7
+2025-10-31 13:24:09.343 [Info] Decode concurrency cap set to 4
+2025-10-31 13:24:09.355 [Info] [Perf] 2025-10-31T17:24:09.3552588Z - Enqueue prefetch page 6
+2025-10-31 13:24:09.389 [Info] [Perf] 2025-10-31T17:24:09.3895020Z - Enqueue prefetch page 8
+2025-10-31 13:24:09.391 [Info] [Perf] 2025-10-31T17:24:09.3914239Z - Enqueue prefetch page 5
+2025-10-31 13:24:09.444 [Info] [Perf] 2025-10-31T17:24:09.4443362Z - Decode_CreateBitmapImage took 102ms
+2025-10-31 13:24:09.455 [Info] [Perf] 2025-10-31T17:24:09.4557210Z - FullLoad page 3 took 329ms
+2025-10-31 13:24:10.238 [Info] [Perf] 2025-10-31T17:24:10.2385193Z - Decode_CreateBitmapImage took 123ms
+2025-10-31 13:24:10.240 [Info] Swap thumbnail->full for page 7 took 951ms (decode 781ms)
+2025-10-31 13:24:10.242 [Info] [Perf] 2025-10-31T17:24:10.2426716Z - FullLoad page 7 took 784ms
+2025-10-31 13:24:10.498 [Info] [Perf] 2025-10-31T17:24:10.4986736Z - Enqueue full load page 5
+2025-10-31 13:24:10.532 [Info] [Perf] 2025-10-31T17:24:10.5323125Z - Prefetch page 5 took 33ms
+2025-10-31 13:24:11.116 [Info] [Perf] 2025-10-31T17:24:11.1161584Z - Decode_CreateBitmapImage took 214ms
+2025-10-31 13:24:11.140 [Info] [Perf] 2025-10-31T17:24:11.1402572Z - FullLoad page 5 took 538ms
+2025-10-31 13:24:11.154 [Info] [Perf] 2025-10-31T17:24:11.1547716Z - Enqueue full load page 8
+2025-10-31 13:24:11.192 [Info] Decode concurrency cap set to 4
+2025-10-31 13:24:11.201 [Info] [Perf] 2025-10-31T17:24:11.2013335Z - Enqueue prefetch page 9
+2025-10-31 13:24:11.290 [Info] [Perf] 2025-10-31T17:24:11.2908380Z - Enqueue prefetch page 6
+2025-10-31 13:24:11.320 [Info] [Perf] 2025-10-31T17:24:11.3205490Z - Enqueue prefetch page 10
+2025-10-31 13:24:11.825 [Info] [Perf] 2025-10-31T17:24:11.8259050Z - Decode_CreateBitmapImage took 203ms
+2025-10-31 13:24:11.827 [Info] Swap thumbnail->full for page 8 took 673ms (decode 654ms)
+2025-10-31 13:24:11.829 [Info] [Perf] 2025-10-31T17:24:11.8296817Z - FullLoad page 8 took 656ms
+2025-10-31 13:24:12.085 [Info] [Perf] 2025-10-31T17:24:12.0851477Z - Enqueue full load page 7
+2025-10-31 13:24:12.086 [Info] [Perf] 2025-10-31T17:24:12.0864446Z - Prefetch page 7 took 1ms
+2025-10-31 13:24:12.642 [Info] [Perf] 2025-10-31T17:24:12.6426964Z - Decode_CreateBitmapImage took 167ms
+2025-10-31 13:24:12.681 [Info] [Perf] 2025-10-31T17:24:12.6812654Z - FullLoad page 7 took 593ms
+2025-10-31 13:24:12.955 [Info] [Perf] 2025-10-31T17:24:12.9555593Z - Enqueue full load page 4
+2025-10-31 13:24:12.985 [Info] [Perf] 2025-10-31T17:24:12.9859380Z - Prefetch page 4 took 30ms
+2025-10-31 13:24:13.263 [Info] [Perf] 2025-10-31T17:24:13.2634794Z - Decode_CreateBitmapImage took 96ms
+2025-10-31 13:24:13.265 [Info] [Perf] 2025-10-31T17:24:13.2657176Z - FullLoad page 4 took 278ms
+2025-10-31 13:24:13.518 [Info] [Perf] 2025-10-31T17:24:13.5189577Z - Enqueue full load page 6
+2025-10-31 13:24:13.523 [Info] [Perf] 2025-10-31T17:24:13.5234357Z - Prefetch page 6 took 4ms
+2025-10-31 13:24:14.039 [Info] [Perf] 2025-10-31T17:24:14.0399053Z - Decode_CreateBitmapImage took 198ms
+2025-10-31 13:24:14.092 [Info] [Perf] 2025-10-31T17:24:14.0927586Z - Enqueue full load page 9
+2025-10-31 13:24:14.134 [Info] [Perf] 2025-10-31T17:24:14.1341917Z - FullLoad page 6 took 609ms
+2025-10-31 13:24:14.141 [Info] Decode concurrency cap set to 4
+2025-10-31 13:24:14.151 [Info] [Perf] 2025-10-31T17:24:14.1511089Z - Enqueue prefetch page 8
+2025-10-31 13:24:14.170 [Info] [Perf] 2025-10-31T17:24:14.1701320Z - Enqueue prefetch page 10
+2025-10-31 13:24:14.172 [Info] [Perf] 2025-10-31T17:24:14.1724709Z - Enqueue prefetch page 7
+2025-10-31 13:24:14.227 [Info] [Perf] 2025-10-31T17:24:14.2272606Z - Enqueue prefetch page 11
+2025-10-31 13:24:14.919 [Info] [Perf] 2025-10-31T17:24:14.9190230Z - Decode_CreateBitmapImage took 240ms
+2025-10-31 13:24:14.921 [Info] Swap thumbnail->full for page 9 took 829ms (decode 770ms)
+2025-10-31 13:24:14.925 [Info] [Perf] 2025-10-31T17:24:14.9250468Z - FullLoad page 9 took 773ms
+2025-10-31 13:24:15.192 [Info] [Perf] 2025-10-31T17:24:15.1923519Z - Enqueue full load page 8
+2025-10-31 13:24:15.198 [Info] [Perf] 2025-10-31T17:24:15.1989334Z - Prefetch page 8 took 6ms
+2025-10-31 13:24:15.911 [Info] [Perf] 2025-10-31T17:24:15.9116831Z - Decode_CreateBitmapImage took 169ms
+2025-10-31 13:24:15.929 [Info] [Perf] 2025-10-31T17:24:15.9296446Z - FullLoad page 8 took 728ms
+2025-10-31 13:24:16.192 [Info] [Perf] 2025-10-31T17:24:16.1919989Z - Enqueue full load page 5
+2025-10-31 13:24:16.198 [Info] [Perf] 2025-10-31T17:24:16.1984637Z - Prefetch page 5 took 6ms
+2025-10-31 13:24:16.531 [Info] [Perf] 2025-10-31T17:24:16.5313233Z - Decode_CreateBitmapImage took 98ms
+2025-10-31 13:24:16.532 [Info] [Perf] 2025-10-31T17:24:16.5329248Z - FullLoad page 5 took 333ms
+2025-10-31 13:24:16.784 [Info] [Perf] 2025-10-31T17:24:16.7847741Z - Enqueue full load page 9
+2025-10-31 13:24:16.789 [Info] [Perf] 2025-10-31T17:24:16.7897520Z - Prefetch page 9 took 5ms
+2025-10-31 13:24:17.536 [Info] [Perf] 2025-10-31T17:24:17.5367089Z - Decode_CreateBitmapImage took 137ms
+2025-10-31 13:24:17.538 [Info] [Perf] 2025-10-31T17:24:17.5382033Z - FullLoad page 9 took 747ms
+2025-10-31 13:24:17.790 [Info] [Perf] 2025-10-31T17:24:17.7907185Z - Enqueue full load page 6
+2025-10-31 13:24:17.807 [Info] [Perf] 2025-10-31T17:24:17.8075207Z - Prefetch page 6 took 16ms
+2025-10-31 13:24:18.176 [Info] [Perf] 2025-10-31T17:24:18.1768990Z - Decode_CreateBitmapImage took 107ms
+2025-10-31 13:24:18.178 [Info] [Perf] 2025-10-31T17:24:18.1787185Z - FullLoad page 6 took 370ms
+2025-10-31 13:24:18.604 [Info] [Perf] 2025-10-31T17:24:18.6040043Z - Enqueue full load page 10
+2025-10-31 13:24:18.622 [Info] [Perf] 2025-10-31T17:24:18.6221333Z - Prefetch page 10 took 186ms
+2025-10-31 13:24:19.353 [Info] [Perf] 2025-10-31T17:24:19.3534710Z - Decode_CreateBitmapImage took 124ms
+2025-10-31 13:24:19.354 [Info] [Perf] 2025-10-31T17:24:19.3547932Z - FullLoad page 10 took 700ms
+2025-10-31 13:24:19.607 [Info] [Perf] 2025-10-31T17:24:19.6071451Z - Enqueue full load page 8
+2025-10-31 13:24:19.609 [Info] [Perf] 2025-10-31T17:24:19.6095571Z - Prefetch page 8 took 2ms
+2025-10-31 13:24:20.150 [Info] [Perf] 2025-10-31T17:24:20.1501936Z - Decode_CreateBitmapImage took 109ms
+2025-10-31 13:24:20.151 [Info] [Perf] 2025-10-31T17:24:20.1514265Z - FullLoad page 8 took 540ms
+2025-10-31 13:24:20.404 [Info] [Perf] 2025-10-31T17:24:20.4042655Z - Enqueue full load page 10
+2025-10-31 13:24:20.405 [Info] [Perf] 2025-10-31T17:24:20.4058386Z - Prefetch page 10 took 1ms
+2025-10-31 13:24:21.040 [Info] [Perf] 2025-10-31T17:24:21.0408739Z - Decode_CreateBitmapImage took 130ms
+2025-10-31 13:24:21.043 [Info] [Perf] 2025-10-31T17:24:21.0436288Z - FullLoad page 10 took 636ms
+2025-10-31 13:24:21.291 [Info] [Perf] 2025-10-31T17:24:21.2912274Z - Enqueue full load page 7
+2025-10-31 13:24:21.303 [Info] [Perf] 2025-10-31T17:24:21.3039722Z - Prefetch page 7 took 12ms
+2025-10-31 13:24:21.759 [Info] [Perf] 2025-10-31T17:24:21.7591765Z - Decode_CreateBitmapImage took 104ms
+2025-10-31 13:24:21.760 [Info] [Perf] 2025-10-31T17:24:21.7607962Z - FullLoad page 7 took 453ms
+2025-10-31 13:24:22.159 [Info] [Perf] 2025-10-31T17:24:22.1593356Z - Enqueue full load page 11
+2025-10-31 13:24:22.164 [Info] [Perf] 2025-10-31T17:24:22.1646653Z - Prefetch page 11 took 150ms
+2025-10-31 13:24:23.055 [Info] [Perf] 2025-10-31T17:24:23.0550689Z - Decode_CreateBitmapImage took 223ms
+2025-10-31 13:24:23.059 [Info] [Perf] 2025-10-31T17:24:23.0598044Z - FullLoad page 11 took 893ms
+2025-10-31 14:32:07.010 [Info] Logger inicializado
+2025-10-31 14:32:07.399 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 14:32:07.835 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 14:32:07.839 [Info] Decode concurrency cap set to 4
+2025-10-31 14:32:07.841 [Info] Prefetch window set to 2
+2025-10-31 14:33:58.762 [Info] Decode concurrency cap set to 4
+2025-10-31 14:33:58.767 [Info] Decode concurrency cap set to 4

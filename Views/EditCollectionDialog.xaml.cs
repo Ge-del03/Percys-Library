@@ -13,22 +13,37 @@ namespace ComicReader.Views
         public string Description { get => DescBox.Text.Trim(); set => DescBox.Text = value; }
         public string CoverPath { get; set; }
 
-        private System.Windows.Point _dragStartPoint;
-        private readonly Stack<(List<Core.Abstractions.ComicItemDto> items, int index)> _undoStack = new Stack<(List<Core.Abstractions.ComicItemDto>, int)>();
+    private System.Windows.Point _dragStartPoint;
+    private readonly Stack<(List<Core.Abstractions.ComicItemDto> items, int index)> _undoStack = new Stack<(List<Core.Abstractions.ComicItemDto>, int)>();
+    private readonly System.Collections.ObjectModel.ObservableCollection<ViewModels.ComicItemViewModel> _itemsCollection = new System.Collections.ObjectModel.ObservableCollection<ViewModels.ComicItemViewModel>();
 
         public EditCollectionDialog()
         {
             InitializeComponent();
+            // Bind the List control to the observable collection so UI updates when properties change
+            try { ItemsList.ItemsSource = _itemsCollection; } catch { }
         }
 
+        // Helper to set the cover path and update the UI text safely from callers
+        public void SetCoverPath(string path)
+        {
+            CoverPath = path;
+            try
+            {
+                CoverPathText.Text = path ?? string.Empty;
+            }
+            catch { }
+        }
+
+        // Public API remains List<ComicItemDto> for compatibility with callers.
         public List<Core.Abstractions.ComicItemDto> Items
         {
-            get => ItemsList.Items.Cast<Core.Abstractions.ComicItemDto>().ToList();
+            get => _itemsCollection.Select(vm => vm.ToDto()).ToList();
             set
             {
-                ItemsList.Items.Clear();
+                _itemsCollection.Clear();
                 if (value == null) return;
-                foreach (var it in value) ItemsList.Items.Add(it);
+                foreach (var it in value) _itemsCollection.Add(new ViewModels.ComicItemViewModel(it));
             }
         }
 
@@ -41,19 +56,20 @@ namespace ComicReader.Views
             {
                 foreach (var f in dlg.FileNames)
                 {
-                    var item = new Core.Abstractions.ComicItemDto { Path = f, Title = System.IO.Path.GetFileNameWithoutExtension(f), ThumbPath = string.Empty };
-                    ItemsList.Items.Add(item);
+                    var dto = new Core.Abstractions.ComicItemDto { Path = f, Title = System.IO.Path.GetFileNameWithoutExtension(f), ThumbPath = string.Empty };
+                    _itemsCollection.Add(new ViewModels.ComicItemViewModel(dto));
                 }
             }
         }
 
         private void RemoveSelected_Click(object sender, RoutedEventArgs e)
         {
-            var selected = ItemsList.SelectedItems.Cast<Core.Abstractions.ComicItemDto>().ToList();
-            if (selected.Count == 0) return;
-            int firstIndex = ItemsList.Items.IndexOf(selected.First());
-            _undoStack.Push((selected, firstIndex));
-            foreach (var s in selected) ItemsList.Items.Remove(s);
+            var selectedVMs = ItemsList.SelectedItems.Cast<ViewModels.ComicItemViewModel>().ToList();
+            if (selectedVMs.Count == 0) return;
+            int firstIndex = _itemsCollection.IndexOf(selectedVMs.First());
+            var selectedDtos = selectedVMs.Select(vm => vm.ToDto()).ToList();
+            _undoStack.Push((selectedDtos, firstIndex));
+            foreach (var s in selectedVMs) _itemsCollection.Remove(s);
             UndoButton.IsEnabled = true;
         }
 
@@ -61,10 +77,10 @@ namespace ComicReader.Views
         {
             if (_undoStack.Count == 0) return;
             var (items, index) = _undoStack.Pop();
-            int insertAt = Math.Min(index, ItemsList.Items.Count);
+            int insertAt = Math.Min(index, _itemsCollection.Count);
             foreach (var it in items)
             {
-                ItemsList.Items.Insert(insertAt++, it);
+                _itemsCollection.Insert(insertAt++, new ViewModels.ComicItemViewModel(it));
             }
             UndoButton.IsEnabled = _undoStack.Count > 0;
         }
@@ -110,10 +126,10 @@ namespace ComicReader.Views
             if (Math.Abs(pos.X - _dragStartPoint.X) < SystemParameters.MinimumHorizontalDragDistance && Math.Abs(pos.Y - _dragStartPoint.Y) < SystemParameters.MinimumVerticalDragDistance) return;
 
             var list = ItemsList;
-            var item = list.SelectedItem as Core.Abstractions.ComicItemDto;
-            if (item == null) return;
+            var itemVm = list.SelectedItem as ViewModels.ComicItemViewModel;
+            if (itemVm == null) return;
 
-            var data = new DataObject("ComicItem", item);
+            var data = new DataObject("ComicItem", itemVm);
             DragDrop.DoDragDrop(list, data, DragDropEffects.Move | DragDropEffects.Copy);
         }
 
@@ -137,14 +153,14 @@ namespace ComicReader.Views
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 foreach (var f in files)
                 {
-                    var item = new Core.Abstractions.ComicItemDto { Path = f, Title = System.IO.Path.GetFileNameWithoutExtension(f), ThumbPath = string.Empty };
-                    if (index >= 0 && index <= list.Items.Count)
+                    var dto = new Core.Abstractions.ComicItemDto { Path = f, Title = System.IO.Path.GetFileNameWithoutExtension(f), ThumbPath = string.Empty };
+                    if (index >= 0 && index <= _itemsCollection.Count)
                     {
-                        list.Items.Insert(index++, item);
+                        _itemsCollection.Insert(index++, new ViewModels.ComicItemViewModel(dto));
                     }
                     else
                     {
-                        list.Items.Add(item);
+                        _itemsCollection.Add(new ViewModels.ComicItemViewModel(dto));
                     }
                 }
                 e.Handled = true;
@@ -153,26 +169,26 @@ namespace ComicReader.Views
 
             if (e.Data.GetDataPresent("ComicItem"))
             {
-                var dragged = e.Data.GetData("ComicItem") as Core.Abstractions.ComicItemDto;
-                if (dragged == null) return;
-                int oldIndex = list.Items.IndexOf(dragged);
-                if (oldIndex >= 0) list.Items.RemoveAt(oldIndex);
-                if (index > list.Items.Count) index = list.Items.Count;
-                list.Items.Insert(index, dragged);
+                var draggedVm = e.Data.GetData("ComicItem") as ViewModels.ComicItemViewModel;
+                if (draggedVm == null) return;
+                int oldIndex = _itemsCollection.IndexOf(draggedVm);
+                if (oldIndex >= 0) _itemsCollection.RemoveAt(oldIndex);
+                if (index > _itemsCollection.Count) index = _itemsCollection.Count;
+                _itemsCollection.Insert(index, draggedVm);
                 e.Handled = true;
             }
         }
 
         private int GetCurrentIndex(System.Windows.Point point)
         {
-            for (int i = 0; i < ItemsList.Items.Count; i++)
+            for (int i = 0; i < _itemsCollection.Count; i++)
             {
                 var item = ItemsList.ItemContainerGenerator.ContainerFromIndex(i) as FrameworkElement;
                 if (item == null) continue;
                 var bounds = new Rect(item.TranslatePoint(new System.Windows.Point(0, 0), ItemsList), item.RenderSize);
                 if (bounds.Contains(point)) return i;
             }
-            return ItemsList.Items.Count;
+            return _itemsCollection.Count;
         }
     }
 }

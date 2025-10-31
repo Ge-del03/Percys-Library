@@ -11,32 +11,76 @@ namespace ComicReader.ViewModels
     public class CollectionsViewModel : System.ComponentModel.INotifyPropertyChanged
     {
         private readonly ICollectionService _service;
+        private readonly Action<string, string, Action> _toastInvoker;
+        private const string ThumbCacheVersion = "v2";
+        private readonly System.Threading.SemaphoreSlim _thumbSemaphore = new System.Threading.SemaphoreSlim(2);
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, System.Threading.Tasks.Task> _thumbTasks = new System.Collections.Concurrent.ConcurrentDictionary<string, System.Threading.Tasks.Task>(StringComparer.OrdinalIgnoreCase);
 
-        public ObservableCollection<CollectionDto> Collections { get; } = new ObservableCollection<CollectionDto>();
+    public ObservableCollection<CollectionDto> Collections { get; } = new ObservableCollection<CollectionDto>();
+    private CollectionDto _selectedCollection;
+    // Expose a VM collection for the selected collection items so the UI can bind to INotifyPropertyChanged items
+    public System.Collections.ObjectModel.ObservableCollection<ComicItemViewModel> SelectedItems { get; } = new System.Collections.ObjectModel.ObservableCollection<ComicItemViewModel>();
+        public CollectionDto SelectedCollection
+        {
+            get => _selectedCollection;
+            set
+            {
+                if (_selectedCollection == value) return;
+                _selectedCollection = value;
+                OnPropertyChanged(nameof(SelectedCollection));
+                // populate SelectedItems viewmodel collection from DTOs
+                SelectedItems.Clear();
+                if (_selectedCollection?.Items != null)
+                {
+                    foreach (var it in _selectedCollection.Items)
+                    {
+                        SelectedItems.Add(new ComicItemViewModel(it));
+                    }
+                }
+                // Notify command system that CanExecute may have changed
+                System.Windows.Input.CommandManager.InvalidateRequerySuggested();
+                // kick off thumbnail population for selected collection
+                if (_selectedCollection != null)
+                {
+                    _ = EnsureThumbnailsForSelectedAsync(_selectedCollection);
+                }
+            }
+        }
 
         public ICommand NewCommand { get; }
         public ICommand RenameCommand { get; }
         public ICommand DuplicateCommand { get; }
         public ICommand DeleteCommand { get; }
+    public System.Windows.Input.ICommand OpenFavoritesCommand { get; }
+
+    // Aggregated favorites across all collections (DTOs implement INotifyPropertyChanged)
+    public System.Collections.ObjectModel.ObservableCollection<Core.Abstractions.ComicItemDto> FavoriteItems { get; } = new System.Collections.ObjectModel.ObservableCollection<Core.Abstractions.ComicItemDto>();
 
         // Default constructor uses JSON service for app runtime
-        public CollectionsViewModel() : this(new CollectionServiceJson()) { }
+        public CollectionsViewModel() : this(new CollectionServiceJson(), ToastService.Show) { }
 
-        // Testable constructor allowing DI of a mock service
-        public CollectionsViewModel(ICollectionService service)
+        // Back-compat constructor (service only)
+        public CollectionsViewModel(ICollectionService service) : this(service, ToastService.Show) { }
+
+        // Testable constructor allowing DI of a mock service and toast invoker
+        public CollectionsViewModel(ICollectionService service, Action<string, string, Action> toastInvoker)
         {
             _service = service ?? throw new ArgumentNullException(nameof(service));
+            _toastInvoker = toastInvoker ?? ((m, l, a) => ToastService.Show(m, l, a));
             NewCommand = new RelayCommand(_ => NewCollection());
             RenameCommand = new RelayCommand(p => Rename(p as CollectionDto), p => p is CollectionDto);
             DuplicateCommand = new RelayCommand(p => Duplicate(p as CollectionDto), p => p is CollectionDto);
             DeleteCommand = new RelayCommand(p => Delete(p as CollectionDto), p => p is CollectionDto);
+            OpenFavoritesCommand = new RelayCommand(_ => { /* view will open window; command placeholder */ });
             Load();
+            RefreshFavorites();
         }
 
         private void Load()
         {
             Collections.Clear();
             foreach (var c in _service.GetAll()) Collections.Add(c);
+            RefreshFavorites();
         }
 
         private void NewCollection()
@@ -52,6 +96,7 @@ namespace ComicReader.ViewModels
             if (req == null) return;
             var created = _service.Create(req);
             if (created != null) Collections.Add(created);
+            RefreshFavorites();
         }
 
         public void ImportFromFile(string path)
@@ -61,6 +106,7 @@ namespace ComicReader.ViewModels
             {
                 _service.ImportCollections(path);
                 Load();
+                RefreshFavorites();
             }
             catch { }
         }
@@ -86,6 +132,12 @@ namespace ComicReader.ViewModels
                     var idx = Collections.IndexOf(Collections.First(x => x.Id == id));
                     Collections[idx] = updated;
                     OnPropertyChanged(nameof(Collections));
+                    // if the updated collection is currently selected, refresh SelectedCollection so UI VMs update
+                    if (_selectedCollection != null && _selectedCollection.Id == id)
+                    {
+                        SelectedCollection = updated;
+                    }
+                    RefreshFavorites();
                 }
             }
             catch { }
@@ -114,8 +166,42 @@ namespace ComicReader.ViewModels
         private void Delete(CollectionDto c)
         {
             if (c == null) return;
+
+            // capture original index so undo can restore position
+            var idx = Collections.IndexOf(c);
+
+            // take a snapshot of the DTO so we can restore it if the user undoes
+            var dto = new CollectionDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
+                CoverPath = c.CoverPath,
+                Count = c.Count,
+                Items = c.Items?.Select(i => new ComicItemDto { Title = i.Title, Path = i.Path, ThumbPath = i.ThumbPath, IsFavorite = i.IsFavorite }).ToList() ?? new System.Collections.Generic.List<ComicItemDto>()
+            };
+
             _service.Delete(c.Id);
             Collections.Remove(c);
+
+            // Show undo toast — if clicked, re-insert the raw DTO into persistence and UI at original index
+            try
+            {
+                _toastInvoker?.Invoke($"Colección \"{dto.Name}\" eliminada", "Deshacer", () =>
+                {
+                    try
+                    {
+                        _service.AddRaw(dto, idx);
+                        System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                        {
+                            var insertAt = Math.Min(Math.Max(0, idx), Collections.Count);
+                            Collections.Insert(insertAt, dto);
+                        });
+                    }
+                    catch { }
+                });
+            }
+            catch { }
         }
 
         // Public wrappers for view code-behind (distinct names to avoid conflict)
@@ -131,5 +217,153 @@ namespace ComicReader.ViewModels
 
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(name));
+
+        // Thumbnail helpers (mirror logic used elsewhere in the app)
+        private string TryGetCachedThumbPath(string filePath)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(filePath)) return null;
+                var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                var dir = System.IO.Path.Combine(appData, "PercysLibrary", "Thumbs");
+                System.IO.Directory.CreateDirectory(dir);
+                using (var sha1 = System.Security.Cryptography.SHA1.Create())
+                {
+                    var key = ThumbCacheVersion + "|" + filePath;
+                    var hash = BitConverter.ToString(sha1.ComputeHash(System.Text.Encoding.UTF8.GetBytes(key))).Replace("-", string.Empty);
+                    var p = System.IO.Path.Combine(dir, hash + ".png");
+                    return System.IO.File.Exists(p) ? p : null;
+                }
+            }
+            catch { return null; }
+        }
+
+        private string ComputeThumbCachePath(string filePath)
+        {
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var dir = System.IO.Path.Combine(appData, "PercysLibrary", "Thumbs");
+            System.IO.Directory.CreateDirectory(dir);
+            using (var sha1 = System.Security.Cryptography.SHA1.Create())
+            {
+                var key = ThumbCacheVersion + "|" + filePath;
+                var hash = BitConverter.ToString(sha1.ComputeHash(System.Text.Encoding.UTF8.GetBytes(key))).Replace("-", string.Empty);
+                return System.IO.Path.Combine(dir, hash + ".png");
+            }
+        }
+
+        private async System.Threading.Tasks.Task EnsureThumbnailsForSelectedAsync(CollectionDto col)
+        {
+            if (col?.Items == null || col.Items.Count == 0) return;
+            foreach (var item in col.Items)
+            {
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(item.ThumbPath) && System.IO.File.Exists(item.ThumbPath)) continue;
+                    var cached = TryGetCachedThumbPath(item.Path);
+                    if (!string.IsNullOrWhiteSpace(cached))
+                    {
+                        item.ThumbPath = cached;
+                        // update corresponding VM if present
+                        var vm = SelectedItems.FirstOrDefault(v => string.Equals(v.Path, item.Path, StringComparison.OrdinalIgnoreCase));
+                        if (vm != null) System.Windows.Application.Current?.Dispatcher?.Invoke(() => vm.ThumbPath = cached);
+                        continue;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(item.Path)) continue;
+                    if (!System.IO.File.Exists(item.Path) && !System.IO.Directory.Exists(item.Path)) continue;
+
+                    // schedule generation (avoid duplicate tasks)
+                    if (!_thumbTasks.ContainsKey(item.Path))
+                    {
+                        var t = GenerateAndSaveThumbAsync(item.Path, item, col);
+                        _thumbTasks.TryAdd(item.Path, t);
+                        _ = t.ContinueWith(_ => { _thumbTasks.TryRemove(item.Path, out _); });
+                    }
+                }
+                catch { }
+            }
+        }
+
+        // Rebuild the FavoriteItems collection from current Collections
+        public void RefreshFavorites()
+        {
+            try
+            {
+                FavoriteItems.Clear();
+                foreach (var c in Collections)
+                {
+                    if (c?.Items == null) continue;
+                    foreach (var it in c.Items)
+                    {
+                        try
+                        {
+                            if (it != null && it.IsFavorite)
+                            {
+                                FavoriteItems.Add(it);
+                            }
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private async System.Threading.Tasks.Task GenerateAndSaveThumbAsync(string filePath, ComicItemDto item, CollectionDto col)
+        {
+            await _thumbSemaphore.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                System.Windows.Media.Imaging.BitmapSource cover = null;
+                try
+                {
+                    using (var loader = new ComicReader.Services.ComicPageLoader(filePath))
+                    {
+                        await loader.LoadComicAsync().ConfigureAwait(false);
+                        cover = await loader.GetCoverThumbnailAsync(300, 400).ConfigureAwait(false);
+                    }
+                }
+                catch { }
+
+                if (cover != null)
+                {
+                    try
+                    {
+                        var path = ComputeThumbCachePath(filePath);
+                        using (var fs = System.IO.File.Open(path, System.IO.FileMode.Create, System.IO.FileAccess.Write, System.IO.FileShare.Read))
+                        {
+                            var enc = new System.Windows.Media.Imaging.PngBitmapEncoder();
+                            enc.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(cover));
+                            enc.Save(fs);
+                        }
+
+                        // update model and persist collection
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            try
+                            {
+                                item.ThumbPath = path;
+                                // update VM if present
+                                var vm = SelectedItems.FirstOrDefault(v => string.Equals(v.Path, item.Path, StringComparison.OrdinalIgnoreCase));
+                                if (vm != null) vm.ThumbPath = path;
+                                // persist collection change
+                                try
+                                {
+                                    var req = new CollectionCreateRequest { Name = col.Name, Description = col.Description, CoverPath = col.CoverPath, Items = col.Items };
+                                    _service.Update(col.Id, req);
+                                }
+                                catch { }
+                            }
+                            catch { }
+                        });
+                    }
+                    catch { }
+                }
+            }
+            finally
+            {
+                _thumbSemaphore.Release();
+            }
+        }
     }
 }

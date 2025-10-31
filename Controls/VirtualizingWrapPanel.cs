@@ -36,13 +36,22 @@ namespace ComicReader.Controls
             if (_generator == null) _generator = ItemContainerGenerator;
 
             int itemCount = _itemsControl.HasItems ? _itemsControl.Items.Count : 0;
-            if (itemCount == 0) return availableSize;
+            if (itemCount == 0) return new Size(0, 0);
 
-            int itemsPerRow = Math.Max(1, (int)Math.Floor(availableSize.Width / ItemWidth));
+            // Handle infinite available size (e.g., inside unconstrained ScrollViewer)
+            double effectiveWidth = availableSize.Width;
+            if (double.IsInfinity(effectiveWidth) || effectiveWidth <= 0)
+            {
+                // Fallback: if unconstrained, lay out items in a single row
+                effectiveWidth = itemCount * ItemWidth;
+            }
+
+            int itemsPerRow = Math.Max(1, (int)Math.Floor(effectiveWidth / ItemWidth));
             int rowCount = (int)Math.Ceiling((double)itemCount / itemsPerRow);
 
             _extent = new Size(itemsPerRow * ItemWidth, rowCount * ItemHeight);
-            _viewport = availableSize;
+            _viewport = new Size(double.IsInfinity(availableSize.Width) ? _extent.Width : availableSize.Width,
+                                 double.IsInfinity(availableSize.Height) ? Math.Min(_extent.Height, SystemParameters.PrimaryScreenHeight) : availableSize.Height);
 
             UpdateScrollInfo();
 

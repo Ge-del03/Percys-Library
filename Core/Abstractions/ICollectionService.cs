@@ -11,6 +11,9 @@ namespace ComicReader.Core.Abstractions
         CollectionDto Rename(Guid id, string newName);
         CollectionDto Duplicate(Guid id);
         void Delete(Guid id);
+    // Re-insert a collection preserving its DTO (useful for undo)
+    // Optional index specifies the position to insert in the list; if null, append to the end.
+    void AddRaw(CollectionDto dto, int? index = null);
         void ExportCollections(string path);
         void ImportCollections(string path);
     }
@@ -25,11 +28,20 @@ namespace ComicReader.Core.Abstractions
         public List<ComicItemDto> Items { get; set; } = new List<ComicItemDto>();
     }
 
-    public class ComicItemDto
+    public class ComicItemDto : System.ComponentModel.INotifyPropertyChanged
     {
-        public string Title { get; set; }
-        public string Path { get; set; }
-        public string ThumbPath { get; set; }
+        private string _title;
+        private string _path;
+        private string _thumbPath;
+        private bool _isFavorite;
+
+        public string Title { get => _title; set { if (_title != value) { _title = value; PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Title))); } } }
+        public string Path { get => _path; set { if (_path != value) { _path = value; PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Path))); } } }
+        public string ThumbPath { get => _thumbPath; set { if (_thumbPath != value) { _thumbPath = value; PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(ThumbPath))); } } }
+        // Mark this comic as favorite (UI toggle). Persisted with collections.
+        public bool IsFavorite { get => _isFavorite; set { if (_isFavorite != value) { _isFavorite = value; PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(IsFavorite))); } } }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
     }
 
     public class CollectionCreateRequest

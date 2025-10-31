@@ -4,6 +4,21 @@
         WindowStyle="None" AllowsTransparency="True" Background="Transparent" ShowInTaskbar="False" Topmost="True"
         Width="320" Height="64" ResizeMode="NoResize" Opacity="0">
     <Border Background="#DD111827" CornerRadius="8" Padding="12" Margin="8" Opacity="0.95">
-        <TextBlock x:Name="MessageText" Foreground="White" TextWrapping="Wrap" FontSize="13" />
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="6" />
+            </Grid.RowDefinitions>
+
+            <DockPanel Grid.Row="0">
+                <TextBlock x:Name="MessageText" Foreground="White" TextWrapping="Wrap" FontSize="13" DockPanel.Dock="Left" VerticalAlignment="Center" />
+                <Button x:Name="ActionButton" Content="Deshacer" Visibility="Collapsed" Margin="8,0,0,0" DockPanel.Dock="Right" Click="ActionButton_Click" AutomationProperties.Name="Acción del toast" />
+            </DockPanel>
+
+            <!-- progress bar row -->
+            <Border Grid.Row="1" Background="#55222222" CornerRadius="3" Height="6" VerticalAlignment="Center">
+                <Rectangle x:Name="ProgressFill" Fill="#FF6EE7B7" HorizontalAlignment="Left" RadiusX="3" RadiusY="3" Width="0" />
+            </Border>
+        </Grid>
     </Border>
 </Window>
