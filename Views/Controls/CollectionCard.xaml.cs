@@ -23,9 +23,10 @@ namespace ComicReader.Views.Controls
             dlg.Description = dto.Description;
             dlg.CoverPath = dto.CoverPath;
             dlg.CoverPathText.Text = dto.CoverPath;
+            dlg.Items = dto.Items != null ? dto.Items : new System.Collections.Generic.List<Core.Abstractions.ComicItemDto>();
             if (dlg.ShowDialog() == true)
             {
-                var req = new Core.Abstractions.CollectionCreateRequest { Name = dlg.CollectionName, Description = dlg.Description, CoverPath = dlg.CoverPath };
+                var req = new Core.Abstractions.CollectionCreateRequest { Name = dlg.CollectionName, Description = dlg.Description, CoverPath = dlg.CoverPath, Items = dlg.Items };
                 vm.UpdateFromRequest(dto.Id, req);
                 MessageBox.Show(win, "Colección actualizada.", "Editar", MessageBoxButton.OK, MessageBoxImage.Information);
             }

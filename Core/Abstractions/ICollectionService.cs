@@ -37,5 +37,6 @@ namespace ComicReader.Core.Abstractions
         public string Name { get; set; }
         public string Description { get; set; }
         public string CoverPath { get; set; }
+        public List<ComicItemDto> Items { get; set; } = new List<ComicItemDto>();
     }
 }

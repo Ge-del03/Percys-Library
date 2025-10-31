@@ -13,7 +13,7 @@
         <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewCommand}" />
     </Window.InputBindings>
 
-    <Grid Margin="20">
+    <Grid Margin="20" PreviewKeyDown="Window_PreviewKeyDown">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="*" />

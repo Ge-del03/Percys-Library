@@ -122,7 +122,12 @@ namespace ComicReader.Services
                 if (!string.IsNullOrWhiteSpace(req.Name)) it.Name = req.Name;
                 it.Description = req.Description;
                 it.CoverPath = req.CoverPath;
-                // Note: Count and Items are managed elsewhere; preserve existing items
+                // Update items if provided
+                if (req.Items != null && req.Items.Count > 0)
+                {
+                    it.Items = req.Items.Select(i => new ComicItemDto { Path = i.Path, Title = i.Title, ThumbPath = i.ThumbPath }).ToList();
+                    it.Count = it.Items.Count;
+                }
                 Save();
                 return it;
             }
