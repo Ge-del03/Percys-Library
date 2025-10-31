@@ -1,0 +1,53 @@
+<Window x:Class="ComicReader.Views.CollectionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:ComicReader.Views.Controls"
+        xmlns:vm="clr-namespace:ComicReader.ViewModels"
+        Title="Favoritos y Colecciones" Height="700" Width="1100" Background="{StaticResource CS_Background}">
+
+    <Window.DataContext>
+        <vm:CollectionsViewModel />
+    </Window.DataContext>
+
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Left: collections list -->
+        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+            <WrapPanel>
+                <ItemsControl ItemsSource="{Binding Collections}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <controls:CollectionCard />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </WrapPanel>
+        </ScrollViewer>
+
+        <!-- Right: actions -->
+        <StackPanel Grid.Column="1" Margin="16,0,0,0">
+            <TextBlock Text="Colecciones" FontSize="20" FontWeight="Bold" Foreground="{StaticResource CS_TextPrimary}" />
+            <Button Content="Nueva Colección" Margin="0,12,0,6" Padding="8" Command="{Binding NewCommand}" Background="{StaticResource CS_ActionAccent}" Foreground="White" />
+            <Button Content="Importar" Margin="0,6,0,6" Padding="8" />
+            <Button Content="Exportar" Margin="0,6,0,6" Padding="8" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                    <Button Content="Nuevo" Width="88" Margin="6" Click="NewCollection_Click" />
+                    <Button Content="Importar" Width="88" Margin="6" Click="ImportCollections_Click" />
+                    <Button Content="Exportar" Width="88" Margin="6" Click="ExportCollections_Click" />
+                </StackPanel>
+            <StackPanel Margin="0,24,0,0">
+                <TextBlock Text="Acciones rápidas" FontWeight="SemiBold" Foreground="{StaticResource CS_TextSecondary}" />
+                <TextBlock Text="Selecciona una colección para ver acciones." Opacity="0.8" Margin="0,6,0,0" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

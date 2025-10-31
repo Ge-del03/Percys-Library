@@ -227,3 +227,11 @@ c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\tests\Rea
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\tests\ReadingStats.Tests\bin\Debug\net8.0-windows7.0\Themes\Modern.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\tests\ReadingStats.Tests\bin\Debug\net8.0-windows7.0\Themes\ReadingStatsResources.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\tests\ReadingStats.Tests\bin\Debug\net8.0-windows7.0\Themes\ThemeTokens.baml
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\bin\Debug\net8.0-windows\Themes\CollectionsResources.xaml
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\CollectionsWindow.g.cs
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\Controls\CollectionCard.g.cs
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\CollectionsWindow.baml
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\Controls\CollectionCard.baml
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\tests\ReadingStats.Tests\bin\Debug\net8.0-windows7.0\Themes\CollectionsResources.baml
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\NewCollectionDialog.baml
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\NewCollectionDialog.g.cs
