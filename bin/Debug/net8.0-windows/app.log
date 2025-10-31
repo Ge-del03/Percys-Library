@@ -35150,3 +35150,8 @@
 2025-10-31 14:32:07.841 [Info] Prefetch window set to 2
 2025-10-31 14:33:58.762 [Info] Decode concurrency cap set to 4
 2025-10-31 14:33:58.767 [Info] Decode concurrency cap set to 4
+2025-10-31 18:43:15.799 [Info] Logger inicializado
+2025-10-31 18:43:16.080 [Info] Applied programmatic theme: MonochromeHighContrast
+2025-10-31 18:43:16.516 [Info] Initializing ComicPageLoader (empty constructor)
+2025-10-31 18:43:16.520 [Info] Decode concurrency cap set to 4
+2025-10-31 18:43:16.522 [Info] Prefetch window set to 2

@@ -3,6 +3,7 @@ using System.Linq;
 using Xunit;
 using ComicReader.Core.Abstractions;
 using System.Collections.ObjectModel;
+using ComicReader.Models;
 
 namespace Collections.Tests
 {

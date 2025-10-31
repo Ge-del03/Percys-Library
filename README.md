@@ -1,5 +1,7 @@
 # Percy's Library - Lector Avanzado de Cómics
 
+[![CI](https://github.com/Ge-del03/Percys-Library/actions/workflows/ci.yml/badge.svg)](https://github.com/Ge-del03/Percys-Library/actions/workflows/ci.yml)
+
 ## Descripción
 Percy's Library es una aplicación avanzada para Windows desarrollada en WPF .NET 6 que permite leer cómics en múltiples formatos con una interfaz moderna y funcionalidades profesionales.
 

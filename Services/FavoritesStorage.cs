@@ -84,5 +84,27 @@ namespace ComicReader.Services
             }
             catch { }
         }
+
+        /// <summary>
+        /// Restores a list of items into the specified collection at their original indices when possible.
+        /// This is extracted to make undo behavior testable and reusable.
+        /// </summary>
+        public static void RestoreItems(ComicCollection collection, System.Collections.Generic.IEnumerable<(FavoriteComic Item, int Index)> items)
+        {
+            if (collection == null || items == null) return;
+            // Insert in order by Index so positions are preserved
+            foreach (var r in items.OrderBy(i => i.Index))
+            {
+                try
+                {
+                    if (r.Item == null) continue;
+                    if (r.Index >= 0 && r.Index <= collection.Items.Count)
+                        collection.Items.Insert(r.Index, r.Item);
+                    else
+                        collection.Items.Add(r.Item);
+                }
+                catch { }
+            }
+        }
     }
 }

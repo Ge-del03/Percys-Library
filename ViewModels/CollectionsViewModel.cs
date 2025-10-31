@@ -11,10 +11,12 @@ namespace ComicReader.ViewModels
     public class CollectionsViewModel : System.ComponentModel.INotifyPropertyChanged
     {
         private readonly ICollectionService _service;
-        private readonly Action<string, string, Action> _toastInvoker;
+    private readonly Action<string, string, Action> _toastInvoker;
+    private readonly Services.IUndoService _undoService;
         private const string ThumbCacheVersion = "v2";
         private readonly System.Threading.SemaphoreSlim _thumbSemaphore = new System.Threading.SemaphoreSlim(2);
-        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, System.Threading.Tasks.Task> _thumbTasks = new System.Collections.Concurrent.ConcurrentDictionary<string, System.Threading.Tasks.Task>(StringComparer.OrdinalIgnoreCase);
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, System.Threading.Tasks.Task> _thumbTasks = new System.Collections.Concurrent.ConcurrentDictionary<string, System.Threading.Tasks.Task>(StringComparer.OrdinalIgnoreCase);
+    private readonly Services.ThumbnailManager _thumbnailManager = new Services.ThumbnailManager(2);
 
     public ObservableCollection<CollectionDto> Collections { get; } = new ObservableCollection<CollectionDto>();
     private CollectionDto _selectedCollection;
@@ -64,9 +66,16 @@ namespace ComicReader.ViewModels
 
         // Testable constructor allowing DI of a mock service and toast invoker
         public CollectionsViewModel(ICollectionService service, Action<string, string, Action> toastInvoker)
+            : this(service, new Services.UndoService(toastInvoker))
+        {
+        }
+
+        // New constructor accepting an IUndoService for better testability and centralization
+        public CollectionsViewModel(ICollectionService service, Services.IUndoService undoService)
         {
             _service = service ?? throw new ArgumentNullException(nameof(service));
-            _toastInvoker = toastInvoker ?? ((m, l, a) => ToastService.Show(m, l, a));
+            _undoService = undoService ?? throw new ArgumentNullException(nameof(undoService));
+            _toastInvoker = ToastService.Show;
             NewCommand = new RelayCommand(_ => NewCollection());
             RenameCommand = new RelayCommand(p => Rename(p as CollectionDto), p => p is CollectionDto);
             DuplicateCommand = new RelayCommand(p => Duplicate(p as CollectionDto), p => p is CollectionDto);
@@ -184,21 +193,20 @@ namespace ComicReader.ViewModels
             _service.Delete(c.Id);
             Collections.Remove(c);
 
-            // Show undo toast — if clicked, re-insert the raw DTO into persistence and UI at original index
+            // Register undo via the central undo service so UI and tests can trigger it consistently
             try
             {
-                _toastInvoker?.Invoke($"Colección \"{dto.Name}\" eliminada", "Deshacer", () =>
+                _undoService?.Register($"Colección \"{dto.Name}\" eliminada", "Deshacer", () =>
                 {
                     try
                     {
                         _service.AddRaw(dto, idx);
-                        System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
-                        {
-                            var insertAt = Math.Min(Math.Max(0, idx), Collections.Count);
-                            Collections.Insert(insertAt, dto);
-                        });
+                        Load();
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        try { Console.WriteLine($"[CollectionsViewModel] Undo restore failed: {ex}"); } catch { }
+                    }
                 });
             }
             catch { }
@@ -275,9 +283,36 @@ namespace ComicReader.ViewModels
                     // schedule generation (avoid duplicate tasks)
                     if (!_thumbTasks.ContainsKey(item.Path))
                     {
-                        var t = GenerateAndSaveThumbAsync(item.Path, item, col);
-                        _thumbTasks.TryAdd(item.Path, t);
-                        _ = t.ContinueWith(_ => { _thumbTasks.TryRemove(item.Path, out _); });
+                        // Ask the thumbnail manager to generate and call back when ready so VM and DTO can update
+                        try
+                        {
+                            _thumbnailManager.EnqueueGenerate(item.Path, async (resultPath) =>
+                            {
+                                if (!string.IsNullOrWhiteSpace(resultPath))
+                                {
+                                    // update model and VM on UI thread
+                                    System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                                    {
+                                        try
+                                        {
+                                            item.ThumbPath = resultPath;
+                                            var vm = SelectedItems.FirstOrDefault(v => string.Equals(v.Path, item.Path, StringComparison.OrdinalIgnoreCase));
+                                            if (vm != null) vm.ThumbPath = resultPath;
+                                            try
+                                            {
+                                                var req = new CollectionCreateRequest { Name = col.Name, Description = col.Description, CoverPath = col.CoverPath, Items = col.Items };
+                                                _service.Update(col.Id, req);
+                                            }
+                                            catch { }
+                                        }
+                                        catch { }
+                                    });
+                                }
+                            });
+                        }
+                        catch { }
+                        // track a dummy task so we don't schedule twice
+                        _thumbTasks.TryAdd(item.Path, System.Threading.Tasks.Task.CompletedTask);
                     }
                 }
                 catch { }
