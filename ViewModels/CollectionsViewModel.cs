@@ -19,9 +19,13 @@ namespace ComicReader.ViewModels
         public ICommand DuplicateCommand { get; }
         public ICommand DeleteCommand { get; }
 
-        public CollectionsViewModel()
+        // Default constructor uses JSON service for app runtime
+        public CollectionsViewModel() : this(new CollectionServiceJson()) { }
+
+        // Testable constructor allowing DI of a mock service
+        public CollectionsViewModel(ICollectionService service)
         {
-            _service = new CollectionServiceJson();
+            _service = service ?? throw new ArgumentNullException(nameof(service));
             NewCommand = new RelayCommand(_ => NewCollection());
             RenameCommand = new RelayCommand(p => Rename(p as CollectionDto), p => p is CollectionDto);
             DuplicateCommand = new RelayCommand(p => Duplicate(p as CollectionDto), p => p is CollectionDto);
