@@ -28,7 +28,7 @@ namespace ComicReader.Views.Controls
             {
                 var req = new Core.Abstractions.CollectionCreateRequest { Name = dlg.CollectionName, Description = dlg.Description, CoverPath = dlg.CoverPath, Items = dlg.Items };
                 vm.UpdateFromRequest(dto.Id, req);
-                MessageBox.Show(win, "Colección actualizada.", "Editar", MessageBoxButton.OK, MessageBoxImage.Information);
+                ComicReader.Services.ToastService.Show("Colección actualizada.");
             }
         }
 
@@ -39,7 +39,7 @@ namespace ComicReader.Views.Controls
             var dto = DataContext as Core.Abstractions.CollectionDto;
             if (dto == null || vm == null) return;
             vm.DuplicateCollection(dto);
-            MessageBox.Show(win, "Colección duplicada.", "Duplicar", MessageBoxButton.OK, MessageBoxImage.Information);
+            ComicReader.Services.ToastService.Show("Colección duplicada.");
         }
 
         private void Delete_Click(object sender, RoutedEventArgs e)

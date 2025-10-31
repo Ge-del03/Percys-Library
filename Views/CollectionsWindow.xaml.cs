@@ -32,7 +32,7 @@ namespace ComicReader.Views
             if (dlg.ShowDialog(this) == true)
             {
                 Vm?.ImportFromFile(dlg.FileName);
-                MessageBox.Show(this, "Importación completada.", "Importar", MessageBoxButton.OK, MessageBoxImage.Information);
+                ComicReader.Services.ToastService.Show("Importación completada.");
             }
         }
 
@@ -44,7 +44,7 @@ namespace ComicReader.Views
             if (dlg.ShowDialog(this) == true)
             {
                 Vm?.ExportToFile(dlg.FileName);
-                MessageBox.Show(this, "Exportación guardada.", "Exportar", MessageBoxButton.OK, MessageBoxImage.Information);
+                ComicReader.Services.ToastService.Show("Exportación guardada.");
             }
         }
 
