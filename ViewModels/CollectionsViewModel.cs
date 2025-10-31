@@ -251,9 +251,9 @@ namespace ComicReader.ViewModels
             }
         }
 
-        private async System.Threading.Tasks.Task EnsureThumbnailsForSelectedAsync(CollectionDto col)
+        private System.Threading.Tasks.Task EnsureThumbnailsForSelectedAsync(CollectionDto col)
         {
-            if (col?.Items == null || col.Items.Count == 0) return;
+            if (col?.Items == null || col.Items.Count == 0) return System.Threading.Tasks.Task.CompletedTask;
             foreach (var item in col.Items)
             {
                 try
@@ -282,6 +282,8 @@ namespace ComicReader.ViewModels
                 }
                 catch { }
             }
+
+            return System.Threading.Tasks.Task.CompletedTask;
         }
 
         // Rebuild the FavoriteItems collection from current Collections
