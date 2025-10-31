@@ -5,6 +5,7 @@ using ComicReader.ViewModels;
 using Microsoft.Win32;
 using ComicReader.Core.Abstractions;
 using ComicReader.Core.Services;
+using System.IO;
 
 namespace ComicReader.Views
 {
@@ -98,22 +99,46 @@ namespace ComicReader.Views
         {
             try
             {
-                var res = MessageBox.Show(this, "¿Deseas resetear todas las estadísticas? Esta acción no se puede deshacer.", "Confirmar reset", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-                if (res == MessageBoxResult.Yes)
+                var res = MessageBox.Show(this, "¿Deseas resetear todas las estadísticas y la configuración relacionada? Esta acción no se puede deshacer.", "Confirmar reset", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (res != MessageBoxResult.Yes) return;
+
+                var svc = ServiceLocator.TryGet<IReadingStatsService>();
+                if (svc == null)
                 {
-                    var svc = ServiceLocator.TryGet<IReadingStatsService>();
-                    if (svc != null)
+                    MessageBox.Show(this, "Servicio de estadísticas no disponible.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                // Reset stored stats
+                svc.ResetAll();
+
+                // Clear thumbnail cache
+                try
+                {
+                    var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                    var dir = System.IO.Path.Combine(appData, "PercysLibrary", "Thumbs");
+                    if (Directory.Exists(dir))
                     {
-                        svc.ResetAll();
-                        // refresh the view model
-                        if (this.DataContext is ReadingStatsViewModel vm) vm.Refresh();
-                        MessageBox.Show(this, "Estadísticas reseteadas.", "Reset", MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
-                    else
-                    {
-                        MessageBox.Show(this, "Servicio de estadísticas no disponible.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        foreach (var f in Directory.GetFiles(dir))
+                        {
+                            try { File.Delete(f); } catch { }
+                        }
                     }
                 }
+                catch { }
+
+                // Reset settings to defaults and persist immediately
+                try
+                {
+                    ComicReader.Services.SettingsManager.ResetToDefaults();
+                    ComicReader.Services.SettingsManager.SaveNow();
+                }
+                catch { }
+
+                // Refresh VM/UI
+                try { if (this.DataContext is ReadingStatsViewModel vm) vm.Refresh(); } catch { }
+
+                MessageBox.Show(this, "Reinicio completo. La aplicación reflejará los valores por defecto.", "Reset", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
