@@ -10,15 +10,15 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Nombre" FontWeight="Bold" />
-        <TextBox x:Name="NameBox" Grid.Row="1" Margin="0,6,0,0" />
+    <TextBlock Text="Nombre" FontWeight="Bold" />
+    <TextBox x:Name="NameBox" Grid.Row="1" Margin="0,6,0,0" AutomationProperties.Name="Nombre de la nueva colección" />
 
         <StackPanel Grid.Row="2" Margin="0,8,0,0">
             <TextBlock Text="Descripción (opcional)" FontWeight="Bold" />
-            <TextBox x:Name="DescBox" Height="80" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,6,0,0" />
+            <TextBox x:Name="DescBox" Height="80" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,6,0,0" AutomationProperties.Name="Descripción de la nueva colección" />
             <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                <Button Content="Seleccionar portada..." Click="SelectCover_Click" />
-                <TextBlock x:Name="CoverPathText" Margin="8,6,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Width="220" />
+                <Button Content="Seleccionar portada..." Click="SelectCover_Click" AutomationProperties.Name="Seleccionar portada" />
+                <TextBlock x:Name="CoverPathText" Margin="8,6,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Width="220" AutomationProperties.Name="Ruta de la portada" />
             </StackPanel>
         </StackPanel>
 

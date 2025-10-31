@@ -5,7 +5,8 @@
              Height="160" Width="260"
              Focusable="True">
     <Border Background="{StaticResource CS_CardBackground}" CornerRadius="10" Padding="12" Margin="8" SnapsToDevicePixels="True"
-            AutomationProperties.Name="CollectionCard">
+        AutomationProperties.Name="{Binding Name, FallbackValue=Colección}" 
+        AutomationProperties.HelpText="{Binding Description}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -16,9 +17,12 @@
             <Grid>
                 <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" Foreground="{StaticResource CS_TextPrimary}" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Width="28" Height="28" Margin="4,0,0,0" Content="✎" ToolTip="Editar" Click="Edit_Click" />
-                    <Button Width="28" Height="28" Margin="4,0,0,0" Content="⎘" ToolTip="Duplicar" Click="Duplicate_Click" />
-                    <Button Width="28" Height="28" Margin="4,0,0,0" Content="🗑" ToolTip="Eliminar" Click="Delete_Click" />
+            <Button Width="28" Height="28" Margin="4,0,0,0" Content="✎" ToolTip="Editar" Click="Edit_Click"
+                AutomationProperties.Name="Editar colección" />
+            <Button Width="28" Height="28" Margin="4,0,0,0" Content="⎘" ToolTip="Duplicar" Click="Duplicate_Click"
+                AutomationProperties.Name="Duplicar colección" />
+            <Button Width="28" Height="28" Margin="4,0,0,0" Content="🗑" ToolTip="Eliminar" Click="Delete_Click"
+                AutomationProperties.Name="Eliminar colección" />
                 </StackPanel>
             </Grid>
 
@@ -37,7 +41,8 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <TextBlock Grid.Row="2" Text="{Binding Count, StringFormat='{}{0} cómics'}" Foreground="{StaticResource CS_TextSecondary}" FontSize="12" HorizontalAlignment="Left" />
+            <TextBlock Grid.Row="2" Text="{Binding Count, StringFormat='{}{0} cómics'}" Foreground="{StaticResource CS_TextSecondary}" FontSize="12" HorizontalAlignment="Left"
+                       AutomationProperties.Name="Cantidad de cómics" AutomationProperties.HelpText="{Binding Count, StringFormat='Tiene {0} cómics'}" />
         </Grid>
     </Border>
 </UserControl>

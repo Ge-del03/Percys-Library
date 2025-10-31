@@ -38,13 +38,14 @@
         <!-- Right: actions -->
         <StackPanel Grid.Column="1" Margin="16,0,0,0">
             <TextBlock Text="Colecciones" FontSize="20" FontWeight="Bold" Foreground="{StaticResource CS_TextPrimary}" />
-            <Button Content="Nueva Colección" Margin="0,12,0,6" Padding="8" Command="{Binding NewCommand}" Background="{StaticResource CS_ActionAccent}" Foreground="White" />
-            <Button Content="Importar" Margin="0,6,0,6" Padding="8" />
-            <Button Content="Exportar" Margin="0,6,0,6" Padding="8" />
+                <Button Content="Nueva Colección" Margin="0,12,0,6" Padding="8" Command="{Binding NewCommand}" Background="{StaticResource CS_ActionAccent}" Foreground="White"
+                        AutomationProperties.Name="Nueva colección (Ctrl+N)" />
+                <Button Content="Importar" Margin="0,6,0,6" Padding="8" AutomationProperties.Name="Importar colecciones (Ctrl+I)" />
+                <Button Content="Exportar" Margin="0,6,0,6" Padding="8" AutomationProperties.Name="Exportar colecciones (Ctrl+E)" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
-                    <Button Content="Nuevo" Width="88" Margin="6" Click="NewCollection_Click" />
-                    <Button Content="Importar" Width="88" Margin="6" Click="ImportCollections_Click" />
-                    <Button Content="Exportar" Width="88" Margin="6" Click="ExportCollections_Click" />
+                    <Button Content="Nuevo" Width="88" Margin="6" Click="NewCollection_Click" AutomationProperties.Name="Nuevo" />
+                    <Button Content="Importar" Width="88" Margin="6" Click="ImportCollections_Click" AutomationProperties.Name="Importar" />
+                    <Button Content="Exportar" Width="88" Margin="6" Click="ExportCollections_Click" AutomationProperties.Name="Exportar" />
                 </StackPanel>
             <StackPanel Margin="0,24,0,0">
                 <TextBlock Text="Acciones rápidas" FontWeight="SemiBold" Foreground="{StaticResource CS_TextSecondary}" />
