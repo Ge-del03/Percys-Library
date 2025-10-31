@@ -803,7 +803,8 @@ namespace ComicReader.Views
         // Métodos para los nuevos botones
         private void OpenComicStats_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            var statsWindow = new ComicStatsWindow();
+            // Open the redesigned Statistics window
+            var statsWindow = new StatisticsWindow();
             statsWindow.Owner = Window.GetWindow(this);
             statsWindow.ShowDialog();
         }
@@ -826,8 +827,8 @@ namespace ComicReader.Views
 
         private void ShowStats_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            // Abrir ventana de estadísticas
-            var statsWindow = new ComicStatsWindow();
+            // Abrir la ventana de estadísticas rediseñada
+            var statsWindow = new StatisticsWindow();
             statsWindow.Owner = Window.GetWindow(this);
             statsWindow.ShowDialog();
         }

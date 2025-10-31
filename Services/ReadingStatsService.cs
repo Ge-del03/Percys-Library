@@ -224,6 +224,7 @@ namespace ComicReader.Services
                 .Select(s => new ReadingSessionInfo
                 {
                     ComicTitle = s.ComicTitle,
+                    ComicPath = s.ComicPath,
                     StartTime = s.StartTime,
                     Duration = s.EndTime - s.StartTime,
                     PagesRead = s.PagesRead

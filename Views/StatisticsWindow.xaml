@@ -1,0 +1,165 @@
+<Window x:Class="ComicReader.Views.StatisticsWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:controls="clr-namespace:ComicReader.Views.Controls"
+	xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
+	xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+		Title="Estadísticas de Lectura" Height="640" Width="1024"
+		WindowStartupLocation="CenterOwner"
+		Background="{StaticResource RS_AppBackgroundBrush}">
+
+	<Grid Margin="18">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+
+		<!-- Header -->
+		<TextBlock Text="Estadísticas de Lectura" FontSize="28" FontWeight="Bold" Foreground="{StaticResource RS_TextOnDarkBrush}" HorizontalAlignment="Center" Margin="0,8" />
+
+		<!-- Main content -->
+		<Grid Grid.Row="1" Margin="0,12,0,12">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="3*" />
+				<ColumnDefinition Width="2*" />
+			</Grid.ColumnDefinitions>
+
+			<!-- Left column: resumen y progreso -->
+			<StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,12,0">
+				<!-- Resumen general: tarjetas en un panel con binding y drag & drop -->
+				<ItemsControl ItemsSource="{Binding Stats}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" HorizontalAlignment="Center">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<!-- allow variable height cards so labels can wrap naturally -->
+							<WrapPanel IsItemsHost="True" Orientation="Horizontal" ItemWidth="220" />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<controls:StatCard Label="{Binding Label}" Value="{Binding Value}" Margin="6" />
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+
+				<!-- Progreso Actual -->
+				<Border Style="{StaticResource RS_StatCardStyle}" Padding="8" Margin="0,12,0,8">
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="*" />
+						</Grid.RowDefinitions>
+						<TextBlock Text="Progreso Actual" Foreground="{StaticResource RS_TextOnDarkBrush}" FontWeight="SemiBold" Margin="4" />
+
+						<Grid Grid.Row="1">
+							<!-- Scrollable progress list -->
+							<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" MaxHeight="220">
+								<ItemsControl ItemsSource="{Binding ProgressList}">
+									<ItemsControl.ItemTemplate>
+										<DataTemplate>
+											<controls:ProgressComicItem Title="{Binding Title}" Percentage="{Binding Percentage}" PagesText="{Binding PagesText}" ThumbnailPath="{Binding ThumbnailPath}" Margin="0,6" />
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<StackPanel />
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+								</ItemsControl>
+							</ScrollViewer>
+
+							<!-- Placeholder when no progress items exist -->
+							<TextBlock Text="No hay progreso reciente" Foreground="{StaticResource RS_TextOnDarkBrush}" Opacity="0.75" HorizontalAlignment="Center" VerticalAlignment="Center">
+								<TextBlock.Style>
+									<Style TargetType="TextBlock">
+										<Setter Property="Visibility" Value="Collapsed" />
+										<Style.Triggers>
+											<DataTrigger Binding="{Binding ProgressList.Count}" Value="0">
+												<Setter Property="Visibility" Value="Visible" />
+											</DataTrigger>
+										</Style.Triggers>
+									</Style>
+								</TextBlock.Style>
+							</TextBlock>
+						</Grid>
+					</Grid>
+				</Border>
+
+				<!-- Simple chart demo (barras por día) -->
+				<Border Style="{StaticResource RS_StatCardStyle}" Padding="8" Margin="0,0,0,8">
+					<StackPanel>
+						<TextBlock Text="Lecturas por día" Foreground="{StaticResource RS_TextOnDarkBrush}" FontWeight="SemiBold" Margin="4" />
+						<Grid Height="160">
+							<lvc:CartesianChart Series="{Binding Series}" Background="Transparent" />
+						</Grid>
+					</StackPanel>
+				</Border>
+			</StackPanel>
+
+			<!-- Right column: preferencias y sesiones -->
+			<StackPanel Grid.Column="1" Orientation="Vertical">
+				<Border Style="{StaticResource RS_StatCardStyle}" Padding="10" Margin="0,0,0,12">
+					<StackPanel>
+						<TextBlock Text="Favoritos" Foreground="{StaticResource RS_TextOnDarkBrush}" FontWeight="SemiBold" Margin="0,0,0,8"/>
+						<TextBlock Text="Género Favorito: —" Foreground="{StaticResource RS_TextOnDarkBrush}"/>
+						<TextBlock Text="Día Favorito: Jueves" Foreground="{StaticResource RS_TextOnDarkBrush}"/>
+						<TextBlock Text="Formato Preferido: CBR" Foreground="{StaticResource RS_TextOnDarkBrush}"/>
+					</StackPanel>
+				</Border>
+
+				<Border Style="{StaticResource RS_StatCardStyle}" Padding="8">
+					<StackPanel>
+						<TextBlock Text="Sesiones de Hoy" Foreground="{StaticResource RS_TextOnDarkBrush}" FontWeight="SemiBold" Margin="0,0,0,8"/>
+						<ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="160">
+							<ItemsControl ItemsSource="{Binding TodaySessions}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+					<Border Background="Transparent" Padding="6" Margin="0,4" CornerRadius="4" Focusable="True"
+						AutomationProperties.Name="{Binding Title}" AutomationProperties.HelpText="{Binding HelpText}"
+						MouseLeftButtonDown="SessionItem_MouseLeftButtonDown" KeyDown="SessionItem_KeyDown">
+											<Border.Style>
+												<Style TargetType="Border">
+													<Setter Property="Background" Value="Transparent" />
+													<Setter Property="SnapsToDevicePixels" Value="True" />
+													<Style.Triggers>
+														<Trigger Property="IsMouseOver" Value="True">
+															<Setter Property="Background" Value="#203C474E" />
+														</Trigger>
+														<Trigger Property="IsKeyboardFocusWithin" Value="True">
+															<Setter Property="Background" Value="#2A4A555B" />
+														</Trigger>
+													</Style.Triggers>
+												</Style>
+											</Border.Style>
+											<Grid>
+												<Grid.ColumnDefinitions>
+													<ColumnDefinition Width="56" />
+													<ColumnDefinition Width="*" />
+													<ColumnDefinition Width="Auto" />
+												</Grid.ColumnDefinitions>
+												<TextBlock Text="{Binding StartText}" Foreground="{StaticResource RS_TextOnDarkBrush}" Opacity="0.9" VerticalAlignment="Top" />
+												<StackPanel Grid.Column="1" Orientation="Vertical" Margin="8,0,0,0">
+													<TextBlock Text="{Binding Title}" Foreground="{StaticResource RS_TextOnDarkBrush}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" />
+													<TextBlock Text="{Binding PagesText}" Foreground="{StaticResource RS_TextOnDarkBrush}" Opacity="0.75" FontSize="12" />
+												</StackPanel>
+												<TextBlock Grid.Column="2" Text="{Binding DurationText}" Foreground="{StaticResource RS_TextOnDarkBrush}" Opacity="0.85" VerticalAlignment="Center" Margin="12,0,0,0" />
+											</Grid>
+										</Border>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</ScrollViewer>
+					</StackPanel>
+				</Border>
+			</StackPanel>
+		</Grid>
+
+		<!-- Footer: acciones -->
+		<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,12,0,0">
+			<Button Content="Exportar Estadísticas" Background="{StaticResource RS_SuccessBrush}" Foreground="White" Padding="10,6" Margin="6"/>
+			<Button Content="Resetear Estadísticas" Background="{StaticResource RS_DangerBrush}" Foreground="White" Padding="10,6" Margin="6"/>
+			<Button Content="Cerrar" Background="#FF6B6B6B" Foreground="White" Padding="10,6" Margin="6"/>
+		</StackPanel>
+	</Grid>
+</Window>
+

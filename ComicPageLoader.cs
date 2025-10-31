@@ -107,6 +107,8 @@ namespace ComicReader.Services
         private int _pageCacheLimit = 60; // configurable luego
         private readonly object _lruLock = new();
         private ILogService _log;
+    // Track currently pinned page indices to avoid repeated pin/unpin churn
+    private readonly HashSet<int> _currentlyPinnedPages = new HashSet<int>();
     private readonly ComicReader.Core.Abstractions.IImageCache _multiLevelCache;
         private int _prefetchWindow = 2;
         private object _lock = new object(); // Para sincronizar acceso a recursos compartidos
@@ -1372,6 +1374,12 @@ namespace ComicReader.Services
 
         public void PreloadPages(int currentPageNumber)
         {
+            try
+            {
+                // Auto-pin current +/- prefetch window to keep high-priority neighbors from being evicted
+                UpdatePinnedWindow(currentPageNumber);
+            }
+            catch { }
             int window = _prefetchWindow > 0 ? _prefetchWindow : 4;
             // Priorizar páginas cercanas y limitar concurrencia para no saturar el I/O
             var toLoad = new List<int>();
@@ -1420,6 +1428,63 @@ namespace ComicReader.Services
                 }, highPriority: false);
             }
 
+        }
+
+        // Pin nearby pages (full + thumbnail keys) using the concrete multi-level cache when available.
+        private void UpdatePinnedWindow(int centerPage)
+        {
+            try
+            {
+                var cache = _multiLevelCache as ComicReader.Core.Services.MultiLevelImageCache;
+                if (cache == null) return;
+
+                int radius = Math.Max(1, _prefetchWindow);
+                var newSet = new HashSet<int>();
+                for (int i = centerPage - radius; i <= centerPage + radius; i++)
+                {
+                    if (i < 0 || i >= _pages.Count) continue;
+                    newSet.Add(i);
+                }
+
+                lock (_lruLock)
+                {
+                    // Unpin pages that are no longer in new set
+                    foreach (var old in _currentlyPinnedPages.ToList())
+                    {
+                        if (!newSet.Contains(old))
+                        {
+                            try
+                            {
+                                var thumbKey = $"thumb_{_filePath}_{old}_300";
+                                var fullKey = $"full_{_filePath}_{old}_1200";
+                                cache.Unpin(thumbKey);
+                                cache.Unpin(fullKey);
+                            }
+                            catch { }
+                        }
+                    }
+
+                    // Pin new pages
+                    foreach (var idx in newSet)
+                    {
+                        if (!_currentlyPinnedPages.Contains(idx))
+                        {
+                            try
+                            {
+                                var thumbKey = $"thumb_{_filePath}_{idx}_300";
+                                var fullKey = $"full_{_filePath}_{idx}_1200";
+                                cache.Pin(thumbKey);
+                                cache.Pin(fullKey);
+                            }
+                            catch { }
+                        }
+                    }
+
+                    _currentlyPinnedPages.Clear();
+                    foreach (var v in newSet) _currentlyPinnedPages.Add(v);
+                }
+            }
+            catch { }
         }
 
         public void ClearCaches()

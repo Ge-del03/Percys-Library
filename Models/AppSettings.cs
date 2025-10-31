@@ -159,6 +159,14 @@ namespace ComicReader.Services
         private bool _enableComicEffects = true;
         public bool EnableComicEffects { get => _enableComicEffects; set => SetProperty(ref _enableComicEffects, value); }
 
+    // Order of modules in the Reading Statistics window (persisted)
+    private string[] _readingStatsModuleOrder = null;
+    public string[] ReadingStatsModuleOrder { get => _readingStatsModuleOrder; set => SetProperty(ref _readingStatsModuleOrder, value); }
+
+    // Concurrency limit for generating reading-stats thumbnails in background
+    private int _readingStatsThumbConcurrency = 2;
+    public int ReadingStatsThumbConcurrency { get => _readingStatsThumbConcurrency; set => SetProperty(ref _readingStatsThumbConcurrency, value); }
+
         // Last opened progress/state
         private string _lastOpenedFilePath = null;
         public string LastOpenedFilePath { get => _lastOpenedFilePath; set => SetProperty(ref _lastOpenedFilePath, value); }

@@ -44,6 +44,7 @@ namespace ComicReader.Core.Abstractions
     public class ReadingSessionInfo
     {
         public string ComicTitle { get; set; }
+        public string ComicPath { get; set; }
         public DateTime StartTime { get; set; }
         public TimeSpan Duration { get; set; }
         public int PagesRead { get; set; }

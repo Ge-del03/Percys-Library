@@ -22,6 +22,7 @@
                 <!-- Redesign overrides and new components -->
                 <ResourceDictionary Source="Styles/ComicRedesignControls.xaml" />
                 <ResourceDictionary Source="Styles/ComicRedesignTheme.xaml" />
+                <ResourceDictionary Source="Themes/ReadingStatsResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <!-- Global rendering and UI tokens -->
             <sys:Boolean x:Key="UseBitmapScalingModeHighQuality">True</sys:Boolean>

@@ -215,7 +215,7 @@ namespace ComicReader.Core.Services
                             else
                             {
                                 var fi = new FileInfo(final);
-                                _diskIndex[key] = new DiskIndexEntry { FileName = Path.GetFileName(final), Size = fi.Length, LastAccessUtcTicks = DateTime.UtcNow.Ticks };
+                                _diskIndex[key] = new DiskIndexEntry { FileName = Path.GetFileName(final), Size = fi.Length, LastAccessUtcTicks = DateTime.UtcNow.Ticks, Pinned = _pinnedKeys.Contains(key) };
                             }
                             SaveIndex();
                             Interlocked.Increment(ref _diskSets);
@@ -241,7 +241,7 @@ namespace ComicReader.Core.Services
                         {
                             File.Move(tmp, final);
                             var fi = new FileInfo(final);
-                            _diskIndex[key] = new DiskIndexEntry { FileName = Path.GetFileName(final), Size = fi.Length, LastAccessUtcTicks = DateTime.UtcNow.Ticks };
+                            _diskIndex[key] = new DiskIndexEntry { FileName = Path.GetFileName(final), Size = fi.Length, LastAccessUtcTicks = DateTime.UtcNow.Ticks, Pinned = _pinnedKeys.Contains(key) };
                             Interlocked.Increment(ref _diskSets);
                             SaveIndex();
                         }
