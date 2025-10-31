@@ -183,9 +183,10 @@
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
-                            <TextBox Name="SearchTextBox" Width="300" Padding="10" FontSize="14"
-                                     BorderBrush="#FFD1D5DB" BorderThickness="1" VerticalAlignment="Center"
-                                     TextChanged="SearchTextBox_TextChanged" Margin="0,0,8,0">
+                       <TextBox Name="SearchTextBox" Width="300" Padding="10" FontSize="14"
+                              BorderBrush="#FFD1D5DB" BorderThickness="1" VerticalAlignment="Center"
+                              TextChanged="SearchTextBox_TextChanged" Margin="0,0,8,0"
+                              AutomationProperties.Name="Buscar favoritos">
                                 <TextBox.Style>
                                     <Style TargetType="TextBox">
                                         <Setter Property="Template">
@@ -203,12 +204,13 @@
                             </TextBox>
 
                             <ComboBox Name="TagFilterComboBox" Width="160" Margin="6,0,6,0" VerticalAlignment="Center"
-                                      SelectionChanged="TagFilterComboBox_SelectionChanged" IsEditable="False"/>
+                                      SelectionChanged="TagFilterComboBox_SelectionChanged" IsEditable="False"
+                                      AutomationProperties.Name="Filtro de etiquetas"/>
 
-                            <Button Style="{StaticResource ModernButtonStyle}" Background="#FF3B82F6" Foreground="White" Click="AddToCollection_Click">
+                            <Button Style="{StaticResource ModernButtonStyle}" Background="#FF3B82F6" Foreground="White" Click="AddToCollection_Click" AutomationProperties.Name="Agregar a colección">
                                 <StackPanel Orientation="Horizontal"><TextBlock Text="📖"/> <TextBlock Text="Agregar" Margin="6,0,0,0"/></StackPanel>
                             </Button>
-                            <Button Style="{StaticResource ModernButtonStyle}" Background="#FFEF4444" Foreground="White" Click="RemoveSelected_Click" Margin="6,0,0,0">
+                            <Button Style="{StaticResource ModernButtonStyle}" Background="#FFEF4444" Foreground="White" Click="RemoveSelected_Click" Margin="6,0,0,0" AutomationProperties.Name="Quitar selección">
                                 <StackPanel Orientation="Horizontal"><TextBlock Text="🗑️"/> <TextBlock Text="Quitar" Margin="6,0,0,0"/></StackPanel>
                             </Button>
                         </StackPanel>
