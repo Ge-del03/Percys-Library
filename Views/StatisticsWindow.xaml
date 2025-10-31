@@ -8,7 +8,8 @@
 		WindowStartupLocation="CenterOwner"
 		Background="{StaticResource RS_AppBackgroundBrush}">
 
-	<Grid Margin="18">
+	<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly">
+		<Grid Margin="18">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
@@ -156,10 +157,11 @@
 
 		<!-- Footer: acciones -->
 		<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,12,0,0">
-			<Button Content="Exportar Estadísticas" Background="{StaticResource RS_SuccessBrush}" Foreground="White" Padding="10,6" Margin="6"/>
-			<Button Content="Resetear Estadísticas" Background="{StaticResource RS_DangerBrush}" Foreground="White" Padding="10,6" Margin="6"/>
-			<Button Content="Cerrar" Background="#FF6B6B6B" Foreground="White" Padding="10,6" Margin="6"/>
+			<Button Content="Exportar Estadísticas" Background="{StaticResource RS_SuccessBrush}" Foreground="White" Padding="10,6" Margin="6" Click="ExportButton_Click"/>
+			<Button Content="Resetear Estadísticas" Background="{StaticResource RS_DangerBrush}" Foreground="White" Padding="10,6" Margin="6" Click="ResetButton_Click"/>
+			<Button Content="Cerrar" Background="#FF6B6B6B" Foreground="White" Padding="10,6" Margin="6" Click="CloseButton_Click"/>
 		</StackPanel>
-	</Grid>
+		</Grid>
+	</ScrollViewer>
 </Window>
 
