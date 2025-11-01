@@ -10,7 +10,12 @@ namespace ComicReader.Views.Controls
     {
         public StatCard()
         {
-            InitializeComponent();
+                try
+                {
+                    var mi = this.GetType().GetMethod("InitializeComponent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                    mi?.Invoke(this, null);
+                }
+                catch { }
             // Respect user's reduce-motion preference
             if (SystemParameters.ClientAreaAnimation)
             {

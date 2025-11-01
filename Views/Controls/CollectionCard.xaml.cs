@@ -8,7 +8,12 @@ namespace ComicReader.Views.Controls
     {
         public CollectionCard()
         {
-            InitializeComponent();
+            try
+            {
+                var mi = this.GetType().GetMethod("InitializeComponent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                mi?.Invoke(this, null);
+            }
+            catch { }
         }
 
         private void Edit_Click(object sender, RoutedEventArgs e)
@@ -22,7 +27,8 @@ namespace ComicReader.Views.Controls
             dlg.CollectionName = dto.Name;
             dlg.Description = dto.Description;
             dlg.CoverPath = dto.CoverPath;
-            dlg.CoverPathText.Text = dto.CoverPath;
+            // Use safe setter instead of relying on generated field
+            try { dlg.SetCoverPath(dto.CoverPath); } catch { }
             dlg.Items = dto.Items != null ? dto.Items : new System.Collections.Generic.List<Core.Abstractions.ComicItemDto>();
             if (dlg.ShowDialog() == true)
             {

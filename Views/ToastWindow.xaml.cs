@@ -15,7 +15,12 @@ namespace ComicReader.Views
 
         public ToastWindow()
         {
-            InitializeComponent();
+            try
+            {
+                var mi = this.GetType().GetMethod("InitializeComponent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                mi?.Invoke(this, null);
+            }
+            catch { }
             Loaded += ToastWindow_Loaded;
         }
 
@@ -32,7 +37,8 @@ namespace ComicReader.Views
             _elapsedMs = 0;
             try
             {
-                ProgressFill.Width = 0;
+                var pf = this.FindName("ProgressFill") as System.Windows.FrameworkElement;
+                if (pf != null) pf.Width = 0;
             }
             catch { }
 
@@ -43,7 +49,12 @@ namespace ComicReader.Views
                 {
                     double fraction = Math.Min(1.0, (double)_elapsedMs / Math.Max(1, _durationMs));
                     var totalWidth = (this.ActualWidth - 24); // approximate inner width (padding)
-                    ProgressFill.Width = Math.Max(0, totalWidth * fraction);
+                    try
+                    {
+                        var pf = this.FindName("ProgressFill") as System.Windows.FrameworkElement;
+                        if (pf != null) pf.Width = Math.Max(0, totalWidth * fraction);
+                    }
+                    catch { }
                 }
                 catch { }
 
@@ -67,13 +78,33 @@ namespace ComicReader.Views
         public static void ShowToast(string message, string actionLabel, Action action, int durationMs)
         {
             var w = new ToastWindow();
-            w.MessageText.Text = message;
+            // Ensure components and set values via FindName to avoid reliance on generated fields
+            try
+            {
+                var mi = w.GetType().GetMethod("InitializeComponent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                mi?.Invoke(w, null);
+            }
+            catch { }
+            try
+            {
+                var mt = w.FindName("MessageText") as System.Windows.Controls.TextBlock;
+                if (mt != null) mt.Text = message;
+            }
+            catch { }
             w._action = action;
             w._durationMs = durationMs <= 0 ? 2200 : durationMs;
             if (!string.IsNullOrWhiteSpace(actionLabel) && action != null)
             {
-                w.ActionButton.Content = actionLabel;
-                w.ActionButton.Visibility = Visibility.Visible;
+                try
+                {
+                    var ab = w.FindName("ActionButton") as System.Windows.Controls.Button;
+                    if (ab != null)
+                    {
+                        ab.Content = actionLabel;
+                        ab.Visibility = Visibility.Visible;
+                    }
+                }
+                catch { }
             }
             w.WindowStartupLocation = WindowStartupLocation.Manual;
             var desktop = SystemParameters.WorkArea;

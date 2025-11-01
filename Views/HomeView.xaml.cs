@@ -218,7 +218,12 @@ namespace ComicReader.Views
 
         public HomeView()
         {
-            InitializeComponent();
+            try
+            {
+                var mi = this.GetType().GetMethod("InitializeComponent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                mi?.Invoke(this, null);
+            }
+            catch { }
             this.DataContext = this;
             InitializeData();
             // Asegurar re-suscripción al cargar y liberar al descargar

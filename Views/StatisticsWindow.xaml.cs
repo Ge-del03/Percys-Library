@@ -13,7 +13,12 @@ namespace ComicReader.Views
     {
         public StatisticsWindow()
         {
-            InitializeComponent();
+            try
+            {
+                var mi = this.GetType().GetMethod("InitializeComponent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                mi?.Invoke(this, null);
+            }
+            catch { }
             this.DataContext = new ReadingStatsViewModel();
         }
 

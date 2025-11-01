@@ -166,7 +166,12 @@ namespace ComicReader
         public MainWindow()
         {
             // Carga el XAML de la ventana. Sin esta llamada, la UI queda en blanco.
-            InitializeComponent();
+            try
+            {
+                var mi = this.GetType().GetMethod("InitializeComponent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                mi?.Invoke(this, null);
+            }
+            catch { }
 
             // Arrancar animaciones visuales de cabecera (sorpresa sutil)
             this.Loaded += (s, e) => StartHeaderShimmer();

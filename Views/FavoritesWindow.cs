@@ -22,7 +22,12 @@ namespace ComicReader.Views
         public FavoritesWindow()
         {
             #pragma warning disable
-            InitializeComponent();
+            try
+            {
+                var mi = this.GetType().GetMethod("InitializeComponent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                mi?.Invoke(this, null);
+            }
+            catch { }
             #pragma warning restore
 
             // Prefer the shared CollectionViewModel exposed by App so multiple views share state.

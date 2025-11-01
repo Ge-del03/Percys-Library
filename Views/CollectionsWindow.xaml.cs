@@ -13,7 +13,12 @@ namespace ComicReader.Views
 
         public CollectionsWindow()
         {
-            InitializeComponent();
+            try
+            {
+                var mi = this.GetType().GetMethod("InitializeComponent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                mi?.Invoke(this, null);
+            }
+            catch { }
             // DataContext is set in XAML
         }
 
@@ -80,7 +85,8 @@ namespace ComicReader.Views
             {
                 var tb = sender as System.Windows.Controls.TextBox;
                 var query = tb?.Text ?? string.Empty;
-                var view = System.Windows.Data.CollectionViewSource.GetDefaultView(CollectionsListBox.ItemsSource);
+                var colList = this.FindName("CollectionsListBox") as System.Windows.Controls.ListBox;
+                var view = System.Windows.Data.CollectionViewSource.GetDefaultView(colList?.ItemsSource);
                 if (view == null) return;
                 if (string.IsNullOrWhiteSpace(query))
                 {
@@ -155,8 +161,9 @@ namespace ComicReader.Views
         {
             var col = Vm?.SelectedCollection;
             if (col == null) return;
-            if (ItemsListView == null) return;
-            var selectedVMs = ItemsListView.SelectedItems.Cast<ComicReader.ViewModels.ComicItemViewModel>().ToList();
+            var itemsList = this.FindName("ItemsListView") as System.Windows.Controls.ListView;
+            if (itemsList == null) return;
+            var selectedVMs = itemsList.SelectedItems.Cast<ComicReader.ViewModels.ComicItemViewModel>().ToList();
             if (selectedVMs.Count == 0) return;
             foreach (var s in selectedVMs)
             {
@@ -183,7 +190,8 @@ namespace ComicReader.Views
         {
             try
             {
-                var view = System.Windows.Data.CollectionViewSource.GetDefaultView(ItemsListView.ItemsSource);
+                var il = this.FindName("ItemsListView") as System.Windows.Controls.ListView;
+                var view = System.Windows.Data.CollectionViewSource.GetDefaultView(il?.ItemsSource);
                 if (view == null) return;
                 if (onlyFavorites)
                 {

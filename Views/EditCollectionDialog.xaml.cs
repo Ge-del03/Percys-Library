@@ -42,7 +42,12 @@ namespace ComicReader.Views
 
         public EditCollectionDialog()
         {
-            InitializeComponent();
+            try
+            {
+                var mi = this.GetType().GetMethod("InitializeComponent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                mi?.Invoke(this, null);
+            }
+            catch { }
             // Bind the List control to the observable collection so UI updates when properties change
             try { var itemsList = this.FindName("ItemsList") as System.Windows.Controls.ListBox; if (itemsList != null) itemsList.ItemsSource = _itemsCollection; } catch { }
         }
@@ -138,7 +143,7 @@ namespace ComicReader.Views
             {
                 _itemsCollection.Insert(insertAt++, new ViewModels.ComicItemViewModel(it));
             }
-            UndoButton.IsEnabled = _undoStack.Count > 0;
+            try { var ub = this.FindName("UndoButton") as System.Windows.Controls.Button; if (ub != null) ub.IsEnabled = _undoStack.Count > 0; } catch { }
         }
 
         private void SelectCover_Click(object sender, RoutedEventArgs e)
@@ -148,7 +153,7 @@ namespace ComicReader.Views
             if (dlg.ShowDialog(this) == true)
             {
                 CoverPath = dlg.FileName;
-                CoverPathText.Text = CoverPath;
+                try { SetCoverPath(CoverPath); } catch { }
             }
         }
 
@@ -181,8 +186,8 @@ namespace ComicReader.Views
             var pos = e.GetPosition(null);
             if (Math.Abs(pos.X - _dragStartPoint.X) < SystemParameters.MinimumHorizontalDragDistance && Math.Abs(pos.Y - _dragStartPoint.Y) < SystemParameters.MinimumVerticalDragDistance) return;
 
-            var list = ItemsList;
-            var itemVm = list.SelectedItem as ViewModels.ComicItemViewModel;
+            var list = this.FindName("ItemsList") as System.Windows.Controls.ListBox;
+            var itemVm = list?.SelectedItem as ViewModels.ComicItemViewModel;
             if (itemVm == null) return;
 
             var data = new DataObject("ComicItem", itemVm);
@@ -200,7 +205,8 @@ namespace ComicReader.Views
 
         private void ItemsList_Drop(object sender, DragEventArgs e)
         {
-            var list = ItemsList;
+            var list = this.FindName("ItemsList") as System.Windows.Controls.ListBox;
+            if (list == null) return;
             var point = e.GetPosition(list);
             int index = GetCurrentIndex(point);
 
@@ -237,11 +243,16 @@ namespace ComicReader.Views
 
         private int GetCurrentIndex(System.Windows.Point point)
         {
+            var list = this.FindName("ItemsList") as System.Windows.Controls.ListBox;
+            if (list == null)
+            {
+                return _itemsCollection.Count;
+            }
             for (int i = 0; i < _itemsCollection.Count; i++)
             {
-                var item = ItemsList.ItemContainerGenerator.ContainerFromIndex(i) as FrameworkElement;
+                var item = list.ItemContainerGenerator.ContainerFromIndex(i) as FrameworkElement;
                 if (item == null) continue;
-                var bounds = new Rect(item.TranslatePoint(new System.Windows.Point(0, 0), ItemsList), item.RenderSize);
+                var bounds = new Rect(item.TranslatePoint(new System.Windows.Point(0, 0), list), item.RenderSize);
                 if (bounds.Contains(point)) return i;
             }
             return _itemsCollection.Count;
