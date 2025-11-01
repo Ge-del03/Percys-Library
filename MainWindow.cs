@@ -26,7 +26,8 @@ namespace ComicReader
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-    private ComicPageLoader _comicLoader = new ComicPageLoader();
+    // Usar el nuevo loader optimizado
+    private OptimizedComicPageLoader _comicLoader = new OptimizedComicPageLoader();
     private int _currentPageIndex;
     private HomeView _homeView; // Se inicializa tras cargar Settings
         private Image _currentComicImage;
@@ -44,8 +45,8 @@ namespace ComicReader
         private bool _thumbnailsVisible = false;
     private double _rotationAngle = 0;
     private IReadingStatsService _stats => ComicReader.Core.Services.ServiceLocator.TryGet<IReadingStatsService>();
-        // Vista de lectura continua (scroll)
-        private Views.ContinuousComicView _continuousView;
+        // Vista de lectura continua mejorada (scroll + zoom)
+        private Views.EnhancedContinuousComicView _continuousView;
     // Secuencia para cancelar cargas obsoletas
     private long _pageLoadSeq = 0;
     // Secuencia independiente para miniaturas (no se invalida al cambiar de página)
@@ -133,7 +134,7 @@ namespace ComicReader
         private bool _windowStateInitialized = false;
 
         // Propiedades públicas para acceso desde Views
-        public ComicPageLoader ComicLoader => _comicLoader;
+        public IComicPageLoader ComicLoader => _comicLoader;
         public int CurrentPageIndex => _currentPageIndex;
     // Compatibilidad: algunas rutas del diseñador buscan 'zoomLevel'
     public double zoomLevel => _zoomFactor;
@@ -185,9 +186,9 @@ namespace ComicReader
             // Interceptar teclas antes de que controles internos (p.ej. ScrollViewer) las consuman
             this.PreviewKeyDown += MainWindow_PreviewKeyDown;
             this.AllowDrop = true;
-            // Inicializar vista continua y sincronizar eventos de página actual
-            _continuousView = new Views.ContinuousComicView();
-            _continuousView.ViewModel.CurrentPageChanged += (idx) =>
+            // Inicializar vista continua mejorada con carga instantánea y zoom
+            _continuousView = new Views.EnhancedContinuousComicView();
+            _continuousView.CurrentPageChanged += (idx) =>
             {
                 _currentPageIndex = idx;
                 try { if (this.FindName("PageIndicator") is TextBlock pi) pi.Text = $"Página {idx + 1} de {_comicLoader.PageCount}"; } catch { }
@@ -885,7 +886,8 @@ namespace ComicReader
                 }
                 LoadCurrentPage();
                 // Si está activa la vista continua, pedirle que recargue
-                try { _continuousView?.ViewModel?.RequestVisiblePagesMaterialization(); } catch { }
+                // TODO: Implementar con EnhancedContinuousComicView
+                // try { _continuousView?.ViewModel?.RequestVisiblePagesMaterialization(); } catch { }
             }
             catch (Exception ex)
             {
@@ -905,12 +907,12 @@ namespace ComicReader
             }
         }
 
-        public void ShowComicView()
+        public async void ShowComicView()
         {
             bool useContinuous = SettingsManager.Settings?.EnableContinuousScroll == true;
             if (useContinuous)
             {
-                _continuousView.ComicLoader = _comicLoader;
+                await _continuousView.LoadComicAsync(_comicLoader);
                 if (this.FindName("MainContentArea") is ContentControl content)
                     content.Content = _continuousView;
                 CurrentView = _continuousView;
@@ -1050,12 +1052,12 @@ namespace ComicReader
             catch { }
         }
 
-        private void EnsureReaderScaffold()
+        private async void EnsureReaderScaffold()
         {
             bool useContinuous = SettingsManager.Settings?.EnableContinuousScroll == true;
             if (useContinuous)
             {
-                _continuousView.ComicLoader = _comicLoader;
+                await _continuousView.LoadComicAsync(_comicLoader);
                 if (this.FindName("MainContentArea") is ContentControl content)
                     content.Content = _continuousView;
                 CurrentView = _continuousView;
@@ -1240,7 +1242,7 @@ namespace ComicReader
                             try
                             {
                                 if (token.IsCancellationRequested) return;
-                                bmp = await _comicLoader.GetPageImageAsync(_currentPageIndex, desiredWidth, token).ConfigureAwait(false);
+                                bmp = await _comicLoader.GetPageImageAsync(_currentPageIndex, desiredWidth).ConfigureAwait(false);
                             }
                             catch { }
                             sw.Stop();
@@ -1468,9 +1470,7 @@ namespace ComicReader
                 if (enable)
                 {
                     // Cambiar a la vista continua
-                    // asegurar que cualquier estado previo no bloquee reactividad
-                    try { _continuousView?.ViewModel?.EndProgrammaticScroll(); } catch { }
-                    _continuousView.ComicLoader = _comicLoader;
+                    await _continuousView.LoadComicAsync(_comicLoader);
                     if (this.FindName("MainContentArea") is ContentControl content)
                         content.Content = _continuousView;
                     CurrentView = _continuousView;
@@ -1478,16 +1478,7 @@ namespace ComicReader
                     await System.Threading.Tasks.Task.Delay(80);
                     try
                     {
-                        // Sincronizar índice: establecer en el ViewModel y desplazar
-                        if (_continuousView?.ViewModel != null)
-                        {
-                            _continuousView.ViewModel.BeginProgrammaticScroll();
-                            _continuousView.ViewModel.CurrentPage = Math.Max(0, Math.Min(_comicLoader.PageCount - 1, _currentPageIndex));
-                            _continuousView.ViewModel.EndProgrammaticScroll();
-                        }
                         _continuousView.ScrollToPage(_currentPageIndex);
-                        // Forzar materialización visible
-                        try { _continuousView?.ViewModel?.RequestVisiblePagesMaterialization(); } catch { }
                     }
                     catch { }
                     // Actualizar botón y navegación
@@ -1501,15 +1492,16 @@ namespace ComicReader
                     // Cambiar a paginado
                     try
                     {
+                        // TODO: Implementar obtención de página actual con EnhancedContinuousComicView
                         // Si la vista continua existe, obtener el índice visible más reciente
-                        if (_continuousView?.ViewModel != null)
-                        {
-                            // Asegurar que el ViewModel no está en modo programático
-                            _continuousView.ViewModel.EndProgrammaticScroll();
-                            var idx = _continuousView.ViewModel.CurrentPage;
-                            if (idx >= 0 && idx < (_comicLoader?.PageCount ?? int.MaxValue))
-                                _currentPageIndex = idx;
-                        }
+                        // if (_continuousView?.ViewModel != null)
+                        // {
+                        //     // Asegurar que el ViewModel no está en modo programático
+                        //     _continuousView.ViewModel.EndProgrammaticScroll();
+                        //     var idx = _continuousView.ViewModel.CurrentPage;
+                        //     if (idx >= 0 && idx < (_comicLoader?.PageCount ?? int.MaxValue))
+                        //         _currentPageIndex = idx;
+                        // }
                     }
                     catch { }
                     EnsureReaderScaffold();
@@ -1720,27 +1712,21 @@ namespace ComicReader
                             var loaderSvc = ComicReader.Core.Services.ServiceLocator.TryGet<ComicReader.Core.Abstractions.IComicPageLoader>();
                             if (loaderSvc is ComicReader.Services.ProgressivePageLoader ploader)
                             {
-                                var win = new Views.PreloadProgressWindow();
-                                win.Owner = this;
-                                win.Show();
+                                // Ejecutar la precarga en background de forma silenciosa (sin ventana de progreso)
                                 var progress = new Progress<(int done, int total)>(t =>
                                 {
-                                    try { win.Report(t.done, t.total); } catch { }
+                                    // Opcional: podríamos escribir en logs o actualizar un HUD no modal.
+                                    try { Logger.Log($"Preload progress: {t.done}/{t.total}"); } catch { }
                                 });
-                                using var linked = CancellationTokenSource.CreateLinkedTokenSource(win.Token, _ctsWindow.Token);
-                                var cts = linked; // alias
-                                // Run preload in background but track the task so window can wait/cancel on close
+                                var cts = CancellationTokenSource.CreateLinkedTokenSource(_ctsWindow.Token);
                                 var preloadTask = Task.Run(async () =>
                                 {
                                     try
                                     {
                                         await ploader.EagerPreloadAllAsync(_currentPageIndex, SettingsManager.Settings?.EagerPreloadConcurrency ?? 3, cts.Token, progress).ConfigureAwait(false);
                                     }
-                                    catch { }
-                                    finally
-                                    {
-                                        try { this.Dispatcher.Invoke(() => { try { win.Report(ploader.Pages.Count, ploader.Pages.Count); win.Close(); } catch { } }); } catch { }
-                                    }
+                                    catch (OperationCanceledException) { }
+                                    catch (Exception ex) { try { Logger.LogException("EagerPreloadAllAsync failed", ex); } catch { } }
                                 }, cts.Token);
                                 TrackBackgroundTask(preloadTask);
                             }
@@ -1784,9 +1770,9 @@ namespace ComicReader
                     {
                         int p2 = _currentPageIndex - 1; // ya se precarga -1 en LoadCurrentPage
                         int p3 = _currentPageIndex - 2;
-                        if (p3 >= 0) TrackBackgroundTask(_comicLoader.GetPageImageAsync(p3, 1200, _ctsWindow.Token));
+                        if (p3 >= 0) TrackBackgroundTask(_comicLoader.GetPageImageAsync(p3, 1200));
                         int p4 = _currentPageIndex - 3;
-                        if (p4 >= 0) TrackBackgroundTask(_comicLoader.GetPageImageAsync(p4, 1200, _ctsWindow.Token));
+                        if (p4 >= 0) TrackBackgroundTask(_comicLoader.GetPageImageAsync(p4, 1200));
                     }
                 catch { }
                 // Si el panel de miniaturas está visible, solo sincronizar selección
@@ -1838,9 +1824,9 @@ namespace ComicReader
                 {
                     int n2 = _currentPageIndex + 1;
                     int n3 = _currentPageIndex + 2;
-                    if (n3 < _comicLoader.Pages.Count) TrackBackgroundTask(_comicLoader.GetPageImageAsync(n3, 1200, _ctsWindow.Token));
+                    if (n3 < _comicLoader.Pages.Count) TrackBackgroundTask(_comicLoader.GetPageImageAsync(n3, 1200));
                     int n4 = _currentPageIndex + 3;
-                    if (n4 < _comicLoader.Pages.Count) TrackBackgroundTask(_comicLoader.GetPageImageAsync(n4, 1200, _ctsWindow.Token));
+                    if (n4 < _comicLoader.Pages.Count) TrackBackgroundTask(_comicLoader.GetPageImageAsync(n4, 1200));
                 }
                 catch { }
                 // Actualizar progreso
@@ -3580,12 +3566,11 @@ namespace ComicReader
                         TryApplyBrightnessContrastToCurrentPageImage();
                     }
 
-                    // En modo continuo, pedir materialización de visibles si hay cambios que afecten al renderizado
+                    // En modo continuo, reaplicar configuración visual si es necesario
                     if (wantContinuous)
                     {
                         try
                         {
-                            _continuousView?.ViewModel?.RequestVisiblePagesMaterialization();
                             // Reaplicar brillo/contraste en elementos visibles
                             _continuousView?.ReapplyBrightnessContrastVisible();
                         }

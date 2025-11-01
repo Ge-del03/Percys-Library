@@ -46,10 +46,10 @@ namespace ComicReader.Services
                             {
                                 await ComicReader.Views.ToastWindow.ShowToastAsync(req.Message, req.ActionLabel, req.Action, req.DurationMs, req.Kind).ConfigureAwait(false);
                             }
-                            catch { }
+                            catch (Exception ex) { Logger.LogException("ToastManager.ProcessQueueAsync - ShowToastAsync failed", ex); }
                         }).Task.ConfigureAwait(false);
                     }
-                    catch { }
+                    catch (Exception ex) { Logger.LogException("ToastManager.ProcessQueueAsync - invoking dispatcher failed", ex); }
                 }
             }
             finally

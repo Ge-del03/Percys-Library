@@ -11,6 +11,7 @@ using SharpCompress.Archives.Rar;
 using SharpCompress.Archives.Tar; // Para CBT
 using SharpCompress.Archives.SevenZip; // Para CB7
 using SharpCompress.Common; // Para PasswordProtectedException
+using SharpCompress.Common.Rar; // Para PasswordProtectedException específico
 using ComicReader.Models;
 using System.Drawing; // Para Bitmap
 using System.Collections.Concurrent;
@@ -77,13 +78,13 @@ namespace ComicReader.Services
                 {
                     _prefetchWindow = w;
                     // cap is proportional to window but bounded to avoid excessive concurrency
-                    // e.g., window 1..16 -> cap roughly window/2, clamped to [1,6]
+                            try { SetConcurrencyCap(SettingsManager.Settings.ConcurrencyCap); } catch (Exception ex) { Logger.LogException("ApplySettingsParameters SetConcurrencyCap failed", ex); }
                     int cap = Math.Max(1, Math.Min(6, (int)Math.Ceiling(w * 0.5)));
-                    try { _prefetchSemaphore = new System.Threading.SemaphoreSlim(cap); } catch { }
+                    try { _prefetchSemaphore = new System.Threading.SemaphoreSlim(cap); } catch (Exception ex) { Logger.LogException("Failed to create prefetch semaphore", ex); }
                 }
                 _log?.Log($"Prefetch window set to {w}", LogLevel.Info);
             }
-            catch { }
+            catch (Exception ex) { Logger.LogException("ClearCaches failed", ex); }
         }
 
         // Allow external tuning of the concurrency cap for image decodes
@@ -95,10 +96,10 @@ namespace ComicReader.Services
                 // replace semaphore (best-effort)
                 var old = _decodeSemaphore;
                 _decodeSemaphore = new System.Threading.SemaphoreSlim(c);
-                try { old?.Dispose(); } catch { }
+                try { old?.Dispose(); } catch (Exception ex) { Logger.LogException("Failed disposing old decode semaphore", ex); }
                 _log?.Log($"Decode concurrency cap set to {c}", LogLevel.Info);
             }
-            catch { }
+            catch (Exception ex) { Logger.LogException("SetPrefetchWindow failed", ex); }
         }
         // Track when a quick thumbnail was placed into page cache to measure swap latency
         private readonly ConcurrentDictionary<int, DateTime> _quickCachedAt = new();
@@ -313,11 +314,6 @@ namespace ComicReader.Services
                 Logger.Log($"Successfully loaded comic structure for: {_filePath} with {_pages.Count} pages.");
                 // Intentar detectar rendimiento de almacenamiento y ajustar prefetch
                 try { DetectAndAdjustPrefetch(); } catch { }
-            }
-            catch (PasswordProtectedException ex)
-            {
-                Logger.LogException($"Failed to load comic structure for: {_filePath} - Password Protected.", ex);
-                throw new Exception("El archivo de cómic está protegido con contraseña y no se puede abrir.", ex);
             }
             catch (InvalidDataException ex)
             {
@@ -660,7 +656,7 @@ namespace ComicReader.Services
             // Enqueue prioritized full load
             _ = StartFullLoadForPageAsync(pageNumber, targetWidth);
         }
-        catch { }
+    catch (Exception ex) { Logger.LogException("GetPageImageAsync quick thumbnail error", ex); }
 
         if (_pageCache.TryGetValue(pageNumber, out var after) && after.img != null) return after.img;
         var placeholder = CreatePlaceholderImage("Cargando", 400, 600);
@@ -724,8 +720,8 @@ namespace ComicReader.Services
             // Enqueue prioritized full load
             _ = StartFullLoadForPageAsync(pageNumber, targetWidth, cancellationToken);
         }
-        catch (OperationCanceledException) { return CreatePlaceholderImage("Cancelado", 200, 200); }
-        catch { }
+    catch (OperationCanceledException) { return CreatePlaceholderImage("Cancelado", 200, 200); }
+    catch (Exception ex) { Logger.LogException("GetPageImageAsync (with token) error", ex); }
 
         if (_pageCache.TryGetValue(pageNumber, out var after) && after.img != null) return after.img;
         var placeholder = CreatePlaceholderImage("Cargando", 400, 600);
@@ -756,7 +752,7 @@ namespace ComicReader.Services
                         return diskThumb;
                     }
                 }
-                catch { }
+                catch (Exception ex) { Logger.LogException($"GetPageThumbnailAsync multi-level cache read failed for {_filePath} page {pageNumber}", ex); }
             }
             // Si se pasa height==0, mantenemos la relación de aspecto usando solo width
             var targetWidth = Math.Max(80, width);
@@ -766,7 +762,7 @@ namespace ComicReader.Services
                 image = await Task.Run(() => LoadThumbnailFromSource(pageNumber, targetWidth, height <= 0 ? 0 : height), _internalCts.Token).ConfigureAwait(false);
             }
             catch (OperationCanceledException) { return CreatePlaceholderImage("Cancelado", width, height); }
-            catch { /* ignore */ }
+            catch (Exception ex) { Logger.LogException($"GetPageThumbnailAsync LoadThumbnailFromSource failed for {_filePath} page {pageNumber}", ex); }
             if (image == null) image = CreatePlaceholderImage("Sin imagen", width, height);
             _thumbCache[pageNumber] = (image, DateTime.UtcNow);
             // Persist thumbnail to multi-level cache (background)
@@ -777,7 +773,7 @@ namespace ComicReader.Services
                     var cacheKey = $"thumb_{_filePath}_{pageNumber}_{width}_{height}";
                     _ = _multiLevelCache.Set(cacheKey, image);
                 }
-                catch { }
+                catch (Exception ex) { Logger.LogException($"GetPageThumbnailAsync multi-level cache persist failed for {_filePath} page {pageNumber}", ex); }
             }
             EnforceThumbCacheLimit(pageNumber);
             return image;
@@ -806,7 +802,7 @@ namespace ComicReader.Services
                         return diskThumb;
                     }
                 }
-                catch { }
+                catch (Exception ex) { Logger.LogException($"GetPageThumbnailAsync (token) multi-level cache read failed for {_filePath} page {pageNumber}", ex); }
             }
             var targetWidth = Math.Max(80, width);
             BitmapImage image = null;
@@ -815,7 +811,7 @@ namespace ComicReader.Services
                 image = await Task.Run(() => LoadThumbnailFromSource(pageNumber, targetWidth, height <= 0 ? 0 : height), cancellationToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException) { return CreatePlaceholderImage("Cancelado", width, height); }
-            catch { /* ignore */ }
+            catch (Exception ex) { Logger.LogException($"GetPageThumbnailAsync (token) LoadThumbnailFromSource failed for {_filePath} page {pageNumber}", ex); }
             if (image == null) image = CreatePlaceholderImage("Sin imagen", width, height);
             _thumbCache[pageNumber] = (image, DateTime.UtcNow);
             // Persist thumbnail to multi-level cache (background)
@@ -826,7 +822,7 @@ namespace ComicReader.Services
                     var cacheKey = $"thumb_{_filePath}_{pageNumber}_{width}_{height}";
                     _ = _multiLevelCache.Set(cacheKey, image);
                 }
-                catch { }
+                catch (Exception ex) { Logger.LogException($"GetPageThumbnailAsync (token) multi-level cache persist failed for {_filePath} page {pageNumber}", ex); }
             }
             EnforceThumbCacheLimit(pageNumber);
             return image;
@@ -1226,9 +1222,10 @@ namespace ComicReader.Services
                     }
                     return bmpTask.Result;
                 }
-                catch
+                catch (Exception ex)
                 {
                     // Si falla ImageSharp, intentar fallback a BitmapImage básico
+                    try { Logger.LogException("CreateBitmapImage: ImageSharp processing failed, falling back to BitmapImage.", ex); } catch { }
                     var img = new BitmapImage();
                     img.BeginInit();
                     try { stream.Position = 0; } catch { }
@@ -1240,9 +1237,10 @@ namespace ComicReader.Services
                     return img;
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 // Fallback a BitmapImage estándar si ImageSharp falla
+                try { Logger.LogException("CreateBitmapImage failed", ex); } catch { }
                 var img = new BitmapImage();
                 img.BeginInit();
                 img.StreamSource = stream;
@@ -1413,17 +1411,19 @@ namespace ComicReader.Services
                             // ensure a thumbnail is available as a quick response
                             if (!_thumbCache.ContainsKey(k))
                             {
-                                try { await GetPageThumbnailAsync(k, 300, 0, _internalCts.Token).ConfigureAwait(false); } catch { }
+                                try { await GetPageThumbnailAsync(k, 300, 0, _internalCts.Token).ConfigureAwait(false); }
+                                catch (Exception ex) { Logger.LogException($"PrefetchPages: GetPageThumbnailAsync failed for {_filePath} page {k}", ex); }
                             }
                             // Enqueue a full high-priority load which will also persist to multi-level cache
-                            try { _ = StartFullLoadForPageAsync(k, 1200, _internalCts.Token); } catch { }
+                            try { _ = StartFullLoadForPageAsync(k, 1200, _internalCts.Token); } catch (Exception ex) { Logger.LogException($"PrefetchPages: StartFullLoadForPageAsync failed for {_filePath} page {k}", ex); }
 
-                            return _pageCache.TryGetValue(k, out var v) ? v.img : CreatePlaceholderImage("Sin imagen", 200, 200);
+                            try { return _pageCache.TryGetValue(k, out var v) ? v.img : CreatePlaceholderImage("Sin imagen", 200, 200); }
+                            catch (Exception ex) { Logger.LogException($"PrefetchPages: fetch page cache failed for {_filePath} page {k}", ex); return CreatePlaceholderImage("Sin imagen", 200, 200); }
                         }
-                        catch { return CreatePlaceholderImage("Sin imagen", 200, 200); }
+                        catch (Exception ex) { Logger.LogException($"PrefetchPages: background load failed for {_filePath} page {k}", ex); return CreatePlaceholderImage("Sin imagen", 200, 200); }
                         finally { _prefetchSemaphore.Release(); _ongoingPageLoads.TryRemove(k, out Task<BitmapImage> _dummy); }
                     }, _internalCts?.Token ?? CancellationToken.None));
-                    try { await task.ConfigureAwait(false); } catch { }
+                    try { await task.ConfigureAwait(false); } catch (Exception ex) { Logger.LogException($"PrefetchPages: awaiting task failed for {_filePath} page {idx}", ex); }
                     }
                 }, highPriority: false);
             }
@@ -1436,7 +1436,7 @@ namespace ComicReader.Services
             try
             {
                 var cache = _multiLevelCache as ComicReader.Core.Services.MultiLevelImageCache;
-                if (cache == null) return;
+                    if (cache == null) return;
 
                 int radius = Math.Max(1, _prefetchWindow);
                 var newSet = new HashSet<int>();
@@ -1460,7 +1460,7 @@ namespace ComicReader.Services
                                 cache.Unpin(thumbKey);
                                 cache.Unpin(fullKey);
                             }
-                            catch { }
+                            catch (Exception ex) { Logger.LogException($"UpdatePinnedWindow: unpin failed for {_filePath} page {old}", ex); }
                         }
                     }
 
@@ -1476,7 +1476,7 @@ namespace ComicReader.Services
                                 cache.Pin(thumbKey);
                                 cache.Pin(fullKey);
                             }
-                            catch { }
+                            catch (Exception ex) { Logger.LogException($"UpdatePinnedWindow: pin failed for {_filePath} page {idx}", ex); }
                         }
                     }
 
@@ -1484,7 +1484,7 @@ namespace ComicReader.Services
                     foreach (var v in newSet) _currentlyPinnedPages.Add(v);
                 }
             }
-            catch { }
+            catch (Exception ex) { Logger.LogException($"UpdatePinnedWindow failed for {_filePath}", ex); }
         }
 
         public void ClearCaches()
@@ -1558,9 +1558,9 @@ namespace ComicReader.Services
                         }
                         finally
                         {
-                            try { _prefetchSemaphore.Release(); } catch { }
-                            try { _ongoingPageLoads.TryRemove(pageNumber, out _); } catch { }
-                            try { linkedCts?.Dispose(); } catch { }
+                            try { _prefetchSemaphore.Release(); } catch (Exception ex) { Logger.LogException($"StartFullLoadForPageAsync: failed to release prefetch semaphore for page {pageNumber}", ex); }
+                            try { _ongoingPageLoads.TryRemove(pageNumber, out _); } catch (Exception ex) { Logger.LogException($"StartFullLoadForPageAsync: failed to remove ongoing load entry for page {pageNumber}", ex); }
+                            try { linkedCts?.Dispose(); } catch (Exception ex) { Logger.LogException($"StartFullLoadForPageAsync: failed to dispose linkedCts for page {pageNumber}", ex); }
                         }
                     }, _internalCts?.Token ?? CancellationToken.None);
                 });
@@ -1599,7 +1599,7 @@ namespace ComicReader.Services
                     else if (latency > 30) _prefetchWindow = Math.Max(1, _prefetchWindow - 1);
                 _log?.Log($"Storage read latency heuristic: {latency:F1}ms", LogLevel.Info);
             }
-            catch { }
+            catch (Exception ex) { Logger.LogException("DetectAndAdjustPrefetch failed", ex); }
         }
 
         private void EnforcePageCacheLimit(int currentPage)

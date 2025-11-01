@@ -37,12 +37,12 @@ namespace ComicReader.Services
                             Directory.CreateDirectory(RootDir);
                             File.Copy(oldFile, CollectionsFile, overwrite: true);
                         }
-                        catch { }
+                        catch (Exception ex) { Logger.LogException("FavoritesStorage.Load - migrate old file copy failed", ex); }
                         return new ObservableCollection<ComicCollection>(list);
                     }
                 }
             }
-            catch { }
+            catch (Exception ex) { Logger.LogException("FavoritesStorage.Load - failed to load collections", ex); }
             return new ObservableCollection<ComicCollection>();
         }
 
@@ -82,7 +82,7 @@ namespace ComicReader.Services
                 var json = JsonSerializer.Serialize(collections, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(CollectionsFile, json);
             }
-            catch { }
+            catch (Exception ex) { Logger.LogException("FavoritesStorage.Save - failed to save collections", ex); }
         }
 
         /// <summary>

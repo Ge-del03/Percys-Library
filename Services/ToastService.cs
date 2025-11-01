@@ -14,7 +14,7 @@ namespace ComicReader.Services
                 {
                     ToastManager.Instance.Enqueue(message, null, null, 2200, ComicReader.Views.ToastWindow.ToastKind.Comic);
                 }
-                catch { }
+                catch (Exception ex) { Logger.LogException("ToastService.Show(message) failed", ex); }
             });
         }
 
@@ -26,7 +26,7 @@ namespace ComicReader.Services
                 {
                     ToastManager.Instance.Enqueue(message, actionLabel, action, 2200, ComicReader.Views.ToastWindow.ToastKind.Comic);
                 }
-                catch { }
+                catch (Exception ex) { Logger.LogException("ToastService.Show(message, actionLabel, action) failed", ex); }
             });
         }
 
@@ -39,7 +39,7 @@ namespace ComicReader.Services
                 {
                     ToastManager.Instance.Enqueue(message, actionLabel, action, durationMs, ComicReader.Views.ToastWindow.ToastKind.Comic);
                 }
-                catch { }
+                catch (Exception ex) { Logger.LogException("ToastService.Show(message, actionLabel, action, durationMs) failed", ex); }
             });
         }
 
@@ -51,7 +51,7 @@ namespace ComicReader.Services
                 {
                     ToastManager.Instance.Enqueue(message, null, null, 2200, kind);
                 }
-                catch { }
+                catch (Exception ex) { Logger.LogException("ToastService.Show(message, kind) failed", ex); }
             });
         }
 
@@ -63,7 +63,7 @@ namespace ComicReader.Services
                 {
                     ToastManager.Instance.Enqueue(message, actionLabel, action, durationMs, kind);
                 }
-                catch { }
+                catch (Exception ex) { Logger.LogException("ToastService.Show(message, actionLabel, action, durationMs, kind) failed", ex); }
             });
         }
 
@@ -82,7 +82,7 @@ namespace ComicReader.Services
                     return;
                 }
             }
-            catch { }
+            catch (Exception ex) { Logger.LogException("ToastService.ShowWithUndo - resolving UndoService failed", ex); }
 
             // Fallback to showing a toast with the provided action
             Show(message, undoLabel, undoAction, durationMs);

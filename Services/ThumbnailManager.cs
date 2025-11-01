@@ -54,16 +54,16 @@ namespace ComicReader.Services
                 {
                     if (maxConcurrency > 0 && (_semaphore == null || _semaphore.CurrentCount != maxConcurrency))
                     {
-                        try { _semaphore?.Dispose(); } catch { }
+                        try { _semaphore?.Dispose(); } catch (Exception ex) { Logger.LogException("ThumbnailManager.Reconfigure - dispose semaphore failed", ex); }
                         _semaphore = new SemaphoreSlim(Math.Max(1, maxConcurrency));
                     }
                     _maxCacheFiles = Math.Max(1, maxCacheFiles);
                     _maxCacheBytes = Math.Max(1024, maxCacheBytes);
                 }
                 // perform a maintenance pass to enforce new limits
-                try { EnforceCacheLimit(); } catch { }
+                try { EnforceCacheLimit(); } catch (Exception ex) { Logger.LogException("ThumbnailManager.Reconfigure - EnforceCacheLimit failed", ex); }
             }
-            catch { }
+            catch (Exception ex) { Logger.LogException("ThumbnailManager.Reconfigure - unexpected error", ex); }
         }
 
         public string TryGetCached(string filePath)
@@ -74,7 +74,7 @@ namespace ComicReader.Services
                 var cachePath = ComputePath(filePath);
                 return File.Exists(cachePath) ? cachePath : null;
             }
-            catch { return null; }
+            catch (Exception ex) { Logger.LogException("ThumbnailManager.TryGetCached failed", ex); return null; }
         }
 
         public string ComputePath(string filePath)
@@ -102,7 +102,7 @@ namespace ComicReader.Services
                 try
                 {
                     var result = await GenerateThumbAsync(filePath, width, height).ConfigureAwait(false);
-                    try { await onComplete(result).ConfigureAwait(false); } catch { }
+                    try { await onComplete(result).ConfigureAwait(false); } catch (Exception ex) { Logger.LogException("ThumbnailManager.EnqueueGenerate - onComplete callback failed", ex); }
                 }
                 finally
                 {
@@ -131,7 +131,7 @@ namespace ComicReader.Services
                         cover = await loader.GetCoverThumbnailAsync(width, height).ConfigureAwait(false);
                     }
                 }
-                catch { }
+                catch (Exception ex) { Logger.LogException("ThumbnailManager.GenerateThumbAsync - ComicPageLoader failed", ex); }
 
                 if (cover == null)
                 {
@@ -149,11 +149,11 @@ namespace ComicReader.Services
                     }
 
                     // enforce cache size (simple LRU by file LastWriteTime)
-                    try { EnforceCacheLimit(); } catch { }
+                    try { EnforceCacheLimit(); } catch (Exception ex) { Logger.LogException("ThumbnailManager.GenerateThumbAsync - EnforceCacheLimit failed", ex); }
 
                     return path;
                 }
-                catch { return null; }
+                catch (Exception ex) { Logger.LogException("ThumbnailManager.GenerateThumbAsync - writing thumbnail failed", ex); return null; }
             }
             catch { return null; }
         }
@@ -207,21 +207,21 @@ namespace ComicReader.Services
                         var toDelete = files.Select(f => f.FullName).Where(p => !keep.Contains(p)).ToList();
                         foreach (var p in toDelete)
                         {
-                            try { File.SetAttributes(p, FileAttributes.Normal); } catch { }
-                            try { File.Delete(p); } catch { }
+                            try { File.SetAttributes(p, FileAttributes.Normal); } catch (Exception ex) { Logger.LogException($"ThumbnailManager.EnforceCacheLimit - set attrs failed for {p}", ex); }
+                            try { File.Delete(p); } catch (Exception ex) { Logger.LogException($"ThumbnailManager.EnforceCacheLimit - delete failed for {p}", ex); }
                             try
                             {
                                 if (File.Exists(p))
                                 {
                                     using (var fs = new FileStream(p, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
-                                    try { File.Delete(p); } catch { }
+                                    try { File.Delete(p); } catch (Exception ex) { Logger.LogException($"ThumbnailManager.EnforceCacheLimit - final delete failed for {p}", ex); }
                                 }
                             }
-                            catch { }
+                            catch (Exception ex) { Logger.LogException($"ThumbnailManager.EnforceCacheLimit - cleanup failed for {p}", ex); }
                         }
                     }
                 }
-                catch { }
+                catch (Exception ex) { Logger.LogException("ThumbnailManager.EnforceCacheLimit - final pass failed", ex); }
             }
             catch { }
         }
@@ -231,11 +231,11 @@ namespace ComicReader.Services
             try
             {
                 if (f == null) return;
-                try { f.IsReadOnly.ToString(); } catch { }
-                try { File.SetAttributes(f.FullName, FileAttributes.Normal); } catch { }
-                try { File.Delete(f.FullName); } catch { }
+                try { f.IsReadOnly.ToString(); } catch (Exception ex) { Logger.LogException("ThumbnailManager.TryDeleteFile - IsReadOnly probe failed", ex); }
+                try { File.SetAttributes(f.FullName, FileAttributes.Normal); } catch (Exception ex) { Logger.LogException($"ThumbnailManager.TryDeleteFile - SetAttributes failed for {f.FullName}", ex); }
+                try { File.Delete(f.FullName); } catch (Exception ex) { Logger.LogException($"ThumbnailManager.TryDeleteFile - Delete failed for {f.FullName}", ex); }
             }
-            catch { }
+            catch (Exception ex) { Logger.LogException("ThumbnailManager.TryDeleteFile - unexpected error", ex); }
         }
 
         /// <summary>
@@ -247,10 +247,10 @@ namespace ComicReader.Services
             {
                 foreach (var f in new DirectoryInfo(_cacheDir).GetFiles("*.png"))
                 {
-                    try { f.Delete(); } catch { }
+                    try { f.Delete(); } catch (Exception ex) { Logger.LogException($"ThumbnailManager.ClearCache - delete failed for {f.FullName}", ex); }
                 }
             }
-            catch { }
+            catch (Exception ex) { Logger.LogException("ThumbnailManager.ClearCache - failed", ex); }
         }
 
         public void Dispose()
