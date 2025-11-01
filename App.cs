@@ -257,6 +257,12 @@ namespace ComicReader
                 ServiceLocator.RegisterSingleton<IImageCache>(new MultiLevelImageCache());
                 ServiceLocator.RegisterSingleton<ComicReader.Core.Abstractions.IReadingStatsService>(new ReadingStatsService());
                 ComicReader.Utils.DevLogger.Info("Servicios registrados en ServiceLocator");
+                // Register UndoService globally using the ToastService as the UI invoker
+                try
+                {
+                    ServiceLocator.RegisterSingleton<ComicReader.Services.IUndoService>(new ComicReader.Services.UndoService(ComicReader.Services.ToastService.Show));
+                }
+                catch { }
                 
                 ComicReader.Utils.DevLogger.Info("Aplicación iniciada exitosamente");
             }

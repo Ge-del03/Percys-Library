@@ -19,15 +19,27 @@ namespace ComicReader.Services
     {
         private readonly SemaphoreSlim _semaphore;
         private readonly ConcurrentDictionary<string, Task> _tasks = new ConcurrentDictionary<string, Task>(StringComparer.OrdinalIgnoreCase);
-        private readonly string _cacheDir;
-        private bool _disposed;
+    private readonly string _cacheDir;
+    private readonly int _maxCacheFiles;
+    private readonly long _maxCacheBytes;
+    private bool _disposed;
 
-        public ThumbnailManager(int maxConcurrency = 2)
+    public ThumbnailManager(int maxConcurrency = 2, int maxCacheFiles = 500, long maxCacheBytes = 200 * 1024 * 1024, string cacheDirectory = null)
         {
             _semaphore = new SemaphoreSlim(maxConcurrency);
-            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            _cacheDir = Path.Combine(appData, "PercysLibrary", "Thumbs");
+            if (!string.IsNullOrWhiteSpace(cacheDirectory))
+            {
+                _cacheDir = cacheDirectory;
+            }
+            else
+            {
+                var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                _cacheDir = Path.Combine(appData, "PercysLibrary", "Thumbs");
+            }
             Directory.CreateDirectory(_cacheDir);
+            // Allow test-friendly small values; minimum 1 file and minimum 1KB
+            _maxCacheFiles = Math.Max(1, maxCacheFiles);
+            _maxCacheBytes = Math.Max(1024, maxCacheBytes);
         }
 
         public string TryGetCached(string filePath)
@@ -111,11 +123,110 @@ namespace ComicReader.Services
                         enc.Frames.Add(BitmapFrame.Create(cover));
                         enc.Save(fs);
                     }
+
+                    // enforce cache size (simple LRU by file LastWriteTime)
+                    try { EnforceCacheLimit(); } catch { }
+
                     return path;
                 }
                 catch { return null; }
             }
             catch { return null; }
+        }
+
+        /// <summary>
+        /// Enforce maximum number of files in the cache by deleting the oldest files.
+        /// Safe to call multiple times.
+        /// </summary>
+        public void EnforceCacheLimit()
+        {
+            try
+            {
+                var files = new DirectoryInfo(_cacheDir).GetFiles("*.png").OrderBy(f => f.LastWriteTimeUtc).ToList();
+                if (files.Count == 0) return;
+
+                // Enforce by count (delete oldest until count <= max)
+                int safety = 0;
+                while (true)
+                {
+                    files = new DirectoryInfo(_cacheDir).GetFiles("*.png").OrderBy(f => f.LastWriteTimeUtc).ToList();
+                    if (files.Count <= _maxCacheFiles) break;
+                    // delete the oldest file
+                    var oldest = files.FirstOrDefault();
+                    if (oldest == null) break;
+                    TryDeleteFile(oldest);
+                    safety++;
+                    if (safety > 1000) break; // avoid runaway
+                }
+
+                // Enforce by total size (delete oldest until total <= max)
+                safety = 0;
+                while (true)
+                {
+                    files = new DirectoryInfo(_cacheDir).GetFiles("*.png").OrderBy(f => f.LastWriteTimeUtc).ToList();
+                    long total = files.Sum(f => f.Length);
+                    if (total <= _maxCacheBytes) break;
+                    var oldest = files.FirstOrDefault();
+                    if (oldest == null) break;
+                    TryDeleteFile(oldest);
+                    safety++;
+                    if (safety > 1000) break;
+                }
+
+                // Final aggressive cleanup: if count still exceeds max, delete all but newest N
+                try
+                {
+                    files = new DirectoryInfo(_cacheDir).GetFiles("*.png").OrderBy(f => f.LastWriteTimeUtc).ToList();
+                    if (files.Count > _maxCacheFiles)
+                    {
+                        var keep = files.OrderByDescending(f => f.LastWriteTimeUtc).Take(_maxCacheFiles).Select(f => f.FullName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                        var toDelete = files.Select(f => f.FullName).Where(p => !keep.Contains(p)).ToList();
+                        foreach (var p in toDelete)
+                        {
+                            try { File.SetAttributes(p, FileAttributes.Normal); } catch { }
+                            try { File.Delete(p); } catch { }
+                            try
+                            {
+                                if (File.Exists(p))
+                                {
+                                    using (var fs = new FileStream(p, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
+                                    try { File.Delete(p); } catch { }
+                                }
+                            }
+                            catch { }
+                        }
+                    }
+                }
+                catch { }
+            }
+            catch { }
+        }
+
+        private void TryDeleteFile(FileInfo f)
+        {
+            try
+            {
+                if (f == null) return;
+                try { f.IsReadOnly.ToString(); } catch { }
+                try { File.SetAttributes(f.FullName, FileAttributes.Normal); } catch { }
+                try { File.Delete(f.FullName); } catch { }
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// Clears entire thumbnail cache.
+        /// </summary>
+        public void ClearCache()
+        {
+            try
+            {
+                foreach (var f in new DirectoryInfo(_cacheDir).GetFiles("*.png"))
+                {
+                    try { f.Delete(); } catch { }
+                }
+            }
+            catch { }
         }
 
         public void Dispose()

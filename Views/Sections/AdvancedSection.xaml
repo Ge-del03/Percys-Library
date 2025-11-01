@@ -10,6 +10,14 @@
           <TextBlock Text="Concurrent tasks:" VerticalAlignment="Center" Margin="0,0,8,0" />
           <TextBox Width="60" Text="{Binding AppSettings.ConcurrencyCap, Mode=TwoWay}" />
         </StackPanel>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,8,0,0">
+          <TextBlock Text="Caché miniaturas (MB):" VerticalAlignment="Center" Margin="0,0,8,0" />
+          <TextBox Width="80" Text="{Binding AppSettings.ThumbCacheMaxMB, Mode=TwoWay}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,8,0,0">
+          <TextBlock Text="Máx. archivos miniaturas:" VerticalAlignment="Center" Margin="0,0,8,0" />
+          <TextBox Width="80" Text="{Binding AppSettings.ThumbCacheMaxFiles, Mode=TwoWay}" />
+        </StackPanel>
       </StackPanel>
     </StackPanel>
   </Border>

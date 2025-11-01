@@ -16,7 +16,7 @@ namespace ComicReader.ViewModels
         private const string ThumbCacheVersion = "v2";
         private readonly System.Threading.SemaphoreSlim _thumbSemaphore = new System.Threading.SemaphoreSlim(2);
     private readonly System.Collections.Concurrent.ConcurrentDictionary<string, System.Threading.Tasks.Task> _thumbTasks = new System.Collections.Concurrent.ConcurrentDictionary<string, System.Threading.Tasks.Task>(StringComparer.OrdinalIgnoreCase);
-    private readonly Services.ThumbnailManager _thumbnailManager = new Services.ThumbnailManager(2);
+    private readonly Services.ThumbnailManager _thumbnailManager;
 
     public ObservableCollection<CollectionDto> Collections { get; } = new ObservableCollection<CollectionDto>();
     private CollectionDto _selectedCollection;
@@ -59,7 +59,7 @@ namespace ComicReader.ViewModels
     public System.Collections.ObjectModel.ObservableCollection<Core.Abstractions.ComicItemDto> FavoriteItems { get; } = new System.Collections.ObjectModel.ObservableCollection<Core.Abstractions.ComicItemDto>();
 
         // Default constructor uses JSON service for app runtime
-        public CollectionsViewModel() : this(new CollectionServiceJson(), ToastService.Show) { }
+    public CollectionsViewModel() : this(new CollectionServiceJson(), ToastService.Show) { }
 
         // Back-compat constructor (service only)
         public CollectionsViewModel(ICollectionService service) : this(service, ToastService.Show) { }
@@ -76,6 +76,21 @@ namespace ComicReader.ViewModels
             _service = service ?? throw new ArgumentNullException(nameof(service));
             _undoService = undoService ?? throw new ArgumentNullException(nameof(undoService));
             _toastInvoker = ToastService.Show;
+            // Initialize thumbnail manager using app settings so users can control cache limits
+            try
+            {
+                var concurrency = 2;
+                try { concurrency = SettingsManager.Settings?.ConcurrencyCap ?? 2; } catch { }
+                var maxFiles = 500;
+                try { maxFiles = SettingsManager.Settings?.ThumbCacheMaxFiles ?? 500; } catch { }
+                var maxBytes = 200 * 1024 * 1024L;
+                try { maxBytes = SettingsManager.Settings?.ThumbCacheMaxBytes ?? maxBytes; } catch { }
+                _thumbnailManager = new Services.ThumbnailManager(Math.Max(1, concurrency), Math.Max(1, maxFiles), Math.Max(1024, maxBytes));
+            }
+            catch
+            {
+                _thumbnailManager = new Services.ThumbnailManager(2);
+            }
             NewCommand = new RelayCommand(_ => NewCollection());
             RenameCommand = new RelayCommand(p => Rename(p as CollectionDto), p => p is CollectionDto);
             DuplicateCommand = new RelayCommand(p => Duplicate(p as CollectionDto), p => p is CollectionDto);

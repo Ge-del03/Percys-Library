@@ -167,6 +167,20 @@ namespace ComicReader.Services
     private int _readingStatsThumbConcurrency = 2;
     public int ReadingStatsThumbConcurrency { get => _readingStatsThumbConcurrency; set => SetProperty(ref _readingStatsThumbConcurrency, value); }
 
+        // Thumbnail cache limits (disk-backed thumbnails used across the app)
+        private int _thumbCacheMaxFiles = 500;
+        public int ThumbCacheMaxFiles { get => _thumbCacheMaxFiles; set => SetProperty(ref _thumbCacheMaxFiles, value); }
+
+        private long _thumbCacheMaxBytes = 200 * 1024 * 1024; // 200 MB
+        public long ThumbCacheMaxBytes { get => _thumbCacheMaxBytes; set => SetProperty(ref _thumbCacheMaxBytes, value); }
+
+        // Convenience MB view for binding in Settings UI
+        public int ThumbCacheMaxMB
+        {
+            get => (int)Math.Max(0, ThumbCacheMaxBytes / (1024 * 1024));
+            set => ThumbCacheMaxBytes = Math.Max(0L, (long)value * 1024 * 1024);
+        }
+
         // Last opened progress/state
         private string _lastOpenedFilePath = null;
         public string LastOpenedFilePath { get => _lastOpenedFilePath; set => SetProperty(ref _lastOpenedFilePath, value); }

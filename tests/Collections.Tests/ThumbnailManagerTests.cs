@@ -10,10 +10,13 @@ namespace Collections.Tests
     {
         private readonly ThumbnailManager _mgr;
         private readonly string _tempFile;
+        private readonly string _tempCacheDir;
 
         public ThumbnailManagerTests()
         {
-            _mgr = new ThumbnailManager(1);
+            _tempCacheDir = Path.Combine(Path.GetTempPath(), "thumbs_" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(_tempCacheDir);
+            _mgr = new ThumbnailManager(1, cacheDirectory: _tempCacheDir);
             _tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".cbz");
             // create an empty file to simulate a comic container
             File.WriteAllText(_tempFile, string.Empty);
@@ -56,6 +59,7 @@ namespace Collections.Tests
         {
             try { if (File.Exists(_tempFile)) File.Delete(_tempFile); } catch { }
             try { _mgr.Dispose(); } catch { }
+            try { if (Directory.Exists(_tempCacheDir)) Directory.Delete(_tempCacheDir, true); } catch { }
         }
     }
 }

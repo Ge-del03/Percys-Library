@@ -731,6 +731,9 @@ namespace ComicReader
                 if (existing != null)
                 {
                     try { existing.WindowState = System.Windows.WindowState.Normal; } catch { }
+                    try { existing.Owner = this; } catch { }
+                    try { existing.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner; } catch { }
+                    try { existing.ShowInTaskbar = false; } catch { }
                     try { existing.Activate(); } catch { }
                     try { existing.Focus(); } catch { }
                 }
@@ -738,10 +741,17 @@ namespace ComicReader
                 {
                     var win = new Views.SettingsWindow();
                     try { ComicReader.Utils.DevLogger.Debug("Creating new SettingsWindow instance."); } catch { }
-                    // No establecer Owner para que sea una ventana totalmente separada
-                    win.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
-                    try { win.ShowInTaskbar = true; } catch { }
-                    win.Show();
+                    // Set owner so the settings window stays above the main window and is focused
+                    try { win.Owner = this; } catch { }
+                    try { win.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner; } catch { }
+                    try { win.ShowInTaskbar = false; } catch { }
+                    // Open as modal to ensure it appears above and receives focus. If non-modal behavior is desired
+                    // in the future, switch to Show() and call Activate()/Focus() as needed.
+                    try { win.ShowDialog(); } catch
+                    {
+                        // Fallback to non-modal show if dialog fails for any reason
+                        try { win.Show(); win.Activate(); win.Focus(); } catch { }
+                    }
                 }
             }
             catch (Exception ex)

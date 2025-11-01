@@ -290,32 +290,59 @@ namespace ComicReader.Views
                         : "Selecciona una colección");
                     FavoritesStorage.Save(Collections);
 
-                    // show actionable toast to undo removal
+                    // Use central IUndoService so UI and tests can handle undo uniformly
                     try
                     {
-                        ComicReader.Services.ToastService.Show($"'{comic.Title}' eliminado", "Deshacer", () =>
+                        var undoSvc = ComicReader.Core.Services.ServiceLocator.TryGet<ComicReader.Services.IUndoService>();
+                        if (undoSvc != null)
                         {
-                            try
+                            undoSvc.Register($"'{comic.Title}' eliminado", "Deshacer", () =>
                             {
-                                // restore into collection at previous index if possible
-                                if (col != null)
+                                try
                                 {
-                                    if (idx >= 0 && idx <= col.Items.Count)
-                                        col.Items.Insert(idx, comic);
-                                    else
-                                        col.Items.Add(comic);
+                                    if (col != null)
+                                    {
+                                        if (idx >= 0 && idx <= col.Items.Count)
+                                            col.Items.Insert(idx, comic);
+                                        else
+                                            col.Items.Add(comic);
+                                    }
+                                    System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                                    {
+                                        CurrentCollectionItems.Add(comic);
+                                        if (!FilteredItems.Contains(comic)) FilteredItems.Add(comic);
+                                        SetCollectionTitle(col != null ? $"{col.Name} ({col.ItemCount} cómics)" : "Selecciona una colección");
+                                    });
+                                    FavoritesStorage.Save(Collections);
                                 }
-                                // restore view lists
-                                System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                                catch { }
+                            });
+                        }
+                        else
+                        {
+                            // Fallback to direct toast if undo service not available
+                            ComicReader.Services.ToastService.Show($"'{comic.Title}' eliminado", "Deshacer", () =>
+                            {
+                                try
                                 {
-                                    CurrentCollectionItems.Add(comic);
-                                    if (!FilteredItems.Contains(comic)) FilteredItems.Add(comic);
-                                    SetCollectionTitle(col != null ? $"{col.Name} ({col.ItemCount} cómics)" : "Selecciona una colección");
-                                });
-                                FavoritesStorage.Save(Collections);
-                            }
-                            catch { }
-                        });
+                                    if (col != null)
+                                    {
+                                        if (idx >= 0 && idx <= col.Items.Count)
+                                            col.Items.Insert(idx, comic);
+                                        else
+                                            col.Items.Add(comic);
+                                    }
+                                    System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                                    {
+                                        CurrentCollectionItems.Add(comic);
+                                        if (!FilteredItems.Contains(comic)) FilteredItems.Add(comic);
+                                        SetCollectionTitle(col != null ? $"{col.Name} ({col.ItemCount} cómics)" : "Selecciona una colección");
+                                    });
+                                    FavoritesStorage.Save(Collections);
+                                }
+                                catch { }
+                            });
+                        }
                     }
                     catch { }
                 }
@@ -350,36 +377,68 @@ namespace ComicReader.Views
                     : "Selecciona una colección");
                 FavoritesStorage.Save(Collections);
 
-                // show actionable toast to undo bulk removal
+                // Use central IUndoService for bulk undo as well
                 try
                 {
-                    ComicReader.Services.ToastService.Show($"{removed.Count} elemento(s) eliminados", "Deshacer", () =>
+                    var undoSvc = ComicReader.Core.Services.ServiceLocator.TryGet<ComicReader.Services.IUndoService>();
+                    if (undoSvc != null)
                     {
-                        try
+                        undoSvc.Register($"{removed.Count} elemento(s) eliminados", "Deshacer", () =>
                         {
-                            var colLocal = _selected_collection_safe();
-                            // restore in reverse order to preserve indices
-                            foreach (var r in removed.OrderBy(r => r.Index))
+                            try
                             {
-                                if (r.Item == null) continue;
-                                if (colLocal != null)
+                                var colLocal = _selected_collection_safe();
+                                foreach (var r in removed.OrderBy(r => r.Index))
                                 {
-                                    if (r.Index >= 0 && r.Index <= colLocal.Items.Count)
-                                        colLocal.Items.Insert(r.Index, r.Item);
-                                    else
-                                        colLocal.Items.Add(r.Item);
+                                    if (r.Item == null) continue;
+                                    if (colLocal != null)
+                                    {
+                                        if (r.Index >= 0 && r.Index <= colLocal.Items.Count)
+                                            colLocal.Items.Insert(r.Index, r.Item);
+                                        else
+                                            colLocal.Items.Add(r.Item);
+                                    }
+                                    System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                                    {
+                                        if (!CurrentCollectionItems.Contains(r.Item)) CurrentCollectionItems.Add(r.Item);
+                                        if (!FilteredItems.Contains(r.Item)) FilteredItems.Add(r.Item);
+                                    });
                                 }
-                                System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
-                                {
-                                    if (!CurrentCollectionItems.Contains(r.Item)) CurrentCollectionItems.Add(r.Item);
-                                    if (!FilteredItems.Contains(r.Item)) FilteredItems.Add(r.Item);
-                                });
+                                SetCollectionTitle(colLocal != null ? $"{colLocal.Name} ({colLocal.ItemCount} cómics)" : "Selecciona una colección");
+                                FavoritesStorage.Save(Collections);
                             }
-                            SetCollectionTitle(colLocal != null ? $"{colLocal.Name} ({colLocal.ItemCount} cómics)" : "Selecciona una colección");
-                            FavoritesStorage.Save(Collections);
-                        }
-                        catch { }
-                    });
+                            catch { }
+                        });
+                    }
+                    else
+                    {
+                        ComicReader.Services.ToastService.Show($"{removed.Count} elemento(s) eliminados", "Deshacer", () =>
+                        {
+                            try
+                            {
+                                var colLocal = _selected_collection_safe();
+                                foreach (var r in removed.OrderBy(r => r.Index))
+                                {
+                                    if (r.Item == null) continue;
+                                    if (colLocal != null)
+                                    {
+                                        if (r.Index >= 0 && r.Index <= colLocal.Items.Count)
+                                            colLocal.Items.Insert(r.Index, r.Item);
+                                        else
+                                            colLocal.Items.Add(r.Item);
+                                    }
+                                    System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                                    {
+                                        if (!CurrentCollectionItems.Contains(r.Item)) CurrentCollectionItems.Add(r.Item);
+                                        if (!FilteredItems.Contains(r.Item)) FilteredItems.Add(r.Item);
+                                    });
+                                }
+                                SetCollectionTitle(colLocal != null ? $"{colLocal.Name} ({colLocal.ItemCount} cómics)" : "Selecciona una colección");
+                                FavoritesStorage.Save(Collections);
+                            }
+                            catch { }
+                        });
+                    }
                 }
                 catch { }
             }
