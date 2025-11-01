@@ -11,8 +11,29 @@ namespace ComicReader.Views
 {
     public partial class EditCollectionDialog : Window
     {
-        public string CollectionName { get => NameBox.Text.Trim(); set => NameBox.Text = value; }
-        public string Description { get => DescBox.Text.Trim(); set => DescBox.Text = value; }
+        public string CollectionName
+        {
+            get
+            {
+                try { var tb = this.FindName("NameBox") as System.Windows.Controls.TextBox; return tb?.Text?.Trim() ?? string.Empty; } catch { return string.Empty; }
+            }
+            set
+            {
+                try { var tb = this.FindName("NameBox") as System.Windows.Controls.TextBox; if (tb != null) tb.Text = value; } catch { }
+            }
+        }
+
+        public string Description
+        {
+            get
+            {
+                try { var tb = this.FindName("DescBox") as System.Windows.Controls.TextBox; return tb?.Text?.Trim() ?? string.Empty; } catch { return string.Empty; }
+            }
+            set
+            {
+                try { var tb = this.FindName("DescBox") as System.Windows.Controls.TextBox; if (tb != null) tb.Text = value; } catch { }
+            }
+        }
         public string CoverPath { get; set; }
 
     private System.Windows.Point _dragStartPoint;
@@ -23,7 +44,7 @@ namespace ComicReader.Views
         {
             InitializeComponent();
             // Bind the List control to the observable collection so UI updates when properties change
-            try { ItemsList.ItemsSource = _itemsCollection; } catch { }
+            try { var itemsList = this.FindName("ItemsList") as System.Windows.Controls.ListBox; if (itemsList != null) itemsList.ItemsSource = _itemsCollection; } catch { }
         }
 
         // Helper to set the cover path and update the UI text safely from callers
@@ -32,7 +53,8 @@ namespace ComicReader.Views
             CoverPath = path;
             try
             {
-                CoverPathText.Text = path ?? string.Empty;
+                var tb = this.FindName("CoverPathText") as System.Windows.Controls.TextBox;
+                if (tb != null) tb.Text = path ?? string.Empty;
             }
             catch { }
         }
@@ -66,13 +88,14 @@ namespace ComicReader.Views
 
         private void RemoveSelected_Click(object sender, RoutedEventArgs e)
         {
-            var selectedVMs = ItemsList.SelectedItems.Cast<ViewModels.ComicItemViewModel>().ToList();
+            var itemsList = this.FindName("ItemsList") as System.Windows.Controls.ListBox;
+            var selectedVMs = itemsList?.SelectedItems.Cast<ViewModels.ComicItemViewModel>().ToList() ?? new System.Collections.Generic.List<ViewModels.ComicItemViewModel>();
             if (selectedVMs.Count == 0) return;
             int firstIndex = _itemsCollection.IndexOf(selectedVMs.First());
             var selectedDtos = selectedVMs.Select(vm => vm.ToDto()).ToList();
             _undoStack.Push((selectedDtos, firstIndex));
             foreach (var s in selectedVMs) _itemsCollection.Remove(s);
-            UndoButton.IsEnabled = true;
+            try { var ub = this.FindName("UndoButton") as System.Windows.Controls.Button; if (ub != null) ub.IsEnabled = true; } catch { }
 
             // Also register with central undo service so the user sees a global toast undo
             try

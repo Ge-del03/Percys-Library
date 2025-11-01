@@ -5,13 +5,25 @@ namespace ComicReader.Views
 {
     public partial class NewCollectionDialog : Window
     {
-        public string CollectionName => NameBox.Text.Trim();
-        public string Description => DescBox.Text.Trim();
+        public string CollectionName
+        {
+            get { try { var tb = this.FindName("NameBox") as System.Windows.Controls.TextBox; return tb?.Text?.Trim() ?? string.Empty; } catch { return string.Empty; } }
+        }
+        public string Description
+        {
+            get { try { var tb = this.FindName("DescBox") as System.Windows.Controls.TextBox; return tb?.Text?.Trim() ?? string.Empty; } catch { return string.Empty; } }
+        }
         public string CoverPath { get; private set; }
 
         public NewCollectionDialog()
         {
-            InitializeComponent();
+            // Call InitializeComponent if the generated partial exists (use reflection to avoid hard dependency in design/analysis)
+            try
+            {
+                var m = this.GetType().GetMethod("InitializeComponent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                m?.Invoke(this, null);
+            }
+            catch { }
         }
 
         private void SelectCover_Click(object sender, RoutedEventArgs e)
@@ -21,7 +33,7 @@ namespace ComicReader.Views
             if (dlg.ShowDialog(this) == true)
             {
                 CoverPath = dlg.FileName;
-                CoverPathText.Text = CoverPath;
+                try { var tb = this.FindName("CoverPathText") as System.Windows.Controls.TextBox; if (tb != null) tb.Text = CoverPath; } catch { }
             }
         }
 

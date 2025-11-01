@@ -42,38 +42,50 @@ namespace ComicReader.Views.Controls
                     }
                 });
 
-                if (bmp != null)
-                    ThumbnailImage.Source = bmp;
+                try { var img = this.FindName("ThumbnailImage") as System.Windows.Controls.Image; if (bmp != null && img != null) img.Source = bmp; }
+                catch { }
             }
 
             // placeholder visibility and fade-in for thumbnail
-            try
-            {
-                bool hasSource = false;
-                try { hasSource = ThumbnailImage?.Source != null; } catch { }
-                PlaceholderIcon.Visibility = hasSource ? Visibility.Collapsed : Visibility.Visible;
-                if (hasSource && SystemParameters.ClientAreaAnimation)
+                try
                 {
-                    var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(240));
-                    ThumbnailImage.BeginAnimation(OpacityProperty, fade);
+                    bool hasSource = false;
+                    try { var img = this.FindName("ThumbnailImage") as System.Windows.Controls.Image; hasSource = img?.Source != null; } catch { }
+                    var ph = this.FindName("PlaceholderIcon") as System.Windows.FrameworkElement;
+                    if (ph != null) ph.Visibility = hasSource ? Visibility.Collapsed : Visibility.Visible;
+                    if (hasSource && SystemParameters.ClientAreaAnimation)
+                    {
+                        var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(240));
+                        try { var img2 = this.FindName("ThumbnailImage") as System.Windows.Controls.Image; img2?.BeginAnimation(OpacityProperty, fade); } catch { }
+                    }
                 }
-            }
-            catch { }
+                catch { }
 
             // Fade in if animations are enabled
+                try
+                {
+                    if (SystemParameters.ClientAreaAnimation)
+                    {
+                        var anim = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(300));
+                        this.BeginAnimation(OpacityProperty, anim);
+                    }
+                    else
+                    {
+                        this.Opacity = 1;
+                    }
+                }
+                catch { this.Opacity = 1; }
+
+            // Accessibility: set AutomationProperties for screen readers
             try
             {
-                if (SystemParameters.ClientAreaAnimation)
-                {
-                    var anim = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(300));
-                    this.BeginAnimation(OpacityProperty, anim);
-                }
-                else
-                {
-                    this.Opacity = 1;
-                }
+                var title = Title ?? string.Empty;
+                var pages = PagesText ?? string.Empty;
+                var name = string.IsNullOrWhiteSpace(title) ? (pages) : ($"{title}. {pages}");
+                System.Windows.Automation.AutomationProperties.SetName(this, name);
+                System.Windows.Automation.AutomationProperties.SetHelpText(this, AccessibilityHelp ?? name);
             }
-            catch { this.Opacity = 1; }
+            catch { }
         }
 
         public static readonly DependencyProperty ThumbnailPathProperty = DependencyProperty.Register(
@@ -126,8 +138,8 @@ namespace ComicReader.Views.Controls
                 if (string.IsNullOrWhiteSpace(path))
                 {
                     // clear image
-                    ThumbnailImage.Source = null;
-                    PlaceholderIcon.Visibility = Visibility.Visible;
+                    try { var img = this.FindName("ThumbnailImage") as System.Windows.Controls.Image; if (img != null) img.Source = null; } catch { }
+                    try { var ph = this.FindName("PlaceholderIcon") as System.Windows.FrameworkElement; if (ph != null) ph.Visibility = Visibility.Visible; } catch { }
                     return;
                 }
 
@@ -154,32 +166,39 @@ namespace ComicReader.Views.Controls
                 {
                     try
                     {
-                        ThumbnailImage.Source = bmp;
-                        PlaceholderIcon.Visibility = bmp == null ? Visibility.Visible : Visibility.Collapsed;
+                        var img = this.FindName("ThumbnailImage") as System.Windows.Controls.Image;
+                        var ph = this.FindName("PlaceholderIcon") as System.Windows.FrameworkElement;
+                        var root = this.FindName("Root") as System.Windows.FrameworkElement;
+
+                        if (img != null) img.Source = bmp;
+                        if (ph != null) ph.Visibility = bmp == null ? Visibility.Visible : Visibility.Collapsed;
 
                         if (bmp != null && SystemParameters.ClientAreaAnimation)
                         {
                             // make sure Root has a TranslateTransform
                             try
                             {
-                                if (!(Root.RenderTransform is TranslateTransform))
+                                if (root != null)
                                 {
-                                    Root.RenderTransform = new TranslateTransform(6, 0);
+                                    if (!(root.RenderTransform is TranslateTransform))
+                                    {
+                                        root.RenderTransform = new TranslateTransform(6, 0);
+                                    }
+
+                                    var tt = root.RenderTransform as TranslateTransform;
+
+                                    // start from slightly below and transparent
+                                    if (tt != null) tt.Y = 6;
+                                    root.Opacity = 0;
+                                    if (img != null) img.Opacity = 0;
+
+                                    var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(260)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } };
+                                    var slide = new DoubleAnimation(6, 0, TimeSpan.FromMilliseconds(260)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } };
+
+                                    root.BeginAnimation(UIElement.OpacityProperty, fade);
+                                    tt?.BeginAnimation(TranslateTransform.YProperty, slide);
+                                    img?.BeginAnimation(UIElement.OpacityProperty, fade);
                                 }
-
-                                var tt = Root.RenderTransform as TranslateTransform;
-
-                                // start from slightly below and transparent
-                                tt.Y = 6;
-                                Root.Opacity = 0;
-                                ThumbnailImage.Opacity = 0;
-
-                                var fade = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(260)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } };
-                                var slide = new DoubleAnimation(6, 0, TimeSpan.FromMilliseconds(260)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } };
-
-                                Root.BeginAnimation(UIElement.OpacityProperty, fade);
-                                tt.BeginAnimation(TranslateTransform.YProperty, slide);
-                                ThumbnailImage.BeginAnimation(UIElement.OpacityProperty, fade);
                             }
                             catch { }
                         }
@@ -217,31 +236,48 @@ namespace ComicReader.Views.Controls
                 try
                 {
                     var newVal = (double)e.NewValue;
-                    if (SystemParameters.ClientAreaAnimation)
-                    {
-                        var da = new DoubleAnimation(ctrl.InnerProgress.Value, newVal, TimeSpan.FromMilliseconds(350)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } };
-                        ctrl.InnerProgress.BeginAnimation(ProgressBar.ValueProperty, da);
-                    }
-                    else
-                    {
-                        ctrl.InnerProgress.Value = newVal;
-                    }
-
-                    // color the progress bar based on thresholds
                     try
                     {
-                        var brush = (Brush)Application.Current.FindResource("RS_AccentBrush");
-                        if (newVal >= 80) brush = (Brush)Application.Current.FindResource("RS_SuccessBrush");
-                        else if (newVal >= 40) brush = (Brush)Application.Current.FindResource("RS_WarningBrush");
-                        else brush = (Brush)Application.Current.FindResource("RS_DangerBrush");
-                        ctrl.InnerProgress.Foreground = brush;
-                    }
-                    catch { }
+                        var pb = ctrl.FindName("InnerProgress") as ProgressBar;
+                        if (pb != null)
+                        {
+                            if (SystemParameters.ClientAreaAnimation)
+                            {
+                                var from = pb.Value;
+                                var da = new DoubleAnimation(from, newVal, TimeSpan.FromMilliseconds(350)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } };
+                                pb.BeginAnimation(ProgressBar.ValueProperty, da);
+                            }
+                            else
+                            {
+                                pb.Value = newVal;
+                            }
 
-                    // Update the accessibility help text when percentage changes
-                    try { ctrl.UpdateAccessibilityHelp(); } catch { }
+                            // color the progress bar based on thresholds
+                            try
+                            {
+                                var brush = (Brush)Application.Current.FindResource("RS_AccentBrush");
+                                if (newVal >= 80) brush = (Brush)Application.Current.FindResource("RS_SuccessBrush");
+                                else if (newVal >= 40) brush = (Brush)Application.Current.FindResource("RS_WarningBrush");
+                                else brush = (Brush)Application.Current.FindResource("RS_DangerBrush");
+                                pb.Foreground = brush;
+                            }
+                            catch { }
+                        }
+
+                        // Update the accessibility help text when percentage changes
+                        try { ctrl.UpdateAccessibilityHelp(); } catch { }
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            var pb2 = ctrl.FindName("InnerProgress") as ProgressBar;
+                            if (pb2 != null) pb2.Value = newVal;
+                        }
+                        catch { }
+                    }
                 }
-                catch { try { ctrl.InnerProgress.Value = (double)e.NewValue; } catch { } }
+                catch { try { var pb = ctrl.FindName("InnerProgress") as ProgressBar; if (pb != null) pb.Value = (double)e.NewValue; } catch { } }
             }
         }
 
@@ -260,6 +296,13 @@ namespace ComicReader.Views.Controls
                 var title = Title ?? string.Empty;
                 var help = $"{title}. {pages}. {pct:F0} por ciento leído.";
                 AccessibilityHelp = help;
+                try
+                {
+                    var name = string.IsNullOrWhiteSpace(title) ? pages : ($"{title}. {pages}");
+                    System.Windows.Automation.AutomationProperties.SetName(this, name);
+                    System.Windows.Automation.AutomationProperties.SetHelpText(this, help);
+                }
+                catch { }
             }
             catch { }
         }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "We6qmU90j58=",
+  "dgSpecHash": "OXm+gkXSutc=",
   "success": true,
-  "projectFilePath": "c:\\Users\\O11CE\\OneDrive\\Desktop\\Percy Library\\ComicReader.csproj",
+  "projectFilePath": "C:\\Users\\O11CE\\OneDrive\\Desktop\\Percy Library\\ComicReader.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\O11CE\\.nuget\\packages\\docnet.core\\2.6.0\\docnet.core.2.6.0.nupkg.sha512",
     "C:\\Users\\O11CE\\.nuget\\packages\\gongsolutions.wpf.dragdrop\\1.0.0.1\\gongsolutions.wpf.dragdrop.1.0.0.1.nupkg.sha512",

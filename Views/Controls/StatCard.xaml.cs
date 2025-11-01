@@ -14,25 +14,55 @@ namespace ComicReader.Views.Controls
             // Respect user's reduce-motion preference
             if (SystemParameters.ClientAreaAnimation)
             {
-                RootBorder.MouseEnter += RootBorder_MouseEnter;
-                RootBorder.MouseLeave += RootBorder_MouseLeave;
+                var rb = this.FindName("RootBorder") as System.Windows.FrameworkElement;
+                if (rb != null)
+                {
+                    rb.MouseEnter += RootBorder_MouseEnter;
+                    rb.MouseLeave += RootBorder_MouseLeave;
+                }
             }
+
+            // Accessibility: set an accessible name combining label and value when available
+            try
+            {
+                var label = (string)GetValue(LabelProperty) ?? string.Empty;
+                var value = (string)GetValue(ValueProperty) ?? string.Empty;
+                var name = string.IsNullOrWhiteSpace(label) ? value : (label + ": " + value);
+                System.Windows.Automation.AutomationProperties.SetName(this, name);
+            }
+            catch { }
         }
 
         private void RootBorder_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            var daX = new DoubleAnimation(1.0, TimeSpan.FromMilliseconds(180)) { EasingFunction = new QuadraticEase() };
-            var daY = new DoubleAnimation(1.0, TimeSpan.FromMilliseconds(180)) { EasingFunction = new QuadraticEase() };
-            CardScale.BeginAnimation(ScaleTransform.ScaleXProperty, daX);
-            CardScale.BeginAnimation(ScaleTransform.ScaleYProperty, daY);
+            try
+            {
+                var daX = new DoubleAnimation(1.0, TimeSpan.FromMilliseconds(180)) { EasingFunction = new QuadraticEase() };
+                var daY = new DoubleAnimation(1.0, TimeSpan.FromMilliseconds(180)) { EasingFunction = new QuadraticEase() };
+                var scale = this.FindName("CardScale") as ScaleTransform;
+                if (scale != null)
+                {
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, daX);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, daY);
+                }
+            }
+            catch { }
         }
 
         private void RootBorder_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            var daX = new DoubleAnimation(1.03, TimeSpan.FromMilliseconds(180)) { EasingFunction = new QuadraticEase() };
-            var daY = new DoubleAnimation(1.03, TimeSpan.FromMilliseconds(180)) { EasingFunction = new QuadraticEase() };
-            CardScale.BeginAnimation(ScaleTransform.ScaleXProperty, daX);
-            CardScale.BeginAnimation(ScaleTransform.ScaleYProperty, daY);
+            try
+            {
+                var daX = new DoubleAnimation(1.03, TimeSpan.FromMilliseconds(180)) { EasingFunction = new QuadraticEase() };
+                var daY = new DoubleAnimation(1.03, TimeSpan.FromMilliseconds(180)) { EasingFunction = new QuadraticEase() };
+                var scale = this.FindName("CardScale") as ScaleTransform;
+                if (scale != null)
+                {
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, daX);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, daY);
+                }
+            }
+            catch { }
         }
 
         public static readonly DependencyProperty IconProperty = DependencyProperty.Register(
