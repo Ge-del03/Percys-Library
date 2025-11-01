@@ -301,7 +301,7 @@ namespace ComicReader.ViewModels
                         // Ask the thumbnail manager to generate and call back when ready so VM and DTO can update
                         try
                         {
-                            _thumbnailManager.EnqueueGenerate(item.Path, async (resultPath) =>
+                            _thumbnailManager.EnqueueGenerate(item.Path, (resultPath) =>
                             {
                                 if (!string.IsNullOrWhiteSpace(resultPath))
                                 {
@@ -323,6 +323,9 @@ namespace ComicReader.ViewModels
                                         catch { }
                                     });
                                 }
+
+                                // EnqueueGenerate espera un Task devolviendo, así que devolvemos un Task completado
+                                return System.Threading.Tasks.Task.CompletedTask;
                             });
                         }
                         catch { }
