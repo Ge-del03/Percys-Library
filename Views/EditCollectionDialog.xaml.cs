@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using ComicReader.Core.Abstractions;
 using Microsoft.Win32;
 using System.Linq;
 using System.Collections.Generic;
