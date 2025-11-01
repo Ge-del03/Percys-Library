@@ -42,5 +42,26 @@ namespace ComicReader.Services
                 catch { }
             });
         }
+
+        /// <summary>
+        /// Try to register an undo action with the central IUndoService; if unavailable, fall back to showing a toast with an actionable button.
+        /// </summary>
+        public static void ShowWithUndo(string message, string undoLabel, Action undoAction, int durationMs = 2200)
+        {
+            try
+            {
+                // Try to resolve the central undo service from the core ServiceLocator
+                var undoSvc = ComicReader.Core.Services.ServiceLocator.TryGet<ComicReader.Services.IUndoService>();
+                if (undoSvc != null)
+                {
+                    undoSvc.Register(message, undoLabel, undoAction);
+                    return;
+                }
+            }
+            catch { }
+
+            // Fallback to showing a toast with the provided action
+            Show(message, undoLabel, undoAction, durationMs);
+        }
     }
 }

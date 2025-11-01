@@ -320,8 +320,8 @@ namespace ComicReader.Views
                         }
                         else
                         {
-                            // Fallback to direct toast if undo service not available
-                            ComicReader.Services.ToastService.Show($"'{comic.Title}' eliminado", "Deshacer", () =>
+                            // Fallback: use centralized helper which will try IUndoService then show a toast
+                            ComicReader.Services.ToastService.ShowWithUndo($"'{comic.Title}' eliminado", "Deshacer", () =>
                             {
                                 try
                                 {
@@ -412,7 +412,7 @@ namespace ComicReader.Views
                     }
                     else
                     {
-                        ComicReader.Services.ToastService.Show($"{removed.Count} elemento(s) eliminados", "Deshacer", () =>
+                        ComicReader.Services.ToastService.ShowWithUndo($"{removed.Count} elemento(s) eliminados", "Deshacer", () =>
                         {
                             try
                             {
