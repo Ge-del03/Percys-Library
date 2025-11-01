@@ -120,7 +120,7 @@ namespace ComicReader.Views
             catch (Exception ex)
             {
                 ComicReader.Services.Logger.LogException("Error loading comic in continuous view", ex);
-                MessageBox.Show($"Error al cargar el cómic: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(ex, "Cargar cómic en vista continua", ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
             }
             finally
             {

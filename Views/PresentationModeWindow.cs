@@ -116,7 +116,7 @@ namespace ComicReader.Views
             {
                 // Fin de la presentación
                 StopPresentation();
-                MessageBox.Show("Presentación completada", "Fin", MessageBoxButton.OK, MessageBoxImage.Information);
+                ComicReader.Services.Notifications.NotificationService.Instance.Success("Presentación completada", "Finalizado");
             }
         }
 

@@ -30,16 +30,14 @@ namespace ComicReader
                 }
                 else
                 {
-                    MessageBox.Show($"Por favor ingresa un número entre 1 y {_maxPages}", "Página Inválida", 
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ComicReader.Services.Notifications.NotificationService.Instance.Warning($"Por favor ingresa un número entre 1 y {_maxPages}", "Página inválida");
                     PageNumberTextBox.SelectAll();
                     PageNumberTextBox.Focus();
                 }
             }
             else
             {
-                MessageBox.Show("Por favor ingresa un número válido", "Entrada Inválida", 
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                ComicReader.Services.Notifications.NotificationService.Instance.Warning("Por favor ingresa un número válido", "Entrada inválida");
                 PageNumberTextBox.SelectAll();
                 PageNumberTextBox.Focus();
             }

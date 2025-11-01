@@ -54,7 +54,7 @@ namespace ComicReader.Views
                 if (string.IsNullOrWhiteSpace(path)) return;
                 if (!System.IO.File.Exists(path) && !System.IO.Directory.Exists(path))
                 {
-                    MessageBox.Show("El archivo no existe o ha sido movido.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+                    ComicReader.Services.Notifications.NotificationService.Instance.Info("El archivo no existe o ha sido movido", "Archivo no encontrado");
                     return;
                 }
 
@@ -86,17 +86,17 @@ namespace ComicReader.Views
                     if (svc != null)
                     {
                         svc.ExportSessionsToCsv(dlg.FileName);
-                        MessageBox.Show(this, "Exportación completada.", "Exportar", MessageBoxButton.OK, MessageBoxImage.Information);
+                        ComicReader.Services.Notifications.NotificationService.Instance.Success("Exportación completada", "Exportación exitosa");
                     }
                     else
                     {
-                        MessageBox.Show(this, "Servicio de estadísticas no disponible.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        ComicReader.Services.Notifications.NotificationService.Instance.Error("Servicio de estadísticas no disponible", "Error");
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this, "Error al exportar: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(ex, "Exportar estadísticas", ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
             }
         }
 
@@ -110,7 +110,7 @@ namespace ComicReader.Views
                 var svc = ServiceLocator.TryGet<IReadingStatsService>();
                 if (svc == null)
                 {
-                    MessageBox.Show(this, "Servicio de estadísticas no disponible.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ComicReader.Services.Notifications.NotificationService.Instance.Error("Servicio de estadísticas no disponible", "Error");
                     return;
                 }
 
@@ -143,11 +143,11 @@ namespace ComicReader.Views
                 // Refresh VM/UI
                 try { if (this.DataContext is ReadingStatsViewModel vm) vm.Refresh(); } catch { }
 
-                MessageBox.Show(this, "Reinicio completo. La aplicación reflejará los valores por defecto.", "Reset", MessageBoxButton.OK, MessageBoxImage.Information);
+                ComicReader.Services.Notifications.NotificationService.Instance.Success("Reinicio completo. La aplicación reflejará los valores por defecto", "Reset exitoso");
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this, "Error al resetear: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(ex, "Resetear estadísticas", ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
             }
         }
 

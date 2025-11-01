@@ -175,7 +175,11 @@ namespace ComicReader
             catch { }
 
             // Arrancar animaciones visuales de cabecera (sorpresa sutil)
-            this.Loaded += (s, e) => StartHeaderShimmer();
+            this.Loaded += (s, e) => 
+            {
+                StartHeaderShimmer();
+                InitializePremiumServices();
+            };
 
             // Inicialización adicional específica de la app
             InitializeComponents();
@@ -891,7 +895,11 @@ namespace ComicReader
             }
             catch (Exception ex)
             {
-                try { MessageBox.Show($"No se pudo re-renderizar el PDF: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning); } catch { }
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
+                    ex, 
+                    "Re-renderizar PDF",
+                    ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify
+                );
             }
         }
 
@@ -903,7 +911,11 @@ namespace ComicReader
             }
             catch (Exception ex)
             {
-                try { MessageBox.Show($"No se pudo abrir Configuración: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
+                    ex, 
+                    "Abrir configuración",
+                    ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify
+                );
             }
         }
 
@@ -1378,7 +1390,11 @@ namespace ComicReader
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al cargar la página: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
+                        ex, 
+                        "Carga de página",
+                        ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify
+                    );
                 }
             }
 
@@ -1570,11 +1586,24 @@ namespace ComicReader
         {
             try
             {
+                // ✅ VALIDACIÓN: Verificar que el archivo es válido ANTES de intentar cargarlo
+                var validationResult = ComicReader.Services.Validation.ValidationService.Instance.ValidateComicFile(filePath);
+                if (!validationResult.IsValid)
+                {
+                    ComicReader.Services.Notifications.NotificationService.Instance.Error(
+                        validationResult.ErrorMessage,
+                        "Archivo inválido"
+                    );
+                    return;
+                }
+
                 // Invalida cualquier carga de páginas/miniaturas anterior
                 Interlocked.Increment(ref _pageLoadSeq);
                 Interlocked.Increment(ref _thumbLoadSeq);
                 RemoveReaderPlaceholder();
                 if (this.FindName("PageIndicator") is TextBlock pi) pi.Text = "Cargando...";
+                
+                // ✅ LOADING: Mostrar feedback mientras carga
                 await _comicLoader.LoadComicAsync(filePath);
                 _comicLoader.RefreshTuningFromSettings();
                 
@@ -1737,12 +1766,19 @@ namespace ComicReader
                 }
                 else
                 {
-                    MessageBox.Show("No se pudieron cargar las páginas del cómic.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ComicReader.Services.Notifications.NotificationService.Instance.Error(
+                        "No se pudieron cargar las páginas del cómic",
+                        "Error de carga"
+                    );
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al abrir el archivo: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
+                    ex, 
+                    "Apertura de archivo",
+                    ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify
+                );
             }
         }
 
@@ -3579,6 +3615,41 @@ namespace ComicReader
                 }
             }
             catch { }
+        }
+
+        /// <summary>
+        /// Inicializa los servicios premium: Notificaciones, Validación, Errores, Carga
+        /// </summary>
+        private void InitializePremiumServices()
+        {
+            try
+            {
+                // Inicializar sistema de notificaciones
+                ComicReader.Services.Notifications.NotificationService.Instance.Initialize(this);
+                
+                // Inicializar sistema de carga
+                ComicReader.Services.Loading.LoadingService.Instance.Initialize(this);
+                
+                // Mostrar notificación de bienvenida
+                ComicReader.Services.Notifications.NotificationService.Instance.Success(
+                    "Todos los sistemas listos", 
+                    "Percy's Library", 
+                    2000
+                );
+            }
+            catch (Exception ex)
+            {
+                // Fallback si falla la inicialización
+                try
+                {
+                    ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
+                        ex, 
+                        "Inicialización de servicios premium",
+                        ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Silent
+                    );
+                }
+                catch { }
+            }
         }
 
         private void TryApplyBrightnessContrastToCurrentPageImage()

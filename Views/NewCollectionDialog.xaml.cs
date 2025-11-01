@@ -47,7 +47,7 @@ namespace ComicReader.Views
         {
             if (string.IsNullOrWhiteSpace(CollectionName))
             {
-                MessageBox.Show(this, "Debes indicar un nombre para la colección.", "Nombre requerido", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ComicReader.Services.Notifications.NotificationService.Instance.Warning("Debes indicar un nombre para la colección", "Nombre requerido");
                 return;
             }
 

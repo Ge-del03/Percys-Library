@@ -169,7 +169,7 @@ namespace ComicReader.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error cargando biblioteca: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(ex, "Cargar contenido de biblioteca", ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
             }
         }
 
@@ -197,7 +197,7 @@ namespace ComicReader.Views
         {
             if (string.IsNullOrWhiteSpace(NewLibraryName))
             {
-                MessageBox.Show("El nombre de la biblioteca es requerido.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ComicReader.Services.Notifications.NotificationService.Instance.Warning("El nombre de la biblioteca es requerido", "Campo obligatorio");
                 return;
             }
 
@@ -219,7 +219,7 @@ namespace ComicReader.Views
             NewLibraryName = "";
             NewLibraryPath = "";
 
-            MessageBox.Show($"Biblioteca '{newLibrary.Name}' creada exitosamente.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
+            ComicReader.Services.Notifications.NotificationService.Instance.Success($"Biblioteca '{newLibrary.Name}' creada exitosamente", "Biblioteca creada");
         }
 
         private void BrowsePath_Click(object sender, RoutedEventArgs e)
@@ -240,25 +240,25 @@ namespace ComicReader.Views
         {
             if (SelectedLibrary == null)
             {
-                MessageBox.Show("Selecciona una biblioteca para editar.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+                ComicReader.Services.Notifications.NotificationService.Instance.Info("Selecciona una biblioteca para editar", "Selección requerida");
                 return;
             }
 
             // Aquí abrirías un diálogo de edición
-            MessageBox.Show($"Editar biblioteca: {SelectedLibrary.Name}", "Funcionalidad", MessageBoxButton.OK, MessageBoxImage.Information);
+            ComicReader.Services.Notifications.NotificationService.Instance.Info($"Editar biblioteca: {SelectedLibrary.Name}", "Funcionalidad pendiente");
         }
 
         private void DeleteLibrary_Click(object sender, RoutedEventArgs e)
         {
             if (SelectedLibrary == null)
             {
-                MessageBox.Show("Selecciona una biblioteca para eliminar.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+                ComicReader.Services.Notifications.NotificationService.Instance.Info("Selecciona una biblioteca para eliminar", "Selección requerida");
                 return;
             }
 
             if (SelectedLibrary.IsDefault)
             {
-                MessageBox.Show("No puedes eliminar la biblioteca predeterminada.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ComicReader.Services.Notifications.NotificationService.Instance.Warning("No puedes eliminar la biblioteca predeterminada", "Operación no permitida");
                 return;
             }
 
@@ -269,7 +269,7 @@ namespace ComicReader.Views
             {
                 Libraries.Remove(SelectedLibrary);
                 SelectedLibrary = null;
-                MessageBox.Show("Biblioteca eliminada.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
+                ComicReader.Services.Notifications.NotificationService.Instance.Success("Biblioteca eliminada", "Operación exitosa");
             }
         }
 
@@ -280,7 +280,7 @@ namespace ComicReader.Views
 
             UpdateLibraryCount(SelectedLibrary);
             LoadLibraryContents();
-            MessageBox.Show("Biblioteca actualizada.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+            ComicReader.Services.Notifications.NotificationService.Instance.Success("Biblioteca actualizada", "Actualización completada");
         }
 
         private void OpenComic_Click(object sender, RoutedEventArgs e)
@@ -300,7 +300,7 @@ namespace ComicReader.Views
                 }
                 else
                 {
-                    MessageBox.Show("El archivo no existe o ha sido movido.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ComicReader.Services.Notifications.NotificationService.Instance.Warning("El archivo no existe o ha sido movido", "Archivo no encontrado");
                 }
             }
         }
@@ -317,8 +317,7 @@ namespace ComicReader.Views
             if (saveDialog.ShowDialog() == true)
             {
                 // Implementar exportación
-                MessageBox.Show($"Bibliotecas exportadas a: {saveDialog.FileName}", 
-                    "Exportación Exitosa", MessageBoxButton.OK, MessageBoxImage.Information);
+                ComicReader.Services.Notifications.NotificationService.Instance.Success($"Bibliotecas exportadas a: {saveDialog.FileName}", "Exportación exitosa");
             }
         }
 
@@ -333,8 +332,7 @@ namespace ComicReader.Views
             if (openDialog.ShowDialog() == true)
             {
                 // Implementar importación
-                MessageBox.Show($"Bibliotecas importadas desde: {openDialog.FileName}", 
-                    "Importación Exitosa", MessageBoxButton.OK, MessageBoxImage.Information);
+                ComicReader.Services.Notifications.NotificationService.Instance.Success($"Bibliotecas importadas desde: {openDialog.FileName}", "Importación exitosa");
             }
         }
 

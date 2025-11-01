@@ -106,11 +106,14 @@ namespace ComicReader.Views
             {
                 var dict = _shortcuts.ToDictionary(s => s.Id, s => s.Gesture ?? string.Empty);
                 ShortcutsService.Save(dict);
-                MessageBox.Show("Atajos guardados.", "Atajos", MessageBoxButton.OK, MessageBoxImage.Information);
+                ComicReader.Services.Notifications.NotificationService.Instance.Success("Atajos guardados", "Configuración guardada");
                 this.DialogResult = true;
                 this.Close();
             }
-            catch { MessageBox.Show("No se pudieron guardar los atajos.", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+            catch (Exception ex) 
+            { 
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(ex, "Guardar atajos", ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify); 
+            }
         }
 
         private void RestoreDefaults_Click(object sender, RoutedEventArgs e)
@@ -121,7 +124,7 @@ namespace ComicReader.Views
                 s.Gesture = defs.ContainsKey(s.Id) ? string.Empty : string.Empty;
             }
             ShortcutsService.Save(new System.Collections.Generic.Dictionary<string, string>());
-            MessageBox.Show("Atajos restablecidos (limpios).", "Atajos", MessageBoxButton.OK, MessageBoxImage.Information);
+            ComicReader.Services.Notifications.NotificationService.Instance.Success("Atajos restablecidos", "Configuración restaurada");
         }
     }
 

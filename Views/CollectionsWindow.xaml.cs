@@ -277,13 +277,21 @@ namespace ComicReader.Views
         {
             try
             {
+                // Open the MODERN redesigned FavoritesWindow (Material Design 3)
                 var win = new FavoritesWindow();
                 win.Owner = this;
                 // reuse same viewmodel so FavoriteItems binding works and updates in-place
                 win.DataContext = this.DataContext;
                 win.ShowDialog();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                // ERROR HANDLING MODERNO
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
+                    ex, 
+                    "Error al abrir la ventana de Favoritos", 
+                    ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
+            }
         }
 
         private static T FindParent<T>(System.Windows.DependencyObject child) where T : class

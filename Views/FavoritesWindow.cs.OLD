@@ -27,14 +27,7 @@ namespace ComicReader.Views
                 var mi = this.GetType().GetMethod("InitializeComponent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
                 mi?.Invoke(this, null);
             }
-            catch (Exception ex)
-            {
-                // ERROR HANDLING MODERNO - Error crítico en InitializeComponent
-                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
-                    ex, 
-                    "Error crítico al inicializar FavoritesWindow", 
-                    ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
-            }
+            catch { }
             #pragma warning restore
 
             // Prefer the shared CollectionViewModel exposed by App so multiple views share state.
@@ -60,9 +53,6 @@ namespace ComicReader.Views
             favList.AllowDrop = true;
             favList.DragOver += FavoritesListBox_DragOver;
             favList.Drop += FavoritesListBox_Drop;
-
-            // Actualizar estadísticas iniciales
-            UpdateStatistics();
         }
 
         // Guardar automáticamente cuando se cierre la ventana
@@ -84,12 +74,6 @@ namespace ComicReader.Views
                 foreach (var item in collection.Items)
                 {
                     CurrentCollectionItems.Add(item);
-                    
-                    // 🎨 Cargar portada si no está cargada
-                    if (item.ThumbnailImage == null)
-                    {
-                        _ = LoadComicCoverAsync(item);
-                    }
                 }
                 
                 // Populate tag filter combobox with distinct tags from the collection
@@ -109,11 +93,7 @@ namespace ComicReader.Views
                         combo.SelectedIndex = 0;
                     }
                 }
-                catch (Exception ex)
-                {
-                    // ERROR HANDLING MODERNO - Error no crítico en carga de tags
-                    System.Diagnostics.Debug.WriteLine($"Error loading tags: {ex.Message}");
-                }
+                catch { }
 
                 ApplyFilter();
             }
@@ -190,13 +170,12 @@ namespace ComicReader.Views
             }
         }
 
-        private async void AddToCollection_Click(object sender, RoutedEventArgs e)
+        private void AddToCollection_Click(object sender, RoutedEventArgs e)
         {
             if (_selectedCollection == null)
             {
-                ComicReader.Services.Notifications.NotificationService.Instance.Info(
-                    "Selecciona una colección primero", 
-                    "Colección requerida");
+                MessageBox.Show("Primero selecciona una colección.", "Información", 
+                    MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
@@ -209,19 +188,8 @@ namespace ComicReader.Views
 
             if (openDialog.ShowDialog() == true)
             {
-                int addedCount = 0;
                 foreach (var filename in openDialog.FileNames)
                 {
-                    // VALIDACIÓN MODERNA con ValidationService
-                    var validation = ComicReader.Services.Validation.ValidationService.Instance.ValidateComicFile(filename);
-                    if (!validation.IsValid)
-                    {
-                        ComicReader.Services.Notifications.NotificationService.Instance.Warning(
-                            $"{Path.GetFileName(filename)}: {validation.ErrorMessage}", 
-                            "Archivo inválido");
-                        continue;
-                    }
-
                     var comic = new FavoriteComic
                     {
                         Id = Guid.NewGuid(),
@@ -233,20 +201,12 @@ namespace ComicReader.Views
 
                     _selectedCollection.Items.Add(comic);
                     CurrentCollectionItems.Add(comic);
-                    addedCount++;
-                    
-                    // CARGAR PORTADA ASYNC en background (estilo dinámico)
-                    _ = LoadComicCoverAsync(comic);
                 }
                 
                 ApplyFilter();
-                UpdateStatistics();
                 FavoritesStorage.Save(Collections);
-                
-                // NOTIFICACIÓN MODERNA premium
-                ComicReader.Services.Notifications.NotificationService.Instance.Success(
-                    $"{addedCount} cómic(s) agregado(s) a '{_selectedCollection.Name}'", 
-                    "Cómics agregados");
+                MessageBox.Show($"Se agregaron {openDialog.FileNames.Length} cómics a la colección.", 
+                    "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
@@ -254,9 +214,8 @@ namespace ComicReader.Views
         {
             if (_selectedCollection == null)
             {
-                ComicReader.Services.Notifications.NotificationService.Instance.Info(
-                    "Selecciona una colección primero", 
-                    "Colección requerida");
+                MessageBox.Show("Primero selecciona una colección.", "Información",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
             using (var dlg = new System.Windows.Forms.FolderBrowserDialog())
@@ -284,13 +243,8 @@ namespace ComicReader.Views
                         CurrentCollectionItems.Add(comic);
                     }
                     ApplyFilter();
-                    UpdateStatistics();
                     FavoritesStorage.Save(Collections);
-                    
-                    // NOTIFICACIÓN MODERNA premium
-                    ComicReader.Services.Notifications.NotificationService.Instance.Success(
-                        $"{files.Count} cómic(s) agregado(s) desde la carpeta", 
-                        "Carpeta importada");
+                    MessageBox.Show($"Se agregaron {files.Count} elementos.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
         }
@@ -299,23 +253,8 @@ namespace ComicReader.Views
         {
             if (sender is FrameworkElement element && element.DataContext is FavoriteComic comic)
             {
-                OpenComic(comic);
-            }
-        }
-
-        // MÉTODO CENTRALIZADO para abrir cómics (desde click, double-click, enter, etc)
-        private void OpenComic(FavoriteComic comic)
-        {
-            if (comic == null) return;
-            
-            if (File.Exists(comic.FilePath))
-            {
-                try
+                if (File.Exists(comic.FilePath))
                 {
-                    // Actualizar última lectura
-                    comic.LastRead = DateTime.Now;
-                    FavoritesStorage.Save(Collections);
-                    
                     // Intentar abrir el cómic en la ventana principal
                     if (Owner is global::ComicReader.MainWindow mainWindow)
                     {
@@ -326,20 +265,11 @@ namespace ComicReader.Views
                         Close();
                     }
                 }
-                catch (Exception ex)
+                else
                 {
-                    ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
-                        ex, 
-                        "Error al abrir el cómic", 
-                        ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
+                    MessageBox.Show("El archivo no existe o ha sido movido.", "Error", 
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
-            }
-            else
-            {
-                // NOTIFICACIÓN MODERNA premium con error handling
-                ComicReader.Services.Notifications.NotificationService.Instance.Error(
-                    $"El archivo '{Path.GetFileName(comic.FilePath)}' no existe o ha sido movido", 
-                    "Archivo no encontrado");
             }
         }
 
@@ -390,11 +320,7 @@ namespace ComicReader.Views
                                     });
                                     FavoritesStorage.Save(Collections);
                                 }
-                                catch (Exception ex)
-                                {
-                                    // ERROR HANDLING MODERNO - Falló el undo
-                                    System.Diagnostics.Debug.WriteLine($"Undo failed: {ex.Message}");
-                                }
+                                catch { }
                             });
                         }
                         else
@@ -419,19 +345,11 @@ namespace ComicReader.Views
                                     });
                                     FavoritesStorage.Save(Collections);
                                 }
-                                catch (Exception ex)
-                                {
-                                    // ERROR HANDLING MODERNO - Falló el undo
-                                    System.Diagnostics.Debug.WriteLine($"Undo failed: {ex.Message}");
-                                }
+                                catch { }
                             });
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        // ERROR HANDLING MODERNO - Error general en RemoveFromCollection
-                        System.Diagnostics.Debug.WriteLine($"Error removing from collection: {ex.Message}");
-                    }
+                    catch { }
                 }
             }
         }
@@ -442,8 +360,6 @@ namespace ComicReader.Views
             var list = GetFavoritesListBox();
             var selected = list.SelectedItems.Cast<FavoriteComic>().ToList();
             if (selected.Count == 0) return;
-            
-            // TODO: Reemplazar con diálogo de confirmación moderno (CustomDialog)
             if (MessageBox.Show($"¿Quitar {selected.Count} elemento(s) de la colección?", "Confirmar",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
@@ -496,11 +412,7 @@ namespace ComicReader.Views
                                 SetCollectionTitle(colLocal != null ? $"{colLocal.Name} ({colLocal.ItemCount} cómics)" : "Selecciona una colección");
                                 FavoritesStorage.Save(Collections);
                             }
-                            catch (Exception ex)
-                            {
-                                // ERROR HANDLING MODERNO - Falló el undo bulk (IUndoService)
-                                System.Diagnostics.Debug.WriteLine($"Bulk undo (IUndoService) failed: {ex.Message}");
-                            }
+                            catch { }
                         });
                     }
                     else
@@ -529,19 +441,11 @@ namespace ComicReader.Views
                                 SetCollectionTitle(colLocal != null ? $"{colLocal.Name} ({colLocal.ItemCount} cómics)" : "Selecciona una colección");
                                 FavoritesStorage.Save(Collections);
                             }
-                            catch (Exception ex)
-                            {
-                                // ERROR HANDLING MODERNO - Falló el undo bulk (ToastService)
-                                System.Diagnostics.Debug.WriteLine($"Bulk undo (ToastService) failed: {ex.Message}");
-                            }
+                            catch { }
                         });
                     }
                 }
-                catch (Exception ex)
-                {
-                    // ERROR HANDLING MODERNO - Error general en RemoveSelected
-                    System.Diagnostics.Debug.WriteLine($"Error in RemoveSelected: {ex.Message}");
-                }
+                catch { }
             }
         }
 
@@ -566,19 +470,13 @@ namespace ComicReader.Views
                     });
                     File.WriteAllText(saveDialog.FileName, json);
                     FavoritesStorage.Save(Collections);
-                    
-                    // NOTIFICACIÓN MODERNA premium
-                    ComicReader.Services.Notifications.NotificationService.Instance.Success(
-                        $"Exportadas {Collections.Count} colecciones a '{Path.GetFileName(saveDialog.FileName)}'", 
-                        "Exportación exitosa");
+                    MessageBox.Show("Colecciones exportadas exitosamente.", "Éxito", 
+                        MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
-                    // ERROR HANDLING MODERNO con ErrorHandler
-                    ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
-                        ex, 
-                        "Error al exportar colecciones", 
-                        ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
+                    MessageBox.Show($"Error al exportar: {ex.Message}", "Error", 
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -598,14 +496,6 @@ namespace ComicReader.Views
                     var json = File.ReadAllText(openDialog.FileName);
                     var importedCollections = System.Text.Json.JsonSerializer.Deserialize<ComicCollection[]>(json);
                     
-                    if (importedCollections == null || importedCollections.Length == 0)
-                    {
-                        ComicReader.Services.Notifications.NotificationService.Instance.Warning(
-                            "El archivo no contiene colecciones válidas", 
-                            "Importación vacía");
-                        return;
-                    }
-                    
                     foreach (var collection in importedCollections)
                     {
                         // Ensure Items is an ObservableCollection after deserialization
@@ -613,20 +503,13 @@ namespace ComicReader.Views
                         Collections.Add(collection);
                     }
                     
-                    UpdateStatistics();
-                    
-                    // NOTIFICACIÓN MODERNA premium
-                    ComicReader.Services.Notifications.NotificationService.Instance.Success(
-                        $"{importedCollections.Length} colecciones importadas exitosamente", 
-                        "Importación completa");
+                    MessageBox.Show($"Se importaron {importedCollections.Length} colecciones.", 
+                        "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
-                    // ERROR HANDLING MODERNO con ErrorHandler
-                    ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
-                        ex, 
-                        "Error al importar colecciones", 
-                        ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
+                    MessageBox.Show($"Error al importar: {ex.Message}", "Error", 
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -640,13 +523,11 @@ namespace ComicReader.Views
         {
             if (_selectedCollection == null)
             {
-                ComicReader.Services.Notifications.NotificationService.Instance.Info(
-                    "Selecciona una colección primero", 
-                    "Colección requerida");
+                MessageBox.Show("Primero selecciona una colección.", "Información", 
+                    MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
-            // TODO: Reemplazar con diálogo de confirmación moderno (CustomDialog)
             var result = MessageBox.Show($"¿Eliminar la colección '{_selectedCollection.Name}'?\nEsta acción no elimina los archivos físicos.",
                 "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result == MessageBoxResult.Yes)
@@ -671,9 +552,7 @@ namespace ComicReader.Views
             var col = (ComicCollection) (list.SelectedItem ?? _selectedCollection);
             if (col == null)
             {
-                ComicReader.Services.Notifications.NotificationService.Instance.Info(
-                    "Selecciona una colección primero", 
-                    "Colección requerida");
+                MessageBox.Show("Selecciona una colección.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
             var input = Microsoft.VisualBasic.Interaction.InputBox("Nuevo nombre de la colección:", "Renombrar", col.Name ?? "");
@@ -690,9 +569,7 @@ namespace ComicReader.Views
             var col = _selectedCollection ?? (GetCollectionsListBox().SelectedItem as ComicCollection);
             if (col == null)
             {
-                ComicReader.Services.Notifications.NotificationService.Instance.Info(
-                    "Selecciona una colección primero", 
-                    "Colección requerida");
+                MessageBox.Show("Selecciona una colección.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
             var copy = new ComicCollection
@@ -757,11 +634,7 @@ namespace ComicReader.Views
             }
             catch (Exception ex)
             {
-                // ERROR HANDLING MODERNO con ErrorHandler
-                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
-                    ex, 
-                    "Error al arrastrar archivos a la colección", 
-                    ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
+                MessageBox.Show($"No se pudieron agregar los elementos: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -793,11 +666,7 @@ namespace ComicReader.Views
                 }
                 catch (Exception ex)
                 {
-                    // ERROR HANDLING MODERNO con ErrorHandler
-                    ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
-                        ex, 
-                        "Error al abrir el explorador", 
-                        ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
+                    MessageBox.Show($"No se pudo abrir el Explorador: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -826,79 +695,6 @@ namespace ComicReader.Views
             catch
             {
                 return _selectedCollection;
-            }
-        }
-
-        // 🎨 DYNAMIC COVER LOADING (estilo cómic premium)
-        /// <summary>
-        /// Carga asíncronamente la portada de un cómic desde el archivo
-        /// </summary>
-        private async System.Threading.Tasks.Task LoadComicCoverAsync(FavoriteComic comic)
-        {
-            if (comic == null || string.IsNullOrEmpty(comic.FilePath)) return;
-            
-            try
-            {
-                await System.Threading.Tasks.Task.Run(async () =>
-                {
-                    using (var loader = new ComicReader.Services.ComicPageLoader(comic.FilePath))
-                    {
-                        await loader.LoadComicAsync().ConfigureAwait(false);
-                        var cover = await loader.GetCoverThumbnailAsync(300, 450).ConfigureAwait(false);
-                        
-                        if (cover != null)
-                        {
-                            // Actualizar en el hilo UI
-                            await Dispatcher.InvokeAsync(() =>
-                            {
-                                comic.ThumbnailImage = cover; // Asignar BitmapImage directamente
-                                comic.Thumbnail = cover.UriSource?.ToString() ?? string.Empty; // Mantener string para compatibilidad
-                            });
-                        }
-                    }
-                }).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error cargando portada para {comic.Title}: {ex.Message}");
-                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(ex, 
-                    $"Cargar portada de {comic.Title}", 
-                    ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Silent);
-            }
-        }
-
-        // 📊 ACTUALIZAR ESTADÍSTICAS EN TIEMPO REAL
-        private void UpdateStatistics()
-        {
-            try
-            {
-                var allComics = Collections.SelectMany(c => c.Items ?? System.Linq.Enumerable.Empty<FavoriteComic>()).ToList();
-                
-                var totalComics = allComics.Count;
-                var completedComics = allComics.Count(c => c.Progress >= 100);
-                var readingComics = allComics.Count(c => c.Progress > 0 && c.Progress < 100);
-                var ratedComics = allComics.Where(c => c.Rating > 0).ToList();
-                var averageRating = ratedComics.Any() ? ratedComics.Average(c => c.Rating) : 0;
-
-                // Actualizar UI
-                if (FindName("TotalComicsText") is TextBlock totalText)
-                    totalText.Text = totalComics.ToString();
-
-                if (FindName("CompletedComicsText") is TextBlock completedText)
-                    completedText.Text = completedComics.ToString();
-
-                if (FindName("ReadingComicsText") is TextBlock readingText)
-                    readingText.Text = readingComics.ToString();
-
-                if (FindName("AverageRatingText") is TextBlock ratingText)
-                    ratingText.Text = averageRating.ToString("F1");
-
-                if (FindName("StatusText") is TextBlock statusText)
-                    statusText.Text = $"Listo · {Collections.Count} colecciones · {totalComics} cómics";
-            }
-            catch (Exception ex)
-            {
-                ComicReader.Services.Logger.LogException("Error actualizando estadísticas", ex);
             }
         }
     }
@@ -964,10 +760,7 @@ namespace ComicReader.Views
                 
                 if (string.IsNullOrEmpty(CollectionName))
                 {
-                    // VALIDACIÓN MODERNA premium
-                    ComicReader.Services.Notifications.NotificationService.Instance.Warning(
-                        "El nombre de la colección no puede estar vacío", 
-                        "Campo requerido");
+                    MessageBox.Show("El nombre es obligatorio.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 

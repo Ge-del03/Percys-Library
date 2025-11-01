@@ -94,12 +94,12 @@ namespace ComicReader.Views
                 if (dlg.ShowDialog(this) == true)
                 {
                     vm?.ExportTo(dlg.FileName);
-                    MessageBox.Show(this, "Ajustes exportados correctamente.", "Exportar", MessageBoxButton.OK, MessageBoxImage.Information);
+                    ComicReader.Services.Notifications.NotificationService.Instance.Success("Ajustes exportados correctamente", "Exportación completada");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show(this, "No se pudo exportar ajustes.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(ex, "Exportar ajustes", ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
             }
         }
 
@@ -112,12 +112,12 @@ namespace ComicReader.Views
                 if (dlg.ShowDialog(this) == true)
                 {
                     vm?.ImportFrom(dlg.FileName);
-                    MessageBox.Show(this, "Ajustes importados y aplicados.", "Importar", MessageBoxButton.OK, MessageBoxImage.Information);
+                    ComicReader.Services.Notifications.NotificationService.Instance.Success("Ajustes importados y aplicados", "Importación completada");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show(this, "No se pudo importar ajustes.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(ex, "Importar ajustes", ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
             }
         }
 

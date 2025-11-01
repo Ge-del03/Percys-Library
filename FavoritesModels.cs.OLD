@@ -81,7 +81,6 @@ namespace ComicReader.Legacy.Models
         private string[] _tags;
         private string _notes;
         private string _thumbnail;
-        private System.Windows.Media.Imaging.BitmapImage _thumbnailImage;
         private int _currentPage;
         private int _totalPages;
         private DateTime? _lastRead;
@@ -140,15 +139,6 @@ namespace ComicReader.Legacy.Models
         {
             get => _thumbnail;
             set { _thumbnail = value; OnPropertyChanged(); }
-        }
-
-        /// <summary>
-        /// Imagen de portada del cómic (BitmapImage para binding directo en UI)
-        /// </summary>
-        public System.Windows.Media.Imaging.BitmapImage ThumbnailImage
-        {
-            get => _thumbnailImage;
-            set { _thumbnailImage = value; OnPropertyChanged(); }
         }
 
         public int CurrentPage

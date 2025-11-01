@@ -561,7 +561,11 @@ namespace ComicReader.Views
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"No se pudo abrir la carpeta: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
+                    ex,
+                    "Apertura de carpeta",
+                    ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify
+                );
             }
         }
 
@@ -624,7 +628,11 @@ namespace ComicReader.Views
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Error al cargar carpeta: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
+                    ex,
+                    "Carga de contenido de carpeta",
+                    ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify
+                );
             }
         }
 
@@ -742,7 +750,10 @@ namespace ComicReader.Views
         {
             RecentComics.Clear();
             ComicReader.Services.ContinueReadingService.Instance.Clear();
-            System.Windows.MessageBox.Show("Lista de cómics recientes limpiada.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+            ComicReader.Services.Notifications.NotificationService.Instance.Success(
+                "Lista de cómics recientes limpiada",
+                "Limpieza exitosa"
+            );
             HasRecentComics = false;
             _allRecentComics.Clear();
             TotalPages = 1;
@@ -755,13 +766,26 @@ namespace ComicReader.Views
         {
             try
             {
+                // TODO: Implementar diálogo de confirmación personalizado
+                // Por ahora usar MessageBox para confirmación YesNo
                 var result = System.Windows.MessageBox.Show("¿Vaciar la lista de completados? Esto no eliminará los archivos.", "Confirmar", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result != MessageBoxResult.Yes) return;
+                
                 ComicReader.Services.ContinueReadingService.Instance.ClearCompleted();
                 LoadCompletedComics();
-                ComicReader.Services.ToastService.Show("Completados borrados", ComicReader.Views.ToastWindow.ToastKind.Success);
+                ComicReader.Services.Notifications.NotificationService.Instance.Success(
+                    "Lista de completados limpiada",
+                    "Limpieza exitosa"
+                );
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(
+                    ex,
+                    "Limpiar completados",
+                    ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify
+                );
+            }
         }
 
         private void OnReopenCompleted(string filePath)
@@ -816,10 +840,10 @@ namespace ComicReader.Views
 
         private void OpenFavorites_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            // Open the redesigned collections window instead of the legacy FavoritesWindow
-            var collectionsWindow = new CollectionsWindow();
-            collectionsWindow.Owner = Window.GetWindow(this);
-            collectionsWindow.ShowDialog();
+            // Open the MODERN redesigned FavoritesWindow (Material Design 3)
+            var favoritesWindow = new FavoritesWindow();
+            favoritesWindow.Owner = Window.GetWindow(this);
+            favoritesWindow.ShowDialog();
         }
 
         // Nuevos métodos para funcionalidades avanzadas
@@ -866,7 +890,10 @@ namespace ComicReader.Views
                 DateCreated = DateTime.Now
             };
             Libraries.Add(library);
-            System.Windows.MessageBox.Show($"Biblioteca '{library.Name}' creada exitosamente.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+            ComicReader.Services.Notifications.NotificationService.Instance.Success(
+                $"Biblioteca '{library.Name}' creada exitosamente",
+                "Biblioteca creada"
+            );
         }
 
         private void OpenRecentComic_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -884,7 +911,10 @@ namespace ComicReader.Views
                 }
                 else
                 {
-                    System.Windows.MessageBox.Show("El archivo no existe o ha sido movido.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ComicReader.Services.Notifications.NotificationService.Instance.Warning(
+                        "El archivo no existe o ha sido movido",
+                        "Archivo no encontrado"
+                    );
                 }
             }
         }
@@ -894,7 +924,10 @@ namespace ComicReader.Views
             if (string.IsNullOrWhiteSpace(filePath)) return;
             if (!File.Exists(filePath) && !Directory.Exists(filePath))
             {
-                System.Windows.MessageBox.Show("El archivo no existe o ha sido movido.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+                ComicReader.Services.Notifications.NotificationService.Instance.Info(
+                    "El archivo no existe o ha sido movido",
+                    "Archivo no encontrado"
+                );
                 return;
             }
             var mainWindow = Window.GetWindow(this) as global::ComicReader.MainWindow;
@@ -1425,17 +1458,17 @@ namespace ComicReader.Views
                     }
                     else
                     {
-                        System.Windows.MessageBox.Show("El archivo no existe o ha sido movido.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+                        ComicReader.Services.Notifications.NotificationService.Instance.Info("El archivo no existe o ha sido movido", "Archivo no encontrado");
                     }
                 }
                 else
                 {
-                    System.Windows.MessageBox.Show("Selecciona un cómic de la lista para mostrarlo en la carpeta.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+                    ComicReader.Services.Notifications.NotificationService.Instance.Info("Selecciona un cómic de la lista para mostrarlo en la carpeta", "Selección requerida");
                 }
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"No se pudo abrir el Explorador: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(ex, "Mostrar cómic en carpeta", ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
             }
         }
 
@@ -1586,12 +1619,12 @@ namespace ComicReader.Views
                 }
                 else
                 {
-                    System.Windows.MessageBox.Show("El archivo no existe o ha sido movido.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+                    ComicReader.Services.Notifications.NotificationService.Instance.Info("El archivo no existe o ha sido movido", "Archivo no encontrado");
                 }
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"No se pudo abrir el Explorador: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(ex, "Mostrar archivo en carpeta", ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
             }
         }
 
@@ -1735,7 +1768,7 @@ namespace ComicReader.Views
         {
             if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath))
             {
-                System.Windows.MessageBox.Show("La carpeta seleccionada no existe.", "Carpeta no válida", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ComicReader.Services.Notifications.NotificationService.Instance.Warning("La carpeta seleccionada no existe", "Carpeta no válida");
                 return;
             }
             CurrentFolderPath = folderPath;
@@ -1778,7 +1811,7 @@ namespace ComicReader.Views
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"No se pudo abrir el Explorador: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ComicReader.Services.ErrorHandling.ErrorHandler.Instance.HandleException(ex, "Abrir carpeta en explorador", ComicReader.Services.ErrorHandling.ErrorRecoveryStrategy.Notify);
             }
         }
     }

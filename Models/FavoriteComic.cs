@@ -16,6 +16,7 @@ namespace ComicReader.Models
         private string _title;
         private string _filePath;
         private string _thumbnail;
+        private System.Windows.Media.Imaging.BitmapImage _thumbnailImage;
         private int _currentPage;
         private int _totalPages;
         private DateTime? _lastRead;
@@ -29,6 +30,15 @@ namespace ComicReader.Models
         public string Title { get => _title; set { _title = value; Raise(); } }
         public string FilePath { get => _filePath; set { _filePath = value; Raise(); } }
         public string Thumbnail { get => _thumbnail; set { _thumbnail = value; Raise(); } }
+        
+        /// <summary>
+        /// Imagen de portada del cómic (BitmapImage para binding directo en UI)
+        /// </summary>
+        public System.Windows.Media.Imaging.BitmapImage ThumbnailImage 
+        { 
+            get => _thumbnailImage; 
+            set { _thumbnailImage = value; Raise(); } 
+        }
 
         public int CurrentPage
         {
