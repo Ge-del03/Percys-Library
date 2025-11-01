@@ -12,7 +12,7 @@ namespace ComicReader.Services
             {
                 try
                 {
-                    ToastWindow.ShowToast(message, null, null, 2200, ComicReader.Views.ToastWindow.ToastKind.Comic);
+                    ToastManager.Instance.Enqueue(message, null, null, 2200, ComicReader.Views.ToastWindow.ToastKind.Comic);
                 }
                 catch { }
             });
@@ -24,7 +24,7 @@ namespace ComicReader.Services
             {
                 try
                 {
-                    ToastWindow.ShowToast(message, actionLabel, action, 2200, ComicReader.Views.ToastWindow.ToastKind.Comic);
+                    ToastManager.Instance.Enqueue(message, actionLabel, action, 2200, ComicReader.Views.ToastWindow.ToastKind.Comic);
                 }
                 catch { }
             });
@@ -37,7 +37,7 @@ namespace ComicReader.Services
             {
                 try
                 {
-                    ToastWindow.ShowToast(message, actionLabel, action, durationMs, ComicReader.Views.ToastWindow.ToastKind.Comic);
+                    ToastManager.Instance.Enqueue(message, actionLabel, action, durationMs, ComicReader.Views.ToastWindow.ToastKind.Comic);
                 }
                 catch { }
             });
@@ -49,7 +49,7 @@ namespace ComicReader.Services
             {
                 try
                 {
-                    ToastWindow.ShowToast(message, null, null, 2200, kind);
+                    ToastManager.Instance.Enqueue(message, null, null, 2200, kind);
                 }
                 catch { }
             });
@@ -61,7 +61,7 @@ namespace ComicReader.Services
             {
                 try
                 {
-                    ToastWindow.ShowToast(message, actionLabel, action, durationMs, kind);
+                    ToastManager.Instance.Enqueue(message, actionLabel, action, durationMs, kind);
                 }
                 catch { }
             });

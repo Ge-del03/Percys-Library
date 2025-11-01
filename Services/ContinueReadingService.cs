@@ -477,9 +477,9 @@ namespace ComicReader.Services
                     try
                     {
                         System.Windows.Application.Current?.Dispatcher?.BeginInvoke(new Action(() =>
-                        {
-                            try { ComicReader.Views.ToastWindow.ShowToast($"[Depuración] Se alcanzó 100%: {displayName}"); } catch { }
-                        }));
+                            {
+                                try { ComicReader.Services.ToastService.Show($"[Depuración] Se alcanzó 100%: {displayName}", ComicReader.Views.ToastWindow.ToastKind.Info); } catch { }
+                            }));
                     }
                     catch { }
 
@@ -582,7 +582,7 @@ namespace ComicReader.Services
                     // Mostrar un toast ligero para depuración: indicar que se movió a completados
                     System.Windows.Application.Current?.Dispatcher?.BeginInvoke(new Action(() =>
                     {
-                        try { ComicReader.Views.ToastWindow.ShowToast($"Completado: {displayName}"); } catch { }
+                        try { ComicReader.Services.ToastService.Show($"Completado: {displayName}", ComicReader.Views.ToastWindow.ToastKind.Success); } catch { }
                     }));
                 }
                 catch { }

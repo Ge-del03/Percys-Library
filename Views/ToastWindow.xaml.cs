@@ -167,6 +167,88 @@ namespace ComicReader.Views
             w.Show();
         }
 
+        /// <summary>
+        /// Async variant that completes when the toast window is closed. Useful for queuing.
+        /// </summary>
+        public static System.Threading.Tasks.Task ShowToastAsync(string message, string actionLabel, Action action, int durationMs, ToastKind kind)
+        {
+            var tcs = new System.Threading.Tasks.TaskCompletionSource<object>();
+            try
+            {
+                var w = new ToastWindow();
+                try
+                {
+                    var mi = w.GetType().GetMethod("InitializeComponent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+                    mi?.Invoke(w, null);
+                }
+                catch { }
+                try { var mt = w.FindName("MessageText") as System.Windows.Controls.TextBlock; if (mt != null) mt.Text = message; } catch { }
+                try
+                {
+                    var icon = w.FindName("IconText") as System.Windows.Controls.TextBlock;
+                    var root = w.FindName("RootBorder") as System.Windows.Controls.Border;
+                    var actionBtn = w.FindName("ActionButton") as System.Windows.Controls.Button;
+                    switch (kind)
+                    {
+                        case ToastKind.Success:
+                            if (icon != null) icon.Text = "✅";
+                            if (root != null) root.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#FFECF9F0");
+                            if (actionBtn != null) actionBtn.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#FF2BC67D");
+                            break;
+                        case ToastKind.Warning:
+                            if (icon != null) icon.Text = "⚠️";
+                            if (root != null) root.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#FFFFF7E0");
+                            break;
+                        case ToastKind.Error:
+                            if (icon != null) icon.Text = "❌";
+                            if (root != null) root.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#FFFFEBEB");
+                            break;
+                        default:
+                            if (icon != null) icon.Text = "💬";
+                            if (root != null) root.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#FF1B1F23");
+                            break;
+                    }
+                }
+                catch { }
+
+                w._action = action;
+                w._durationMs = durationMs <= 0 ? 2200 : durationMs;
+                if (!string.IsNullOrWhiteSpace(actionLabel) && action != null)
+                {
+                    try
+                    {
+                        var ab = w.FindName("ActionButton") as System.Windows.Controls.Button;
+                        if (ab != null)
+                        {
+                            ab.Content = actionLabel;
+                            ab.Visibility = Visibility.Visible;
+                        }
+                    }
+                    catch { }
+                }
+
+                w.WindowStartupLocation = WindowStartupLocation.Manual;
+                var desktop = SystemParameters.WorkArea;
+                w.Left = desktop.Right - w.Width - 20;
+                w.Top = desktop.Bottom - w.Height - 20;
+
+                // when closed, complete tcs
+                w.Closed += (s, e) =>
+                {
+                    try { tcs.TrySetResult(null); } catch { tcs.TrySetResult(null); }
+                };
+
+                // show on UI thread
+                try { w.Show(); } catch { try { System.Windows.Application.Current.Dispatcher.Invoke(() => w.Show()); } catch { } }
+            }
+            catch (Exception ex)
+            {
+                tcs.TrySetException(ex);
+            }
+
+            return tcs.Task;
+        }
+
         private void ActionButton_Click(object sender, RoutedEventArgs e)
         {
             try { _action?.Invoke(); } catch { }

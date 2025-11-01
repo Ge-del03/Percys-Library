@@ -759,7 +759,7 @@ namespace ComicReader.Views
                 if (result != MessageBoxResult.Yes) return;
                 ComicReader.Services.ContinueReadingService.Instance.ClearCompleted();
                 LoadCompletedComics();
-                ToastWindow.ShowToast("Completados borrados");
+                ComicReader.Services.ToastService.Show("Completados borrados", ComicReader.Views.ToastWindow.ToastKind.Success);
             }
             catch { }
         }
@@ -779,14 +779,14 @@ namespace ComicReader.Views
                 if (string.IsNullOrWhiteSpace(filePath)) return;
                 var menu = new System.Windows.Controls.ContextMenu();
                 var miRemove = new System.Windows.Controls.MenuItem { Header = "Eliminar de completados" };
-                miRemove.Click += (s, _) => { ComicReader.Services.ContinueReadingService.Instance.Remove(filePath); LoadCompletedComics(); ToastWindow.ShowToast("Eliminado de completados"); };
+                miRemove.Click += (s, _) => { ComicReader.Services.ContinueReadingService.Instance.Remove(filePath); LoadCompletedComics(); ComicReader.Services.ToastService.Show("Eliminado de completados", ComicReader.Views.ToastWindow.ToastKind.Success); };
                 var miRate = new System.Windows.Controls.MenuItem { Header = "Valorar" };
                 miRate.Click += (s, _) => {
                     var win = new RatingWindow(); win.Owner = Window.GetWindow(this);
                     if (win.ShowDialog() == true)
                     {
                         var item = ComicReader.Services.ContinueReadingService.Instance.CompletedItems.FirstOrDefault(x => string.Equals(x.FilePath, filePath, StringComparison.OrdinalIgnoreCase));
-                        if (item != null) { item.Rating = win.Stars; item.Review = win.Comment; ComicReader.Services.ContinueReadingService.Instance.Save(); ToastWindow.ShowToast("Valoración guardada"); }
+                        if (item != null) { item.Rating = win.Stars; item.Review = win.Comment; ComicReader.Services.ContinueReadingService.Instance.Save(); ComicReader.Services.ToastService.Show("Valoración guardada", ComicReader.Views.ToastWindow.ToastKind.Success); }
                     }
                 };
                 var miShare = new System.Windows.Controls.MenuItem { Header = "Compartir" };
@@ -794,7 +794,7 @@ namespace ComicReader.Views
                     // Generar enlace simple (file://)
                     var link = new System.Uri(filePath).AbsoluteUri;
                     System.Windows.Clipboard.SetText(link);
-                    ToastWindow.ShowToast("Enlace copiado al portapapeles");
+                    ComicReader.Services.ToastService.Show("Enlace copiado al portapapeles", ComicReader.Views.ToastWindow.ToastKind.Info);
                 };
                 menu.Items.Add(miRemove);
                 menu.Items.Add(miRate);
