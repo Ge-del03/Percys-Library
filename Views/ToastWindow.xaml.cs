@@ -1,12 +1,14 @@
 using System;
 using System.Windows;
 using System.Windows.Media.Animation;
+using System.Windows.Media;
 using System.Threading.Tasks;
 
 namespace ComicReader.Views
 {
     public partial class ToastWindow : Window
     {
+        public enum ToastKind { Info, Success, Warning, Error, Comic }
         private Action _action;
         private System.Windows.Threading.DispatcherTimer _timer;
         private int _durationMs = 2200;
@@ -30,8 +32,27 @@ namespace ComicReader.Views
             var wa = SystemParameters.WorkArea;
             Left = wa.Right - Width - 16;
             Top = wa.Bottom - Height - 16;
-            var fadeIn = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromMilliseconds(200)));
+            // entrance: slide up + fade in
+            try
+            {
+                var rootBorder = this.FindName("RootBorder") as System.Windows.Controls.Border;
+                if (rootBorder != null) rootBorder.RenderTransform = new TranslateTransform(0, 14);
+            }
+            catch { }
+            var fadeIn = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromMilliseconds(220))) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } };
             this.BeginAnimation(OpacityProperty, fadeIn);
+            try
+            {
+                var rootBorder = this.FindName("RootBorder") as System.Windows.Controls.Border;
+                var tr = (rootBorder?.RenderTransform as TranslateTransform) ?? new TranslateTransform(0, 14);
+                var slide = new DoubleAnimation(14, 0, new Duration(TimeSpan.FromMilliseconds(260))) { EasingFunction = new BackEase { Amplitude = 0.45, EasingMode = EasingMode.EaseOut } };
+                if (rootBorder != null)
+                {
+                    rootBorder.RenderTransform = tr;
+                    tr.BeginAnimation(TranslateTransform.YProperty, slide);
+                }
+            }
+            catch { }
 
             // start TTL timer to update progress and close when elapsed
             _elapsedMs = 0;
@@ -72,10 +93,15 @@ namespace ComicReader.Views
 
         public static void ShowToast(string message)
         {
-            ShowToast(message, null, null, 2200);
+            ShowToast(message, null, null, 2200, ToastKind.Comic);
         }
 
         public static void ShowToast(string message, string actionLabel, Action action, int durationMs)
+        {
+            ShowToast(message, actionLabel, action, durationMs, ToastKind.Comic);
+        }
+
+        public static void ShowToast(string message, string actionLabel, Action action, int durationMs, ToastKind kind)
         {
             var w = new ToastWindow();
             // Ensure components and set values via FindName to avoid reliance on generated fields
@@ -89,6 +115,34 @@ namespace ComicReader.Views
             {
                 var mt = w.FindName("MessageText") as System.Windows.Controls.TextBlock;
                 if (mt != null) mt.Text = message;
+            }
+            catch { }
+            // set visual style based on kind
+            try
+            {
+                var icon = w.FindName("IconText") as System.Windows.Controls.TextBlock;
+                var root = w.FindName("RootBorder") as System.Windows.Controls.Border;
+                var actionBtn = w.FindName("ActionButton") as System.Windows.Controls.Button;
+                switch (kind)
+                {
+                    case ToastKind.Success:
+                        if (icon != null) icon.Text = "✅";
+                        if (root != null) root.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#FFECF9F0");
+                        if (actionBtn != null) actionBtn.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#FF2BC67D");
+                        break;
+                    case ToastKind.Warning:
+                        if (icon != null) icon.Text = "⚠️";
+                        if (root != null) root.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#FFFFF7E0");
+                        break;
+                    case ToastKind.Error:
+                        if (icon != null) icon.Text = "❌";
+                        if (root != null) root.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#FFFFEBEB");
+                        break;
+                    default:
+                        if (icon != null) icon.Text = "💬";
+                        if (root != null) root.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFromString("#FF1B1F23");
+                        break;
+                }
             }
             catch { }
             w._action = action;
