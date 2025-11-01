@@ -39,8 +39,11 @@ namespace ComicReader.ViewModels
         }
     }
 
-    public class ReadingStatsViewModel
+    public class ReadingStatsViewModel : System.ComponentModel.INotifyPropertyChanged
     {
+        private string _favoriteGenre = "—";
+        private string _favoriteDay = "—";
+        private string _preferredFormat = "—";
         private readonly IReadingStatsService _statsService = ComicReader.Core.Services.ServiceLocator.TryGet<IReadingStatsService>();
         private readonly DispatcherTimer _refreshTimer;
         private const string ThumbCacheVersion = "v2";
@@ -62,6 +65,10 @@ namespace ComicReader.ViewModels
         }
 
         public ObservableCollection<SessionItem> TodaySessions { get; } = new ObservableCollection<SessionItem>();
+
+    public string FavoriteGenre { get => _favoriteGenre; set { _favoriteGenre = value; OnPropertyChanged(); } }
+    public string FavoriteDay { get => _favoriteDay; set { _favoriteDay = value; OnPropertyChanged(); } }
+    public string PreferredFormat { get => _preferredFormat; set { _preferredFormat = value; OnPropertyChanged(); } }
 
         // LiveCharts series
         public ISeries[] Series { get; private set; }
@@ -90,6 +97,12 @@ namespace ComicReader.ViewModels
 
             // Persist order when collection changes (reorder via drag & drop)
             Stats.CollectionChanged += (s, e) => SaveOrder();
+        }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propName = null)
+        {
+            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propName));
         }
 
         private void EnsureDefaultStats()
@@ -155,6 +168,15 @@ namespace ComicReader.ViewModels
                     // series remain a simple column series showing comics this week as sample
                     Series = new ISeries[] { new ColumnSeries<double> { Values = new double[] { dash.ComicsThisWeek, dash.ComicsThisMonth }, Name = "Lecturas" } };
                     Labels = new[] { "Semana", "Mes" };
+
+                    // Update favorites values for the UI
+                    try
+                    {
+                        FavoriteGenre = string.IsNullOrWhiteSpace(dash.FavoriteGenre) ? "—" : dash.FavoriteGenre;
+                        FavoriteDay = string.IsNullOrWhiteSpace(dash.FavoriteDay) ? "—" : dash.FavoriteDay;
+                        PreferredFormat = string.IsNullOrWhiteSpace(dash.PreferredFormat) ? "—" : dash.PreferredFormat;
+                    }
+                    catch { }
                 }
 
                 // progress list: try to attach a cached thumbnail path if available

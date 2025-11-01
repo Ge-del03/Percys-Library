@@ -102,9 +102,9 @@
 				<Border Style="{StaticResource RS_StatCardStyle}" Padding="10" Margin="0,0,0,12">
 					<StackPanel>
 						<TextBlock Text="Favoritos" Foreground="{StaticResource RS_TextOnDarkBrush}" FontWeight="SemiBold" Margin="0,0,0,8"/>
-						<TextBlock Text="Género Favorito: —" Foreground="{StaticResource RS_TextOnDarkBrush}"/>
-						<TextBlock Text="Día Favorito: Jueves" Foreground="{StaticResource RS_TextOnDarkBrush}"/>
-						<TextBlock Text="Formato Preferido: CBR" Foreground="{StaticResource RS_TextOnDarkBrush}"/>
+						<TextBlock Foreground="{StaticResource RS_TextOnDarkBrush}" Text="{Binding FavoriteGenre, StringFormat=Género Favorito: {0}}" />
+						<TextBlock Foreground="{StaticResource RS_TextOnDarkBrush}" Text="{Binding FavoriteDay, StringFormat=Día Favorito: {0}}" />
+						<TextBlock Foreground="{StaticResource RS_TextOnDarkBrush}" Text="{Binding PreferredFormat, StringFormat=Formato Preferido: {0}}" />
 					</StackPanel>
 				</Border>
 
