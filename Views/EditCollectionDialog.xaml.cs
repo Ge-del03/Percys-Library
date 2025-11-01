@@ -2,6 +2,7 @@ using System;
 using System.Windows;
 using ComicReader.Core.Abstractions;
 using Microsoft.Win32;
+using ComicReader.Core.Services;
 using System.Linq;
 using System.Collections.Generic;
 using System.Windows.Input;
@@ -72,6 +73,37 @@ namespace ComicReader.Views
             _undoStack.Push((selectedDtos, firstIndex));
             foreach (var s in selectedVMs) _itemsCollection.Remove(s);
             UndoButton.IsEnabled = true;
+
+            // Also register with central undo service so the user sees a global toast undo
+            try
+            {
+                var undoSvc = ServiceLocator.TryGet<ComicReader.Services.IUndoService>();
+                if (undoSvc != null)
+                {
+                    // Capture data for the action
+                    var dtos = selectedDtos.Select(d => new Core.Abstractions.ComicItemDto { Path = d.Path, Title = d.Title, ThumbPath = d.ThumbPath }).ToList();
+                    var idx = firstIndex;
+                    undoSvc.Register($"{dtos.Count} cómics eliminados", "Deshacer", () =>
+                    {
+                        try
+                        {
+                            // Avoid duplicate insertion if local undo already restored
+                            bool alreadyPresent = dtos.All(d => _itemsCollection.Any(vm => string.Equals(vm.Path, d.Path, StringComparison.OrdinalIgnoreCase)));
+                            if (alreadyPresent) return;
+                            var insertAt = Math.Min(idx, _itemsCollection.Count);
+                            foreach (var it in dtos)
+                            {
+                                System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                                {
+                                    try { _itemsCollection.Insert(insertAt++, new ViewModels.ComicItemViewModel(it)); } catch { }
+                                });
+                            }
+                        }
+                        catch { }
+                    });
+                }
+            }
+            catch { }
         }
 
         private void Undo_Click(object sender, RoutedEventArgs e)
