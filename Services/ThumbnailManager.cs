@@ -17,14 +17,15 @@ namespace ComicReader.Services
     /// </summary>
     public class ThumbnailManager : IDisposable
     {
-        private readonly SemaphoreSlim _semaphore;
+        private SemaphoreSlim _semaphore;
         private readonly ConcurrentDictionary<string, Task> _tasks = new ConcurrentDictionary<string, Task>(StringComparer.OrdinalIgnoreCase);
     private readonly string _cacheDir;
-    private readonly int _maxCacheFiles;
-    private readonly long _maxCacheBytes;
+    private int _maxCacheFiles;
+    private long _maxCacheBytes;
+    private readonly object _sync = new object();
     private bool _disposed;
 
-    public ThumbnailManager(int maxConcurrency = 2, int maxCacheFiles = 500, long maxCacheBytes = 200 * 1024 * 1024, string cacheDirectory = null)
+        public ThumbnailManager(int maxConcurrency = 2, int maxCacheFiles = 500, long maxCacheBytes = 200 * 1024 * 1024, string cacheDirectory = null)
         {
             _semaphore = new SemaphoreSlim(maxConcurrency);
             if (!string.IsNullOrWhiteSpace(cacheDirectory))
@@ -40,6 +41,29 @@ namespace ComicReader.Services
             // Allow test-friendly small values; minimum 1 file and minimum 1KB
             _maxCacheFiles = Math.Max(1, maxCacheFiles);
             _maxCacheBytes = Math.Max(1024, maxCacheBytes);
+        }
+
+        /// <summary>
+        /// Reconfigure runtime limits (concurrency and cache limits). Safe to call concurrently.
+        /// </summary>
+        public void Reconfigure(int maxConcurrency, int maxCacheFiles, long maxCacheBytes)
+        {
+            try
+            {
+                lock (_sync)
+                {
+                    if (maxConcurrency > 0 && (_semaphore == null || _semaphore.CurrentCount != maxConcurrency))
+                    {
+                        try { _semaphore?.Dispose(); } catch { }
+                        _semaphore = new SemaphoreSlim(Math.Max(1, maxConcurrency));
+                    }
+                    _maxCacheFiles = Math.Max(1, maxCacheFiles);
+                    _maxCacheBytes = Math.Max(1024, maxCacheBytes);
+                }
+                // perform a maintenance pass to enforce new limits
+                try { EnforceCacheLimit(); } catch { }
+            }
+            catch { }
         }
 
         public string TryGetCached(string filePath)

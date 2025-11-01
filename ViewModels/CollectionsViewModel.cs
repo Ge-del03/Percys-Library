@@ -76,16 +76,24 @@ namespace ComicReader.ViewModels
             _service = service ?? throw new ArgumentNullException(nameof(service));
             _undoService = undoService ?? throw new ArgumentNullException(nameof(undoService));
             _toastInvoker = ToastService.Show;
-            // Initialize thumbnail manager using app settings so users can control cache limits
+            // Prefer a global ThumbnailManager registered in ServiceLocator; fall back to a local instance.
             try
             {
-                var concurrency = 2;
-                try { concurrency = SettingsManager.Settings?.ConcurrencyCap ?? 2; } catch { }
-                var maxFiles = 500;
-                try { maxFiles = SettingsManager.Settings?.ThumbCacheMaxFiles ?? 500; } catch { }
-                var maxBytes = 200 * 1024 * 1024L;
-                try { maxBytes = SettingsManager.Settings?.ThumbCacheMaxBytes ?? maxBytes; } catch { }
-                _thumbnailManager = new Services.ThumbnailManager(Math.Max(1, concurrency), Math.Max(1, maxFiles), Math.Max(1024, maxBytes));
+                var global = ComicReader.Core.Services.ServiceLocator.TryGet<Services.ThumbnailManager>();
+                if (global != null)
+                {
+                    _thumbnailManager = global;
+                }
+                else
+                {
+                    var concurrency = 2;
+                    try { concurrency = SettingsManager.Settings?.ConcurrencyCap ?? 2; } catch { }
+                    var maxFiles = 500;
+                    try { maxFiles = SettingsManager.Settings?.ThumbCacheMaxFiles ?? 500; } catch { }
+                    var maxBytes = 200 * 1024 * 1024L;
+                    try { maxBytes = SettingsManager.Settings?.ThumbCacheMaxBytes ?? maxBytes; } catch { }
+                    _thumbnailManager = new Services.ThumbnailManager(Math.Max(1, concurrency), Math.Max(1, maxFiles), Math.Max(1024, maxBytes));
+                }
             }
             catch
             {

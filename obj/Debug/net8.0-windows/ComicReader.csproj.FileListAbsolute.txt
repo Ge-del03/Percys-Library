@@ -140,7 +140,6 @@ c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\Con
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\Controls\SliderComic.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\Controls\ToggleComic.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\CoverGridView.baml
-c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\EditCollectionDialog.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\FavoritesWindow.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\FileExplorerView.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\LibraryManagerWindow.baml
@@ -216,6 +215,7 @@ c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\Con
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\Controls\CollectionCard.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\Controls\ColorPickerSimple.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\Controls\StatCard.baml
+c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\EditCollectionDialog.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\FavoritesSection.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\HomeView.baml
 c:\Users\O11CE\OneDrive\Desktop\Percy Library\obj\Debug\net8.0-windows\Views\Sections\AppearanceSection.baml

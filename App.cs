@@ -263,6 +263,47 @@ namespace ComicReader
                     ServiceLocator.RegisterSingleton<ComicReader.Services.IUndoService>(new ComicReader.Services.UndoService(ComicReader.Services.ToastService.Show));
                 }
                 catch { }
+                // Register a global ThumbnailManager and subscribe to settings changes so cache limits
+                // and concurrency can be updated at runtime.
+                try
+                {
+                    var concurrency = 2;
+                    try { concurrency = SettingsManager.Settings?.ConcurrencyCap ?? concurrency; } catch { }
+                    var maxFiles = 500;
+                    try { maxFiles = SettingsManager.Settings?.ThumbCacheMaxFiles ?? maxFiles; } catch { }
+                    var maxBytes = 200 * 1024 * 1024L;
+                    try { maxBytes = SettingsManager.Settings?.ThumbCacheMaxBytes ?? maxBytes; } catch { }
+
+                    var thumbMgr = new ComicReader.Services.ThumbnailManager(Math.Max(1, concurrency), Math.Max(1, maxFiles), Math.Max(1024, maxBytes));
+                    ServiceLocator.RegisterSingleton<ComicReader.Services.ThumbnailManager>(thumbMgr);
+
+                    // Listen to settings changes to reconfigure the ThumbnailManager at runtime
+                    try
+                    {
+                        SettingsManager.Settings.PropertyChanged += (s, ev) =>
+                        {
+                            try
+                            {
+                                if (ev.PropertyName == nameof(Services.AppSettings.ThumbCacheMaxFiles)
+                                    || ev.PropertyName == nameof(Services.AppSettings.ThumbCacheMaxBytes)
+                                    || ev.PropertyName == nameof(Services.AppSettings.ConcurrencyCap))
+                                {
+                                    try
+                                    {
+                                        var c = SettingsManager.Settings.ConcurrencyCap;
+                                        var mf = SettingsManager.Settings.ThumbCacheMaxFiles;
+                                        var mb = SettingsManager.Settings.ThumbCacheMaxBytes;
+                                        thumbMgr.Reconfigure(Math.Max(1, c), Math.Max(1, mf), Math.Max(1024, mb));
+                                    }
+                                    catch { }
+                                }
+                            }
+                            catch { }
+                        };
+                    }
+                    catch { }
+                }
+                catch { }
                 
                 ComicReader.Utils.DevLogger.Info("Aplicación iniciada exitosamente");
             }
