@@ -183,12 +183,12 @@
 
                                         <StackPanel Orientation="Horizontal" Margin="0,10">
                                             <TextBlock Text="Carpeta por defecto" Style="{StaticResource LabelText}" Width="360"/>
-                                            <TextBlock Text="{Binding AppSettings.DefaultComicsFolder}" Style="{StaticResource LabelText}" Width="360" TextTrimming="CharacterEllipsis"/>
-                                            <Button Style="{StaticResource ComicButton}" Content="Cambiar" Command="{Binding ChangeFolderCommand}" />
+                                            <TextBlock Text="{Binding AppSettings.DefaultComicsFolder}" Style="{StaticResource LabelText}" Width="320" TextTrimming="CharacterEllipsis"/>
+                                            <Button Style="{StaticResource ComicButton}" Content="Cambiar" Command="{Binding ChangeFolderCommand}" Margin="4,0"/>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,14,0,0" HorizontalAlignment="Right">
-                                            <Button Style="{StaticResource ComicButton}" Content="Restaurar por defecto" Command="{Binding RestoreDefaultsCommand}"/>
+                                            <Button Style="{StaticResource ComicButton}" Content="Restaurar por defecto" Command="{Binding RestoreDefaultsCommand}" Padding="14,8" MinWidth="180"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </Border>
@@ -222,10 +222,10 @@
 
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Tamaño UI" Style="{StaticResource LabelText}" Width="360"/>
-                                            <ComboBox SelectedItem="{Binding AppSettings.UIScale, Mode=TwoWay}" Width="180">
-                                                <ComboBoxItem>Small</ComboBoxItem>
-                                                <ComboBoxItem>Medium</ComboBoxItem>
-                                                <ComboBoxItem>Large</ComboBoxItem>
+                                            <ComboBox SelectedValue="{Binding AppSettings.UIScale, Mode=TwoWay}" SelectedValuePath="Content" Width="180">
+                                                <ComboBoxItem Content="Small"/>
+                                                <ComboBoxItem Content="Medium"/>
+                                                <ComboBoxItem Content="Large"/>
                                             </ComboBox>
                                         </StackPanel>
 
@@ -247,28 +247,28 @@
 
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Dirección de lectura" Style="{StaticResource LabelText}" Width="360"/>
-                                            <ComboBox SelectedItem="{Binding AppSettings.CurrentReadingDirection, Mode=TwoWay}" Width="200">
-                                                <ComboBoxItem>LeftToRight</ComboBoxItem>
-                                                <ComboBoxItem>RightToLeft</ComboBoxItem>
+                                            <ComboBox SelectedValue="{Binding AppSettings.CurrentReadingDirection, Mode=TwoWay}" SelectedValuePath="Content" Width="200">
+                                                <ComboBoxItem Content="LeftToRight"/>
+                                                <ComboBoxItem Content="RightToLeft"/>
                                             </ComboBox>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Tipo de lectura" Style="{StaticResource LabelText}" Width="360"/>
-                                            <ComboBox SelectedItem="{Binding AppSettings.ReadingMode, Mode=TwoWay}" Width="200">
-                                                <ComboBoxItem>PageByPage</ComboBoxItem>
-                                                <ComboBoxItem>Continuous</ComboBoxItem>
-                                                <ComboBoxItem>DoublePage</ComboBoxItem>
+                                            <ComboBox SelectedValue="{Binding AppSettings.ReadingMode, Mode=TwoWay}" SelectedValuePath="Content" Width="200">
+                                                <ComboBoxItem Content="PageByPage"/>
+                                                <ComboBoxItem Content="Continuous"/>
+                                                <ComboBoxItem Content="DoublePage"/>
                                             </ComboBox>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Animación al pasar página" Style="{StaticResource LabelText}" Width="360"/>
-                                            <ComboBox SelectedItem="{Binding AppSettings.PageTurnAnimation, Mode=TwoWay}" Width="200">
-                                                <ComboBoxItem>None</ComboBoxItem>
-                                                <ComboBoxItem>Fade</ComboBoxItem>
-                                                <ComboBoxItem>Slide</ComboBoxItem>
-                                                <ComboBoxItem>Flip</ComboBoxItem>
+                                            <ComboBox SelectedValue="{Binding AppSettings.PageTurnAnimation, Mode=TwoWay}" SelectedValuePath="Content" Width="200">
+                                                <ComboBoxItem Content="None"/>
+                                                <ComboBoxItem Content="Fade"/>
+                                                <ComboBoxItem Content="Slide"/>
+                                                <ComboBoxItem Content="Flip"/>
                                             </ComboBox>
                                         </StackPanel>
 

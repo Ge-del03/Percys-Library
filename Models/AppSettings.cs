@@ -244,6 +244,13 @@ namespace ComicReader.Services
         private ReadingDirection _currentReadingDirection = ReadingDirection.LeftToRight;
         public ReadingDirection CurrentReadingDirection { get => _currentReadingDirection; set => SetProperty(ref _currentReadingDirection, value); }
 
+        // Additional properties for Settings UI compatibility
+        private string _readingMode = "PageByPage";
+        public string ReadingMode { get => _readingMode; set => SetProperty(ref _readingMode, value); }
+
+        private string _pageTurnAnimation = "Fade";
+        public string PageTurnAnimation { get => _pageTurnAnimation; set => SetProperty(ref _pageTurnAnimation, value); }
+
         // Add more stubs here as needed by other parts of the app.
     }
 }
