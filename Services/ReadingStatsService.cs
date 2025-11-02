@@ -200,6 +200,168 @@ namespace ComicReader.Services
             };
         }
 
+        public ReadingInsights GetInsights(int days = 30)
+        {
+            var insights = new ReadingInsights();
+            try
+            {
+                if (days < 7) days = 7;
+                if (days > 180) days = 180;
+
+                var now = DateTime.Now;
+                var startDate = now.Date.AddDays(-(days - 1));
+
+                var scopedSessions = _data.Sessions
+                    .Where(s => s.StartTime.Date >= startDate)
+                    .OrderBy(s => s.StartTime)
+                    .ToList();
+
+                var daily = new List<DailyActivityPoint>();
+                for (var cursor = startDate; cursor <= now.Date; cursor = cursor.AddDays(1))
+                {
+                    var daySessions = scopedSessions.Where(s => s.StartTime.Date == cursor).ToList();
+                    var minutes = daySessions.Sum(s => (s.EndTime - s.StartTime).TotalMinutes);
+                    var pages = daySessions.Sum(s => s.PagesRead);
+                    daily.Add(new DailyActivityPoint
+                    {
+                        Date = cursor,
+                        Minutes = minutes,
+                        Pages = pages
+                    });
+                }
+
+                var dow = scopedSessions
+                    .GroupBy(s => s.StartTime.DayOfWeek)
+                    .Select(g => new DayOfWeekActivityPoint
+                    {
+                        Day = g.Key,
+                        Sessions = g.Count(),
+                        Minutes = g.Sum(s => (s.EndTime - s.StartTime).TotalMinutes),
+                        Pages = g.Sum(s => s.PagesRead)
+                    })
+                    .OrderBy(g => ((int)g.Day + 6) % 7) // Monday-first ordering
+                    .ToList();
+
+                var hourly = scopedSessions
+                    .GroupBy(s => s.StartTime.Hour)
+                    .Select(g => new HourlyActivityPoint
+                    {
+                        Hour = g.Key,
+                        Sessions = g.Count(),
+                        Minutes = g.Sum(s => (s.EndTime - s.StartTime).TotalMinutes),
+                        Pages = g.Sum(s => s.PagesRead)
+                    })
+                    .OrderBy(g => g.Hour)
+                    .ToList();
+
+                // Genre distribution leveraging Favorites tags when present
+                var genreCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                try
+                {
+                    var activityPaths = scopedSessions.Select(s => s.ComicPath)
+                        .Concat(_data.Progress.Select(p => p.ComicPath))
+                        .Where(p => !string.IsNullOrWhiteSpace(p))
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .ToList();
+
+                    if (activityPaths.Count > 0)
+                    {
+                        var collections = FavoritesStorage.Load();
+                        foreach (var item in collections.SelectMany(c => c.Items))
+                        {
+                            if (string.IsNullOrWhiteSpace(item.FilePath))
+                                continue;
+                            if (!activityPaths.Contains(item.FilePath))
+                                continue;
+
+                            if (item.Tags == null || item.Tags.Count == 0)
+                                continue;
+
+                            foreach (var rawTag in item.Tags)
+                            {
+                                var tag = rawTag?.Trim();
+                                if (string.IsNullOrWhiteSpace(tag))
+                                    continue;
+                                if (genreCounts.TryGetValue(tag, out var count)) genreCounts[tag] = count + 1;
+                                else genreCounts[tag] = 1;
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    // ignore tagging failures and rely on fallbacks
+                }
+
+                if (genreCounts.Count == 0)
+                {
+                    foreach (var path in scopedSessions.Select(s => s.ComicPath)
+                                 .Where(p => !string.IsNullOrWhiteSpace(p)))
+                    {
+                        var genreKey = GuessFallbackGenre(path);
+                        if (genreCounts.TryGetValue(genreKey, out var count)) genreCounts[genreKey] = count + 1;
+                        else genreCounts[genreKey] = 1;
+                    }
+                }
+
+                var genres = genreCounts
+                    .OrderByDescending(kv => kv.Value)
+                    .Take(8)
+                    .Select(kv => new GenreDistributionPoint { Genre = kv.Key, Count = kv.Value })
+                    .ToList();
+
+                var leaderboard = _data.Progress
+                    .Where(p => p.TotalPages > 0)
+                    .OrderByDescending(p => p.Progress * 1.0 / Math.Max(1, p.TotalPages))
+                    .ThenByDescending(p => p.LastRead)
+                    .Take(6)
+                    .Select(p => new CompletionLeaderboardEntry
+                    {
+                        Title = p.Title ?? Path.GetFileNameWithoutExtension(p.ComicPath) ?? "—",
+                        Completion = Math.Min(100d, Math.Round(p.Progress * 100d / Math.Max(1, p.TotalPages), 1)),
+                        PagesRead = p.Progress,
+                        TotalPages = p.TotalPages,
+                        LastRead = p.LastRead
+                    })
+                    .ToList();
+
+                insights = new ReadingInsights
+                {
+                    DailyActivity = daily,
+                    DayOfWeekActivity = dow,
+                    HourlyActivity = hourly,
+                    GenreDistribution = genres,
+                    CompletionLeaderboard = leaderboard
+                };
+            }
+            catch
+            {
+                // Return whatever we could compute so far
+            }
+
+            return insights;
+        }
+
+        private static string GuessFallbackGenre(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+                return "Sin etiqueta";
+
+            try
+            {
+                var ext = Path.GetExtension(path) ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(ext))
+                    return ext.Trim('.').ToUpperInvariant();
+
+                var folder = Path.GetFileName(Path.GetDirectoryName(path) ?? string.Empty);
+                if (!string.IsNullOrWhiteSpace(folder))
+                    return folder;
+            }
+            catch { }
+
+            return "Sin etiqueta";
+        }
+
         public IEnumerable<ComicProgressInfo> GetRecentProgress(int count = 10)
         {
             return _data.Progress
