@@ -27,6 +27,7 @@ namespace ComicReader.Views
                 Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
                 {
                     try { UpdateSectionVisibility(_vm?.SelectedSection); } catch { }
+                    try { InitializeComboBoxValues(); } catch { }
                     if (_vm != null)
                     {
                         try
@@ -72,6 +73,72 @@ namespace ComicReader.Views
                 SetVis("Panel_Acerca", "Acerca");
             }
             catch { /* safe-ignore UI update errors */ }
+        }
+
+        private void InitializeComboBoxValues()
+        {
+            try
+            {
+                var settings = ComicReader.Services.SettingsManager.Settings;
+                
+                // ReadingDirection
+                var dirCombo = this.FindName("ReadingDirectionCombo") as ComboBox;
+                if (dirCombo != null)
+                {
+                    var dirTag = settings.CurrentReadingDirection.ToString();
+                    foreach (ComboBoxItem item in dirCombo.Items)
+                    {
+                        if (item.Tag?.ToString() == dirTag)
+                        {
+                            dirCombo.SelectedItem = item;
+                            break;
+                        }
+                    }
+                }
+
+                // ReadingMode
+                var modeCombo = this.FindName("ReadingModeCombo") as ComboBox;
+                if (modeCombo != null)
+                {
+                    foreach (ComboBoxItem item in modeCombo.Items)
+                    {
+                        if (item.Tag?.ToString() == settings.ReadingMode)
+                        {
+                            modeCombo.SelectedItem = item;
+                            break;
+                        }
+                    }
+                }
+
+                // PageTurnAnimation
+                var animCombo = this.FindName("PageTurnAnimationCombo") as ComboBox;
+                if (animCombo != null)
+                {
+                    foreach (ComboBoxItem item in animCombo.Items)
+                    {
+                        if (item.Tag?.ToString() == settings.PageTurnAnimation)
+                        {
+                            animCombo.SelectedItem = item;
+                            break;
+                        }
+                    }
+                }
+
+                // UIScale
+                var scaleCombo = this.FindName("UIScaleCombo") as ComboBox;
+                if (scaleCombo != null)
+                {
+                    foreach (ComboBoxItem item in scaleCombo.Items)
+                    {
+                        if (item.Tag?.ToString() == settings.UIScale)
+                        {
+                            scaleCombo.SelectedItem = item;
+                            break;
+                        }
+                    }
+                }
+            }
+            catch { }
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
@@ -137,6 +204,69 @@ namespace ComicReader.Views
             {
                 var vm = this.DataContext as SettingsViewModel;
                 vm?.FilterSections(((TextBox)sender).Text);
+            }
+            catch { }
+        }
+
+        private void ReadingDirectionCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                var combo = sender as ComboBox;
+                var item = combo?.SelectedItem as ComboBoxItem;
+                if (item?.Tag is string tag)
+                {
+                    if (Enum.TryParse<ComicReader.Services.ReadingDirection>(tag, out var direction))
+                    {
+                        ComicReader.Services.SettingsManager.Settings.CurrentReadingDirection = direction;
+                        ComicReader.Services.SettingsManager.SaveSettings();
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private void ReadingModeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                var combo = sender as ComboBox;
+                var item = combo?.SelectedItem as ComboBoxItem;
+                if (item?.Tag is string mode)
+                {
+                    ComicReader.Services.SettingsManager.Settings.ReadingMode = mode;
+                    ComicReader.Services.SettingsManager.SaveSettings();
+                }
+            }
+            catch { }
+        }
+
+        private void PageTurnAnimationCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                var combo = sender as ComboBox;
+                var item = combo?.SelectedItem as ComboBoxItem;
+                if (item?.Tag is string animation)
+                {
+                    ComicReader.Services.SettingsManager.Settings.PageTurnAnimation = animation;
+                    ComicReader.Services.SettingsManager.SaveSettings();
+                }
+            }
+            catch { }
+        }
+
+        private void UIScaleCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                var combo = sender as ComboBox;
+                var item = combo?.SelectedItem as ComboBoxItem;
+                if (item?.Tag is string scale)
+                {
+                    ComicReader.Services.SettingsManager.Settings.UIScale = scale;
+                    ComicReader.Services.SettingsManager.SaveSettings();
+                }
             }
             catch { }
         }

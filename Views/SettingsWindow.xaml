@@ -222,10 +222,10 @@
 
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Tamaño UI" Style="{StaticResource LabelText}" Width="360"/>
-                                            <ComboBox SelectedValue="{Binding AppSettings.UIScale, Mode=TwoWay}" SelectedValuePath="Content" Width="180">
-                                                <ComboBoxItem Content="Small"/>
-                                                <ComboBoxItem Content="Medium"/>
-                                                <ComboBoxItem Content="Large"/>
+                                            <ComboBox x:Name="UIScaleCombo" Width="180" SelectionChanged="UIScaleCombo_SelectionChanged">
+                                                <ComboBoxItem Content="Pequeño" Tag="Small"/>
+                                                <ComboBoxItem Content="Mediano" Tag="Medium"/>
+                                                <ComboBoxItem Content="Grande" Tag="Large"/>
                                             </ComboBox>
                                         </StackPanel>
 
@@ -247,28 +247,28 @@
 
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Dirección de lectura" Style="{StaticResource LabelText}" Width="360"/>
-                                            <ComboBox SelectedValue="{Binding AppSettings.CurrentReadingDirection, Mode=TwoWay}" SelectedValuePath="Content" Width="200">
-                                                <ComboBoxItem Content="LeftToRight"/>
-                                                <ComboBoxItem Content="RightToLeft"/>
+                                            <ComboBox x:Name="ReadingDirectionCombo" Width="200" SelectionChanged="ReadingDirectionCombo_SelectionChanged">
+                                                <ComboBoxItem Content="Izquierda a Derecha" Tag="LeftToRight"/>
+                                                <ComboBoxItem Content="Derecha a Izquierda" Tag="RightToLeft"/>
                                             </ComboBox>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Tipo de lectura" Style="{StaticResource LabelText}" Width="360"/>
-                                            <ComboBox SelectedValue="{Binding AppSettings.ReadingMode, Mode=TwoWay}" SelectedValuePath="Content" Width="200">
-                                                <ComboBoxItem Content="PageByPage"/>
-                                                <ComboBoxItem Content="Continuous"/>
-                                                <ComboBoxItem Content="DoublePage"/>
+                                            <ComboBox x:Name="ReadingModeCombo" Width="200" SelectionChanged="ReadingModeCombo_SelectionChanged">
+                                                <ComboBoxItem Content="Página por página" Tag="PageByPage"/>
+                                                <ComboBoxItem Content="Continuo" Tag="Continuous"/>
+                                                <ComboBoxItem Content="Doble página" Tag="DoublePage"/>
                                             </ComboBox>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Animación al pasar página" Style="{StaticResource LabelText}" Width="360"/>
-                                            <ComboBox SelectedValue="{Binding AppSettings.PageTurnAnimation, Mode=TwoWay}" SelectedValuePath="Content" Width="200">
-                                                <ComboBoxItem Content="None"/>
-                                                <ComboBoxItem Content="Fade"/>
-                                                <ComboBoxItem Content="Slide"/>
-                                                <ComboBoxItem Content="Flip"/>
+                                            <ComboBox x:Name="PageTurnAnimationCombo" Width="200" SelectionChanged="PageTurnAnimationCombo_SelectionChanged">
+                                                <ComboBoxItem Content="Ninguna" Tag="None"/>
+                                                <ComboBoxItem Content="Fundido" Tag="Fade"/>
+                                                <ComboBoxItem Content="Deslizar" Tag="Slide"/>
+                                                <ComboBoxItem Content="Voltear" Tag="Flip"/>
                                             </ComboBox>
                                         </StackPanel>
 
