@@ -2,83 +2,81 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Paleta principal para la sección de estadísticas -->
-    <Color x:Key="RS_AppBackgroundColor">#0F1824</Color>
-    <Color x:Key="RS_SurfaceColor">#162132</Color>
-    <Color x:Key="RS_SurfaceElevated">#1F2D41</Color>
-    <Color x:Key="RS_TextPrimary">#F4F7FF</Color>
-    <Color x:Key="RS_TextSecondary">#AFC4DA</Color>
-    <Color x:Key="RS_Accent">#FF1EA7FF</Color>
-    <Color x:Key="RS_Success">#FF2CD880</Color>
-    <Color x:Key="RS_Warning">#FFFFC75F</Color>
-    <Color x:Key="RS_Danger">#FFFF6B6B</Color>
+    <!-- 🎨 PALETA ESTILO CÓMIC: Colores vibrantes, alto contraste, inspirado en viñetas clásicas -->
+    <Color x:Key="RS_AppBackgroundColor">#1A1A2E</Color>
+    <Color x:Key="RS_SurfaceColor">#16213E</Color>
+    <Color x:Key="RS_SurfaceElevated">#0F3460</Color>
+    <Color x:Key="RS_TextPrimary">#EAEAEA</Color>
+    <Color x:Key="RS_TextSecondary">#94A3B8</Color>
+    <Color x:Key="RS_ComicYellow">#FFD700</Color>
+    <Color x:Key="RS_ComicRed">#E94560</Color>
+    <Color x:Key="RS_ComicBlue">#00D9FF</Color>
+    <Color x:Key="RS_ComicPurple">#9D4EDD</Color>
+    <Color x:Key="RS_ComicGreen">#06FFA5</Color>
 
     <SolidColorBrush x:Key="RS_AppBackgroundBrush" Color="{StaticResource RS_AppBackgroundColor}"/>
     <SolidColorBrush x:Key="RS_SurfaceBrush" Color="{StaticResource RS_SurfaceColor}"/>
     <SolidColorBrush x:Key="RS_SurfaceElevatedBrush" Color="{StaticResource RS_SurfaceElevated}"/>
     <SolidColorBrush x:Key="RS_TextOnDarkBrush" Color="{StaticResource RS_TextPrimary}"/>
     <SolidColorBrush x:Key="RS_TextMutedBrush" Color="{StaticResource RS_TextSecondary}"/>
-    <SolidColorBrush x:Key="RS_AccentBrush" Color="{StaticResource RS_Accent}"/>
-    <SolidColorBrush x:Key="RS_SuccessBrush" Color="{StaticResource RS_Success}"/>
-    <SolidColorBrush x:Key="RS_WarningBrush" Color="{StaticResource RS_Warning}"/>
-    <SolidColorBrush x:Key="RS_DangerBrush" Color="{StaticResource RS_Danger}"/>
+    <SolidColorBrush x:Key="RS_AccentBrush" Color="{StaticResource RS_ComicBlue}"/>
+    <SolidColorBrush x:Key="RS_SuccessBrush" Color="{StaticResource RS_ComicGreen}"/>
+    <SolidColorBrush x:Key="RS_WarningBrush" Color="{StaticResource RS_ComicYellow}"/>
+    <SolidColorBrush x:Key="RS_DangerBrush" Color="{StaticResource RS_ComicRed}"/>
 
-    <LinearGradientBrush x:Key="RS_HeroGradientBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#332E4F" Offset="0"/>
-        <GradientStop Color="#19253A" Offset="0.4"/>
-        <GradientStop Color="#112033" Offset="1"/>
+    <!-- Gradiente vibrante tipo página de cómic -->
+    <LinearGradientBrush x:Key="RS_ComicPanelGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#16213E" Offset="0"/>
+        <GradientStop Color="#0F3460" Offset="0.5"/>
+        <GradientStop Color="#1A1A2E" Offset="1"/>
     </LinearGradientBrush>
 
-    <LinearGradientBrush x:Key="RS_StatCardGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#252F41" Offset="0"/>
-        <GradientStop Color="#1B2738" Offset="1"/>
-    </LinearGradientBrush>
-
-    <!-- Tokens tipográficos y de layout -->
+    <!-- Tokens tipográficos estilo cómic -->
     <sys:Double x:Key="RS_StatValueSize">24</sys:Double>
     <sys:Double x:Key="RS_StatLabelSize">13</sys:Double>
-    <CornerRadius x:Key="RS_CardCorner">14</CornerRadius>
+    <CornerRadius x:Key="RS_CardCorner">8</CornerRadius>
 
-    <!-- Estilo base para tarjetas pequeñas -->
+    <!-- 💥 ESTILO TARJETA ESTILO VIÑETA: Bordes gruesos, sombras pronunciadas -->
     <Style x:Key="RS_StatCardStyle" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource RS_StatCardGradient}"/>
+        <Setter Property="Background" Value="{StaticResource RS_ComicPanelGradient}"/>
         <Setter Property="CornerRadius" Value="{StaticResource RS_CardCorner}"/>
         <Setter Property="Padding" Value="16"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <!-- Borde grueso tipo viñeta de cómic -->
+        <Setter Property="BorderBrush" Value="#00D9FF"/>
+        <Setter Property="BorderThickness" Value="2"/>
         <Setter Property="Effect">
             <Setter.Value>
-                <DropShadowEffect Color="#1F2D41" BlurRadius="16" Opacity="0.35" ShadowDepth="0"/>
+                <DropShadowEffect Color="#000000" BlurRadius="12" Opacity="0.6" ShadowDepth="4" Direction="315"/>
             </Setter.Value>
         </Setter>
-        <Setter Property="BorderBrush" Value="#3340566A"/>
-        <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
     <Style x:Key="RS_ElevatedCardStyle" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource RS_SurfaceElevatedBrush}"/>
-        <Setter Property="CornerRadius" Value="18"/>
+        <Setter Property="CornerRadius" Value="12"/>
         <Setter Property="Padding" Value="18"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="BorderBrush" Value="#9D4EDD"/>
+        <Setter Property="BorderThickness" Value="2"/>
         <Setter Property="Effect">
             <Setter.Value>
-                <DropShadowEffect Color="#101521" BlurRadius="22" Opacity="0.45" ShadowDepth="0"/>
+                <DropShadowEffect Color="#000000" BlurRadius="16" Opacity="0.7" ShadowDepth="5" Direction="315"/>
             </Setter.Value>
         </Setter>
-        <Setter Property="BorderBrush" Value="#3340566A"/>
-        <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
-    <!-- ProgressBar estilizada para el panel de progreso -->
+    <!-- ProgressBar estilo POW! tipo cómic -->
     <Style x:Key="RS_ProgressBarStyle" TargetType="ProgressBar">
-        <Setter Property="Height" Value="12"/>
-        <Setter Property="Background" Value="#1B2738"/>
+        <Setter Property="Height" Value="10"/>
+        <Setter Property="Background" Value="#0F3460"/>
         <Setter Property="Foreground" Value="{StaticResource RS_AccentBrush}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ProgressBar">
-                    <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="5" BorderBrush="#00D9FF" BorderThickness="1">
                         <Grid>
-                            <Rectangle x:Name="PART_Indicator" Fill="{TemplateBinding Foreground}" RadiusX="6" RadiusY="6" HorizontalAlignment="Left"/>
+                            <Rectangle x:Name="PART_Indicator" Fill="{TemplateBinding Foreground}" RadiusX="4" RadiusY="4" HorizontalAlignment="Left"/>
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
