@@ -302,20 +302,8 @@ namespace ComicReader.ViewModels
             {
                 if (_selectedThemeInfo == value) return;
                 _selectedThemeInfo = value;
-                // Persist selection to AppSettings and optionally preview
-                try
-                {
-                    if (_selectedThemeInfo != null)
-                    {
-                        SettingsManager.Settings.Theme = _selectedThemeInfo.Mode.ToString();
-                        SettingsManager.SaveSettings();
-                        if (SettingsManager.Settings.EnableLivePreview)
-                        {
-                            ThemeManager.ApplyTheme(_selectedThemeInfo.Mode);
-                        }
-                    }
-                }
-                catch { }
+                // NO guardamos automáticamente, solo notificamos el cambio
+                // La vista previa se maneja en el code-behind de SettingsWindow
                 Raise();
             }
         }

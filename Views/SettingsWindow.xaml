@@ -7,19 +7,19 @@
         Height="820" Width="1200"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResizeWithGrip"
-        Background="#FFF8E6D6">
+        Background="{DynamicResource WindowBackgroundBrush}">
 
     <Window.Resources>
         <!-- Fonts -->
         <FontFamily x:Key="ComicTitleFont">Bangers, "Komika Axis", "Comic Sans MS", Segoe UI</FontFamily>
         <FontFamily x:Key="UiFont">Segoe UI, Roboto, Arial</FontFamily>
 
-        <!-- Styles: hybrid comic classic + modern -->
+        <!-- Styles: hybrid comic classic + modern con tema dinámico -->
         <Style x:Key="PanelCard" TargetType="Border">
             <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="6"/>
-            <Setter Property="Background" Value="#FFFFFBF6"/>
+            <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}"/>
             <Setter Property="Padding" Value="12"/>
             <Setter Property="Margin" Value="8"/>
             <Setter Property="SnapsToDevicePixels" Value="True"/>
@@ -30,16 +30,16 @@
             </Setter>
         </Style>
 
-        <!-- Comic button (primary look) -->
+        <!-- Comic button (primary look) con tema dinámico -->
         <Style x:Key="ComicButton" TargetType="Button">
             <Setter Property="FontFamily" Value="{StaticResource ComicTitleFont}"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Padding" Value="10,8"/>
             <Setter Property="MinWidth" Value="110"/>
             <Setter Property="Margin" Value="6,4,6,4"/>
-            <Setter Property="Background" Value="#FFDFAF1F"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="4"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
@@ -70,27 +70,62 @@
         </Style>
 
         <Style x:Key="PrimaryAction" TargetType="Button" BasedOn="{StaticResource ComicButton}">
-            <Setter Property="Background" Value="#FFE23E3E"/>
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
         </Style>
 
         <Style x:Key="SecondaryAction" TargetType="Button" BasedOn="{StaticResource ComicButton}">
-            <Setter Property="Background" Value="#FF2A6F97"/>
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{DynamicResource SecondaryBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
         </Style>
 
         <Style x:Key="SectionHeader" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="{StaticResource ComicTitleFont}"/>
             <Setter Property="FontSize" Value="22"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="#111111"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
         </Style>
 
         <Style x:Key="LabelText" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
             <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Foreground" Value="#111111"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- ComboBox style con tema dinámico -->
+        <Style TargetType="ComboBox">
+            <Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="MinHeight" Value="32"/>
+        </Style>
+
+        <!-- CheckBox style con tema dinámico -->
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- TextBox style con tema dinámico -->
+        <Style TargetType="TextBox">
+            <Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Padding" Value="8,6"/>
+        </Style>
+
+        <!-- Slider style con tema dinámico -->
+        <Style TargetType="Slider">
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
         </Style>
 
         <!-- ViewModel instance -->
@@ -104,17 +139,17 @@
                 <!-- Header -->
                 <DockPanel DockPanel.Dock="Top" Margin="4">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="6">
-                        <Border Background="#FFE23E3E" CornerRadius="8" Padding="8" BorderBrush="Black" BorderThickness="3">
-                            <TextBlock Text="PERCY'S LIBRARY" Foreground="White" FontFamily="{StaticResource ComicTitleFont}" FontSize="20" FontWeight="Bold"/>
+                        <Border Background="{DynamicResource PrimaryBrush}" CornerRadius="8" Padding="8" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="3">
+                            <TextBlock Text="PERCY'S LIBRARY" Foreground="{DynamicResource TextBrush}" FontFamily="{StaticResource ComicTitleFont}" FontSize="20" FontWeight="Bold"/>
                         </Border>
                         <TextBlock Text="  Configuración" Style="{StaticResource SectionHeader}" Margin="12,0,0,0" VerticalAlignment="Center"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,12,0">
-                        <Button Style="{StaticResource ComicButton}" Content="Exportar" Click="Export_Click"/>
-                        <Button Style="{StaticResource ComicButton}" Content="Importar" Click="Import_Click"/>
-                        <Button Style="{StaticResource SecondaryAction}" Content="Vista previa" Click="Preview_Click"/>
-                        <Button Style="{StaticResource PrimaryAction}" Content="Cerrar" Click="Close_Click"/>
+                        <Button Style="{StaticResource ComicButton}" Content="Exportar" Click="Export_Click" MinWidth="100"/>
+                        <Button Style="{StaticResource ComicButton}" Content="Importar" Click="Import_Click" MinWidth="100"/>
+                        <Button Style="{StaticResource PrimaryAction}" Content="Aplicar" Click="Apply_Click" MinWidth="100"/>
+                        <Button Style="{StaticResource SecondaryAction}" Content="Cancelar" Click="Close_Click" MinWidth="100"/>
                     </StackPanel>
                 </DockPanel>
 
@@ -142,12 +177,12 @@
                             <Button Style="{StaticResource ComicButton}" Content="💬  Acerca de" Command="{Binding SelectSectionCommand}" CommandParameter="Acerca" />
                         </StackPanel>
 
-                        <Border BorderBrush="Black" BorderThickness="3" CornerRadius="8" Margin="0,12,0,0" Padding="10" Background="#FFFFF9E6">
+                        <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="3" CornerRadius="8" Margin="0,12,0,0" Padding="10" Background="{DynamicResource PanelBackgroundBrush}">
                             <StackPanel>
-                                <TextBlock Text="Atajos" FontFamily="{StaticResource ComicTitleFont}" FontWeight="Bold"/>
+                                <TextBlock Text="Atajos" FontFamily="{StaticResource ComicTitleFont}" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
                                 <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                                     <CheckBox IsChecked="{Binding AppSettings.AutoSaveEnabled, Mode=TwoWay}" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Auto-guardar" Margin="8,0,0,0" FontFamily="{StaticResource UiFont}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Auto-guardar" Margin="8,0,0,0" FontFamily="{StaticResource UiFont}" VerticalAlignment="Center" Foreground="{DynamicResource TextBrush}"/>
                                 </StackPanel>
                                 <Button Style="{StaticResource ComicButton}" Content="Abrir carpeta de instalación" Command="{Binding OpenFolderCommand}" Margin="0,8,0,0"/>
                             </StackPanel>
@@ -164,7 +199,7 @@
                             <!-- GENERAL -->
                             <StackPanel x:Name="Panel_General" Margin="0,4,0,8">
                                 <TextBlock Text="GENERAL" Style="{StaticResource SectionHeader}" Margin="0,0,0,10"/>
-                                <Border Background="White" BorderThickness="3" BorderBrush="Black" CornerRadius="8" Padding="12">
+                                <Border Background="{DynamicResource PanelBackgroundBrush}" BorderThickness="3" BorderBrush="{DynamicResource BorderBrush}" CornerRadius="8" Padding="12">
                                     <StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Recordar última sesión" Style="{StaticResource LabelText}" Width="360"/>
@@ -183,8 +218,8 @@
 
                                         <StackPanel Orientation="Horizontal" Margin="0,10">
                                             <TextBlock Text="Carpeta por defecto" Style="{StaticResource LabelText}" Width="360"/>
-                                            <TextBlock Text="{Binding AppSettings.DefaultComicsFolder}" Style="{StaticResource LabelText}" Width="320" TextTrimming="CharacterEllipsis"/>
-                                            <Button Style="{StaticResource ComicButton}" Content="Cambiar" Command="{Binding ChangeFolderCommand}" Margin="4,0"/>
+                                            <TextBlock Text="{Binding AppSettings.DefaultComicsFolder}" Style="{StaticResource LabelText}" Width="280" TextTrimming="CharacterEllipsis"/>
+                                            <Button Style="{StaticResource ComicButton}" Content="Cambiar" Command="{Binding ChangeFolderCommand}" Margin="4,0" MinWidth="90" Padding="12,8"/>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,14,0,0" HorizontalAlignment="Right">
@@ -197,43 +232,42 @@
                             <!-- APARIENCIA -->
                             <StackPanel x:Name="Panel_Apariencia" Margin="0,4,0,8" Visibility="Collapsed">
                                 <TextBlock Text="APARIENCIA" Style="{StaticResource SectionHeader}" Margin="0,0,0,10"/>
-                                <Border Background="White" BorderThickness="3" BorderBrush="Black" CornerRadius="8" Padding="12">
+                                <Border Background="{DynamicResource PanelBackgroundBrush}" BorderThickness="3" BorderBrush="{DynamicResource BorderBrush}" CornerRadius="8" Padding="12">
                                     <StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Tema global" Style="{StaticResource LabelText}" Width="360"/>
-                                            <ComboBox ItemsSource="{Binding ThemeInfos}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedThemeInfo, Mode=TwoWay}" Width="260"/>
-                                            <Button Style="{StaticResource ComicButton}" Content="Vista previa" Command="{Binding PreviewThemeCommand}" Margin="8,0,0,0"/>
+                                            <ComboBox x:Name="ThemeCombo" ItemsSource="{Binding ThemeInfos}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedThemeInfo, Mode=TwoWay}" Width="380" SelectionChanged="ThemeCombo_SelectionChanged"/>
                                         </StackPanel>
 
                                         <!-- 'Tema de la pantalla principal' eliminado: la selección por pantalla ya no está disponible -->
 
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Color de acento" Style="{StaticResource LabelText}" Width="360"/>
-                                            <ComboBox ItemsSource="{Binding AccentColors}" SelectedItem="{Binding AppSettings.AccentColorName, Mode=TwoWay}" Width="220"/>
-                                            <Button Style="{StaticResource ComicButton}" Content="Aplicar color" Command="{Binding ApplyAccentCommand}" Margin="8,0,0,0"/>
+                                            <ComboBox ItemsSource="{Binding AccentColors}" SelectedItem="{Binding AppSettings.AccentColorName, Mode=TwoWay}" Width="380"/>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Fuente de lectura" Style="{StaticResource LabelText}" Width="360"/>
-                                            <ComboBox ItemsSource="{Binding AvailableFonts}" SelectedItem="{Binding AppSettings.ReaderFontName, Mode=TwoWay}" Width="240"/>
-                                            <Button Style="{StaticResource ComicButton}" Content="Probar fuente" Command="{Binding PreviewFontCommand}" Margin="8,0,0,0"/>
+                                            <ComboBox ItemsSource="{Binding AvailableFonts}" SelectedItem="{Binding AppSettings.ReaderFontName, Mode=TwoWay}" Width="380"/>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Tamaño UI" Style="{StaticResource LabelText}" Width="360"/>
-                                            <ComboBox x:Name="UIScaleCombo" Width="180" SelectionChanged="UIScaleCombo_SelectionChanged">
+                                            <ComboBox x:Name="UIScaleCombo" Width="380" SelectionChanged="UIScaleCombo_SelectionChanged">
                                                 <ComboBoxItem Content="Pequeño" Tag="Small"/>
                                                 <ComboBoxItem Content="Mediano" Tag="Medium"/>
                                                 <ComboBoxItem Content="Grande" Tag="Large"/>
                                             </ComboBox>
                                         </StackPanel>
 
-                                        <StackPanel Orientation="Horizontal" Margin="0,12" VerticalAlignment="Center">
-                                            <TextBlock Text="Vista previa en vivo" Style="{StaticResource LabelText}" Width="360"/>
-                                            <CheckBox IsChecked="{Binding AppSettings.EnableLivePreview, Mode=TwoWay}" VerticalAlignment="Center"/>
-                                            <TextBlock Text="(aplica cambios en mini-visor)" Foreground="#666" Margin="8,0,0,0" VerticalAlignment="Center"/>
-                                        </StackPanel>
+                                        <TextBlock Text="💡 Los cambios de tema se previsualizan al instante. Haz clic en 'Aplicar' para guardarlos permanentemente." 
+                                                   Style="{StaticResource LabelText}" 
+                                                   FontSize="12"
+                                                   FontStyle="Italic"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   Margin="0,12,0,0"/>
 
                                     </StackPanel>
                                 </Border>
@@ -242,7 +276,7 @@
                             <!-- LECTURA -->
                             <StackPanel x:Name="Panel_Lectura" Margin="0,4,0,8" Visibility="Collapsed">
                                 <TextBlock Text="LECTURA" Style="{StaticResource SectionHeader}" Margin="0,0,0,10"/>
-                                <Border Background="White" BorderThickness="3" BorderBrush="Black" CornerRadius="8" Padding="12">
+                                <Border Background="{DynamicResource PanelBackgroundBrush}" BorderThickness="3" BorderBrush="{DynamicResource BorderBrush}" CornerRadius="8" Padding="12">
                                     <StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
@@ -290,7 +324,7 @@
                             <!-- CONTROLES -->
                             <StackPanel x:Name="Panel_Controles" Margin="0,4,0,8" Visibility="Collapsed">
                                 <TextBlock Text="CONTROLES" Style="{StaticResource SectionHeader}" Margin="0,0,0,10"/>
-                                <Border Background="White" BorderThickness="3" BorderBrush="Black" CornerRadius="8" Padding="12">
+                                <Border Background="{DynamicResource PanelBackgroundBrush}" BorderThickness="3" BorderBrush="{DynamicResource BorderBrush}" CornerRadius="8" Padding="12">
                                     <StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Navegación táctil" Style="{StaticResource LabelText}" Width="360"/>
@@ -314,7 +348,7 @@
                             <!-- RENDIMIENTO -->
                             <StackPanel x:Name="Panel_Rendimiento" Margin="0,4,0,8" Visibility="Collapsed">
                                 <TextBlock Text="RENDIMIENTO" Style="{StaticResource SectionHeader}" Margin="0,0,0,10"/>
-                                <Border Background="White" BorderThickness="3" BorderBrush="Black" CornerRadius="8" Padding="12">
+                                <Border Background="{DynamicResource PanelBackgroundBrush}" BorderThickness="3" BorderBrush="{DynamicResource BorderBrush}" CornerRadius="8" Padding="12">
                                     <StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Precarga de páginas" Style="{StaticResource LabelText}" Width="360"/>
@@ -337,7 +371,7 @@
                             <!-- SEGURIDAD -->
                             <StackPanel x:Name="Panel_Seguridad" Margin="0,4,0,8" Visibility="Collapsed">
                                 <TextBlock Text="SEGURIDAD" Style="{StaticResource SectionHeader}" Margin="0,0,0,10"/>
-                                <Border Background="White" BorderThickness="3" BorderBrush="Black" CornerRadius="8" Padding="12">
+                                <Border Background="{DynamicResource PanelBackgroundBrush}" BorderThickness="3" BorderBrush="{DynamicResource BorderBrush}" CornerRadius="8" Padding="12">
                                     <StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Bloqueo con PIN" Style="{StaticResource LabelText}" Width="360"/>
@@ -360,11 +394,16 @@
                             <!-- PERSONALIZACIÓN AVANZADA -->
                             <StackPanel x:Name="Panel_Personalizacion" Margin="0,4,0,8" Visibility="Collapsed">
                                 <TextBlock Text="PERSONALIZACIÓN AVANZADA" Style="{StaticResource SectionHeader}" Margin="0,0,0,10"/>
-                                <Border Background="White" BorderThickness="3" BorderBrush="Black" CornerRadius="8" Padding="12">
+                                <Border Background="{DynamicResource PanelBackgroundBrush}" BorderThickness="3" BorderBrush="{DynamicResource BorderBrush}" CornerRadius="8" Padding="12">
                                     <StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
                                             <TextBlock Text="Activar efectos pop-art (POW!)" Style="{StaticResource LabelText}" Width="360"/>
                                             <CheckBox IsChecked="{Binding AppSettings.EnableComicEffects, Mode=TwoWay}"/>
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal" Margin="0,6">
+                                            <TextBlock Text="Habilitar animaciones en la interfaz" Style="{StaticResource LabelText}" Width="360"/>
+                                            <CheckBox IsChecked="{Binding AppSettings.AnimationsEnabled, Mode=TwoWay}"/>
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal" Margin="0,6">
@@ -383,11 +422,11 @@
                             <!-- ACERCA -->
                             <StackPanel x:Name="Panel_Acerca" Margin="0,4,0,8" Visibility="Collapsed">
                                 <TextBlock Text="ACERCA DE" Style="{StaticResource SectionHeader}" Margin="0,0,0,10"/>
-                                <Border Background="White" BorderThickness="3" BorderBrush="Black" CornerRadius="8" Padding="12">
+                                <Border Background="{DynamicResource PanelBackgroundBrush}" BorderThickness="3" BorderBrush="{DynamicResource BorderBrush}" CornerRadius="8" Padding="12">
                                     <StackPanel>
-                                        <TextBlock Text="Percy's Library" FontFamily="{StaticResource ComicTitleFont}" FontSize="18" FontWeight="Bold"/>
-                                        <TextBlock Text="Versión 1.0.0" Margin="0,6,0,0"/>
-                                        <TextBlock Text="Creado por Geovany Yunior Peguero Rosario. Gracias por usar la app." TextWrapping="Wrap" Margin="0,8,0,0"/>
+                                        <TextBlock Text="Percy's Library" FontFamily="{StaticResource ComicTitleFont}" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBlock Text="Versión 1.0.0" Margin="0,6,0,0" Foreground="{DynamicResource TextBrush}"/>
+                                        <TextBlock Text="Creado por Geovany Yunior Peguero Rosario. Gracias por usar la app." TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource TextBrush}"/>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
                                             <Button Style="{StaticResource ComicButton}" Content="Ver créditos" Command="{Binding ViewCreditsCommand}"/>
                                             <Button Style="{StaticResource ComicButton}" Content="Sitio web" Command="{Binding OpenWebsiteCommand}" Margin="8,0,0,0"/>
@@ -396,11 +435,7 @@
                                 </Border>
                             </StackPanel>
 
-                            <!-- Bottom actions -->
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
-                                <Button Style="{StaticResource ComicButton}" Content="Aplicar" Command="{Binding ApplyCommand}" />
-                                <Button Style="{StaticResource PrimaryAction}" Content="Guardar" Command="{Binding SaveCommand}" Margin="8,0,0,0" />
-                            </StackPanel>
+
 
                         </StackPanel>
                     </ScrollViewer>

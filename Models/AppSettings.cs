@@ -56,6 +56,14 @@ namespace ComicReader.Services
     private bool _enableEagerPreloadInMemory = true;
     public bool EnableEagerPreloadInMemory { get => _enableEagerPreloadInMemory; set => SetProperty(ref _enableEagerPreloadInMemory, value); }
 
+    // Pre-cargar TODAS las páginas en modo uno a uno (elimina imágenes borrosas completamente)
+    private bool _preloadAllPagesInSinglePageMode = true;
+    public bool PreloadAllPagesInSinglePageMode { get => _preloadAllPagesInSinglePageMode; set => SetProperty(ref _preloadAllPagesInSinglePageMode, value); }
+
+    // Controlar si las animaciones están habilitadas en toda la aplicación
+    private bool _animationsEnabled = true;
+    public bool AnimationsEnabled { get => _animationsEnabled; set => SetProperty(ref _animationsEnabled, value); }
+
     // Por defecto permitir un número razonable de páginas en RAM; el usuario puede ajustarlo en Settings.
     private int _eagerPreloadMemoryLimitPages = 50;
     public int EagerPreloadMemoryLimitPages { get => _eagerPreloadMemoryLimitPages; set => SetProperty(ref _eagerPreloadMemoryLimitPages, value); }

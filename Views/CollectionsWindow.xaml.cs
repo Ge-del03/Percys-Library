@@ -20,6 +20,41 @@ namespace ComicReader.Views
             }
             catch { }
             // DataContext is set in XAML
+            
+            // ✅ SUSCRIBIRSE A CAMBIOS DE TEMA
+            try
+            {
+                ComicReader.Themes.ThemeManager.ThemeChanged += OnThemeChanged;
+                UpdateThemeResources();
+            }
+            catch { }
+        }
+        
+        private void OnThemeChanged(ComicReader.Services.ThemeMode mode)
+        {
+            // Ejecutar en UI thread
+            this.Dispatcher?.BeginInvoke(new Action(() =>
+            {
+                try
+                {
+                    UpdateThemeResources();
+                    this.InvalidateVisual();
+                    this.UpdateLayout();
+                    ComicReader.Utils.ModernLogger.Info("✓ CollectionsWindow actualizada con nuevo tema");
+                }
+                catch { }
+            }));
+        }
+        
+        private void UpdateThemeResources()
+        {
+            try
+            {
+                this.Background = this.TryFindResource("WindowBackgroundBrush") as System.Windows.Media.Brush 
+                    ?? this.TryFindResource("CS_Background") as System.Windows.Media.Brush
+                    ?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(18, 18, 18));
+            }
+            catch { }
         }
 
         private void NewCollection_Click(object sender, RoutedEventArgs e)

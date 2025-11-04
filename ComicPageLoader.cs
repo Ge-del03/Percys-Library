@@ -52,12 +52,12 @@ namespace ComicReader.Services
 
         private string _filePath;
         private List<Models.ComicPage> _pages = new List<Models.ComicPage>();
-        private readonly ComicReader.ContinuousReader.CacheManager<int, (BitmapImage img, DateTime ts)> _pageCache = new(120);
-        private readonly ComicReader.ContinuousReader.CacheManager<int, (BitmapImage img, DateTime ts)> _thumbCache = new(240);
+        private readonly ComicReader.ContinuousReader.CacheManager<int, (BitmapImage img, DateTime ts)> _pageCache = new(200); // OPTIMIZADO: Más páginas en cache
+        private readonly ComicReader.ContinuousReader.CacheManager<int, (BitmapImage img, DateTime ts)> _thumbCache = new(400); // OPTIMIZADO: Más miniaturas
         // Inicial: permitir hasta 4 hilos de prefetch en máquinas con >4 cores, pero mínimo 1
         private System.Threading.SemaphoreSlim _prefetchSemaphore = new(System.Math.Max(1, System.Math.Min(4, Environment.ProcessorCount)));
         private readonly ConcurrentDictionary<int, Task<BitmapImage>> _ongoingPageLoads = new();
-        private const int MaxDecodeWidth = 1500; // reasonable default for full images
+        private const int MaxDecodeWidth = 2000; // OPTIMIZADO: Mayor resolución para pantallas modernas
         // Semaphore to limit concurrent decodes (configurable)
         private System.Threading.SemaphoreSlim _decodeSemaphore = new(System.Math.Max(1, Math.Min(4, Environment.ProcessorCount / 2)));
         // Metrics

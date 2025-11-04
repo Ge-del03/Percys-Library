@@ -213,7 +213,31 @@ namespace ComicReader.ViewModels
             try
             {
                 if (_statsService == null)
+                {
+                    // Servicio no disponible: mostrar contenido de marcador para evitar pantalla vacía
+                    DailyActivitySeries = new ISeries[]
+                    {
+                        new ColumnSeries<double>
+                        {
+                            Values = new double[] { 0 },
+                            Name = "Sin datos",
+                            Fill = new SolidColorPaint(new SKColor(96, 165, 250)), // azul visible sobre fondo oscuro
+                            Stroke = new SolidColorPaint(new SKColor(59, 130, 246))
+                        }
+                    };
+                    DayOfWeekSeries = new ISeries[]
+                    {
+                        new ColumnSeries<double>
+                        {
+                            Values = new double[] { 0 },
+                            Name = "Sin datos",
+                            Fill = new SolidColorPaint(new SKColor(181, 126, 255)),
+                            Stroke = new SolidColorPaint(new SKColor(157, 78, 221))
+                        }
+                    };
+                    GenreShareSeries = Array.Empty<ISeries>();
                     return;
+                }
 
                 var dash = _statsService.GetDashboard();
                 var insights = _statsService.GetInsights(30);
@@ -385,7 +409,16 @@ namespace ComicReader.ViewModels
                 var daily = insights?.DailyActivity?.ToList() ?? new List<DailyActivityPoint>();
                 if (daily.Count == 0)
                 {
-                    DailyActivitySeries = new ISeries[] { new ColumnSeries<double> { Values = new double[] { 0 }, Name = "Sin datos" } };
+                    DailyActivitySeries = new ISeries[]
+                    {
+                        new ColumnSeries<double>
+                        {
+                            Values = new double[] { 0 },
+                            Name = "Sin datos",
+                            Fill = new SolidColorPaint(new SKColor(96, 165, 250)),
+                            Stroke = new SolidColorPaint(new SKColor(59, 130, 246))
+                        }
+                    };
                 }
                 else
                 {
@@ -394,7 +427,9 @@ namespace ComicReader.ViewModels
                         new ColumnSeries<double>
                         {
                             Values = daily.Select(d => (double)d.Pages).ToArray(),
-                            Name = "Páginas"
+                            Name = "Páginas",
+                            Fill = new SolidColorPaint(new SKColor(96, 165, 250)),
+                            Stroke = new SolidColorPaint(new SKColor(59, 130, 246))
                         }
                     };
                 }
@@ -402,7 +437,16 @@ namespace ComicReader.ViewModels
                 var byDay = insights?.DayOfWeekActivity?.ToList() ?? new List<DayOfWeekActivityPoint>();
                 if (byDay.Count == 0)
                 {
-                    DayOfWeekSeries = new ISeries[] { new ColumnSeries<double> { Values = new double[] { 0 }, Name = "Sin datos" } };
+                    DayOfWeekSeries = new ISeries[]
+                    {
+                        new ColumnSeries<double>
+                        {
+                            Values = new double[] { 0 },
+                            Name = "Sin datos",
+                            Fill = new SolidColorPaint(new SKColor(181, 126, 255)),
+                            Stroke = new SolidColorPaint(new SKColor(157, 78, 221))
+                        }
+                    };
                 }
                 else
                 {
@@ -411,7 +455,9 @@ namespace ComicReader.ViewModels
                         new ColumnSeries<double>
                         {
                             Values = byDay.Select(d => Math.Round(d.Minutes, 1)).ToArray(),
-                            Name = "Minutos"
+                            Name = "Minutos",
+                            Fill = new SolidColorPaint(new SKColor(181, 126, 255)),
+                            Stroke = new SolidColorPaint(new SKColor(157, 78, 221))
                         }
                     };
                 }
@@ -426,7 +472,8 @@ namespace ComicReader.ViewModels
                     GenreShareSeries = genres.Select(g => new PieSeries<double>
                     {
                         Values = new double[] { g.Count },
-                        Name = g.Genre
+                        Name = g.Genre,
+                        Fill = new SolidColorPaint(GenrePalette[Math.Abs(g.Genre?.GetHashCode() ?? 0) % GenrePalette.Length])
                     } as ISeries).ToArray();
                 }
 

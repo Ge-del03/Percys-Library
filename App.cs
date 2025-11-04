@@ -218,8 +218,11 @@ namespace ComicReader
             {
                 ComicReader.Utils.DevLogger.Info("Iniciando aplicación...");
                 
+                // Inicializar sistemas de logging (Legacy + Moderno con Serilog)
                 Logger.Initialize();
+                ComicReader.Utils.ModernLogger.Initialize();
                 ComicReader.Utils.DevLogger.Info("Logger inicializado correctamente");
+                ComicReader.Utils.ModernLogger.Info("✓ Sistema de logging moderno activado");
                 
                 this.DispatcherUnhandledException += App_DispatcherUnhandledException;
                 AppDomain.CurrentDomain.UnhandledException += (s, e) =>
@@ -242,11 +245,33 @@ namespace ComicReader
                 };
                 ComicReader.Utils.DevLogger.Info("Manejador de excepciones configurado");
                 
-                SettingsManager.LoadSettings();
-                ComicReader.Utils.DevLogger.Info("Configuraciones cargadas correctamente");
+                // ═══════════════════════════════════════════════════════════════
+                // NUEVO SISTEMA DE PERSISTENCIA (ÚNICO Y DEFINITIVO)
+                // ═══════════════════════════════════════════════════════════════
+                ComicReader.Utils.ModernLogger.Info("═══════════════════════════════════");
+                ComicReader.Utils.ModernLogger.Info("  INICIALIZANDO SISTEMA DE PERSISTENCIA V3.0");
+                ComicReader.Utils.ModernLogger.Info("═══════════════════════════════════");
                 
-                ApplyTheme(SettingsManager.Settings.Theme);
-                ComicReader.Utils.DevLogger.Info("Tema aplicado correctamente");
+                // Inicializar ConfigurationManager (carga config + limpia archivos legacy)
+                var initTask = ComicReader.Services.Persistence.ConfigurationManager.Instance.InitializeAsync();
+                initTask.GetAwaiter().GetResult();
+                ComicReader.Utils.ModernLogger.Info("✓ ConfigurationManager inicializado");
+                
+                // Inicializar PersistenceIntegrator (aplica configuración a todos los servicios)
+                var integrationTask = ComicReader.Services.PersistenceIntegrator.Instance.InitializeApplicationAsync();
+                integrationTask.GetAwaiter().GetResult();
+                ComicReader.Utils.ModernLogger.Info("✓ PersistenceIntegrator inicializado");
+                
+                var stats = ComicReader.Services.PersistenceIntegrator.Instance.GetStatistics();
+                ComicReader.Utils.ModernLogger.Info($"→ Total configuraciones guardadas: {stats.TotalSaves}");
+                ComicReader.Utils.ModernLogger.Info($"→ Total configuraciones cargadas: {stats.TotalLoads}");
+                ComicReader.Utils.ModernLogger.Info($"→ Backups creados: {stats.TotalBackups}");
+                ComicReader.Utils.ModernLogger.Info($"→ Archivos legacy eliminados: {stats.LegacyFilesDeleted}");
+                ComicReader.Utils.ModernLogger.Info("═══════════════════════════════════");
+                
+                // Cargar configuración legacy de SettingsManager (temporal, para compatibilidad)
+                SettingsManager.LoadSettings();
+                ComicReader.Utils.DevLogger.Info("Configuraciones legacy cargadas (compatibilidad temporal)");
 
                 // Registro de servicios básicos (fase inicial DI ligera)
                 // Registrar el loader progresivo por defecto para mejorar la experiencia de carga
@@ -349,7 +374,20 @@ namespace ComicReader
 
         protected override void OnExit(ExitEventArgs e)
         {
-            SettingsManager.SaveSettings();
+            try
+            {
+                ComicReader.Utils.ModernLogger.Info("Cerrando Percy's Library...");
+                // Forzar persistencia de ajustes antes de salir
+                SettingsManager.SaveNow();
+                try
+                {
+                    var cts = new System.Threading.CancellationTokenSource(1500);
+                    SettingsManager.FlushPendingSavesAsync(cts.Token).GetAwaiter().GetResult();
+                }
+                catch { }
+                ComicReader.Utils.ModernLogger.Shutdown();
+            }
+            catch { }
             base.OnExit(e);
         }
 

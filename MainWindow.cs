@@ -223,6 +223,25 @@ namespace ComicReader
                 };
             }
             
+            // Aplicar configuraciones del sistema v3.0 que requieren UI
+            try
+            {
+                // Aplicar tema guardado
+                ComicReader.Themes.ThemeManager.LoadSavedTheme();
+                
+                // Aplicar configuración UI desde PersistenceIntegrator
+                var config = ComicReader.Services.Persistence.ConfigurationManager.Instance.GetConfiguration();
+                if (config?.UI != null)
+                {
+                    System.Windows.Application.Current.Resources["DefaultFontSize"] = (double)config.UI.FontSize;
+                    System.Windows.Application.Current.Resources["DefaultFontFamily"] = config.UI.FontFamily;
+                }
+            }
+            catch (Exception ex)
+            {
+                ComicReader.Utils.ModernLogger.Warning($"No se pudo aplicar configuración UI: {ex.Message}");
+            }
+            
             // Configurar ventana inicial
             ConfigureInitialWindowState();
             this.Closing += MainWindow_Closing;
@@ -256,8 +275,8 @@ namespace ComicReader
                         this.MaxWidth = m.Width;
                         this.Top = m.Top;
                         this.Left = m.Left;
-                        // Poner la ventana como topmost mientras está maximizada para cubrir la barra de tareas
-                        this.Topmost = true;
+                        // ❌ REMOVIDO: No usar Topmost para permitir que otras apps se abran encima
+                        // this.Topmost = true;
                     }
                     catch
                     {
@@ -273,8 +292,8 @@ namespace ComicReader
                     // Restablecer límites cuando no está maximizada
                     this.MaxHeight = double.PositiveInfinity;
                     this.MaxWidth = double.PositiveInfinity;
-                    // Asegurar que ya no estamos topmost cuando no esté maximizada
-                    this.Topmost = false;
+                    // Ya no necesitamos esto porque nunca establecemos Topmost
+                    // this.Topmost = false;
                 }
             }
             catch { }
@@ -404,6 +423,30 @@ namespace ComicReader
         private async System.Threading.Tasks.Task HandleWindowClosingAsync()
         {
             try { _ctsWindow?.Cancel(); } catch { }
+
+            // Guardar configuración de ventana con v3.0
+            try
+            {
+                await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    try
+                    {
+                        await ComicReader.Services.PersistenceIntegrator.Instance.UpdateWindowConfigurationAsync(
+                            width: this.ActualWidth,
+                            height: this.ActualHeight,
+                            left: this.Left,
+                            top: this.Top,
+                            isMaximized: this.WindowState == WindowState.Maximized
+                        );
+                        ComicReader.Utils.ModernLogger.Info("✓ Configuración de ventana guardada");
+                    }
+                    catch (Exception ex)
+                    {
+                        ComicReader.Utils.ModernLogger.Error($"Error guardando ventana: {ex.Message}");
+                    }
+                });
+            }
+            catch { }
 
             // Request a save (this schedules the debounced save and records the task)
             try { SettingsManager.SaveSettings(); } catch { }
@@ -571,12 +614,58 @@ namespace ComicReader
         private void ConfigureInitialWindowState()
         {
             // Configurar tamaño y posición inicial de manera más agresiva
-            this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            this.WindowStartupLocation = WindowStartupLocation.Manual;
             this.MinWidth = 800;
             this.MinHeight = 600;
-            // Restaurar desde Settings si existe
+            
+            // Cargar configuración de ventana desde v3.0
+            try
+            {
+                var windowConfig = ComicReader.Services.PersistenceIntegrator.Instance.GetWindowConfiguration();
+                if (windowConfig != null)
+                {
+                    // Tamaño normal recordado
+                    _normalWidth = Math.Max(800, windowConfig.Width);
+                    _normalHeight = Math.Max(600, windowConfig.Height);
+                    
+                    // Aplicar tamaño y posición
+                    this.Width = _normalWidth;
+                    this.Height = _normalHeight;
+                    this.Left = windowConfig.Left;
+                    this.Top = windowConfig.Top;
+                    
+                    // Estado recordado
+                    if (windowConfig.IsMaximized)
+                    {
+                        // Diferir a Loaded para evitar parpadeos
+                        this.Loaded += (_, __) =>
+                        {
+                            try { this.WindowState = WindowState.Maximized; } catch { }
+                        };
+                    }
+                    
+                    ComicReader.Utils.ModernLogger.Info($"✓ Configuración de ventana cargada: {_normalWidth}x{_normalHeight}");
+                }
+                else
+                {
+                    // Fallback si no hay configuración
+                    this.Width = _normalWidth;
+                    this.Height = _normalHeight;
+                    CenterWindowOnScreen();
+                }
+            }
+            catch (Exception ex)
+            {
+                ComicReader.Utils.ModernLogger.Error($"Error cargando ventana: {ex.Message}");
+                // Fallback
+                this.Width = _normalWidth;
+                this.Height = _normalHeight;
+                CenterWindowOnScreen();
+            }
+            
+            // Fallback adicional desde SettingsManager (compatibilidad temporal)
             var s = SettingsManager.Settings;
-            if (s != null)
+            if (s != null && this.Width == 1200) // Si no se cargó de v3.0
             {
                 // Tamaño normal recordado
                 _normalWidth = Math.Max(800, s.LastWindowWidth);
@@ -593,17 +682,6 @@ namespace ComicReader
                         try { this.WindowState = WindowState.Maximized; } catch { }
                     };
                 }
-                else
-                {
-                    // Centrar en pantalla si estamos en estado normal
-                    CenterWindowOnScreen();
-                }
-            }
-            else
-            {
-                // Fallback
-                this.Width = _normalWidth;
-                this.Height = _normalHeight;
             }
             
             // Forzar el tamaño inmediatamente
@@ -1029,7 +1107,7 @@ namespace ComicReader
             }
 
             // Aplicar ajuste por defecto después de cargar
-            this.Dispatcher.BeginInvoke(new Action(() =>
+            _ = this.Dispatcher.BeginInvoke(new Action(() =>
             {
                 var mode = SettingsManager.Settings?.DefaultFitMode?.ToLowerInvariant();
                 switch (mode)
@@ -1488,10 +1566,14 @@ namespace ComicReader
                     // Cambiar a la vista continua
                     await _continuousView.LoadComicAsync(_comicLoader);
                     if (this.FindName("MainContentArea") is ContentControl content)
+                    {
                         content.Content = _continuousView;
+                        // ✅ Forzar layout update para evitar que el panel se despegue
+                        content.UpdateLayout();
+                    }
                     CurrentView = _continuousView;
                     // Asegurar sincronización: desplazar a la página actual
-                    await System.Threading.Tasks.Task.Delay(80);
+                    await System.Threading.Tasks.Task.Delay(100); // Aumentado a 100ms
                     try
                     {
                         _continuousView.ScrollToPage(_currentPageIndex);
@@ -1521,6 +1603,12 @@ namespace ComicReader
                     }
                     catch { }
                     EnsureReaderScaffold();
+                    if (this.FindName("MainContentArea") is ContentControl content)
+                    {
+                        content.Content = _readerScrollViewer;
+                        // ✅ Forzar layout update
+                        content.UpdateLayout();
+                    }
                     // Restaurar página actual en la imagen
                     LoadCurrentPage();
                     if (this.FindName("ToggleContinuousButton") is Button tb) tb.Content = "📄";
@@ -1763,6 +1851,17 @@ namespace ComicReader
                     }
                     catch { }
                     EnsureAutoAdvanceBehavior();
+                    
+                    // Registrar archivo reciente en v3.0
+                    try
+                    {
+                        await ComicReader.Services.PersistenceIntegrator.Instance.AddRecentFileAsync(filePath);
+                        ComicReader.Utils.ModernLogger.Info($"✓ Archivo reciente registrado: {Path.GetFileName(filePath)}");
+                    }
+                    catch (Exception ex)
+                    {
+                        ComicReader.Utils.ModernLogger.Error($"Error registrando archivo reciente: {ex.Message}");
+                    }
                 }
                 else
                 {

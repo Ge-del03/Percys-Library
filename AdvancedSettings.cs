@@ -24,56 +24,177 @@ namespace ComicReader.Legacy.Services
         Custom
     }
 
+    /// <summary>
+    /// Temas disponibles para Percy's Library
+    /// NOTA: Todos los temas están inspirados en la estética de superhéroes
+    /// pero usan nombres genéricos libres de copyright
+    /// </summary>
     public enum ThemeMode
     {
+        // ═══════════════════════════════════════════════════════════════════
+        // TEMAS BÁSICOS
+        // ═══════════════════════════════════════════════════════════════════
         Light,
         Dark,
         Comic,
         Sepia,
         HighContrast,
 
-        // Marvel-inspired / high energy palettes
-        StarkRed,
-        PatriotBlue,
-        ArañaRoja,
-        GammaGreen,
-        AsgardGold,
+        // ═══════════════════════════════════════════════════════════════════
+        // TEMAS INSPIRADOS EN SUPERHÉROES (Genéricos - Sin Copyright)
+        // ═══════════════════════════════════════════════════════════════════
+        
+        /// <summary>Armor Red - Rojo metálico y dorado (estilo tech hero)</summary>
+        ArmorRed,
+        
+        /// <summary>Patriot Shield - Azul, rojo y blanco (estilo héroe patriótico)</summary>
+        PatriotShield,
+        
+        /// <summary>Web Crawler - Rojo y negro (estilo héroe arácnido)</summary>
+        WebCrawler,
+        
+        /// <summary>Gamma Rage - Verde radiactivo (estilo héroe con fuerza)</summary>
+        GammaRage,
+        
+        /// <summary>Thunder God - Dorado y azul eléctrico (estilo dios del trueno)</summary>
+        ThunderGod,
+        
+        /// <summary>Dark Knight - Negro y gris oscuro (estilo vigilante nocturno)</summary>
+        DarkKnight,
+        
+        /// <summary>Kryptonian Blue - Azul y rojo brillante (estilo héroe alienígena)</summary>
+        KryptonianBlue,
+        
+        /// <summary>Speed Force - Rojo y amarillo con energía (estilo velocista)</summary>
+        SpeedForce,
+        
+        /// <summary>Amazon Warrior - Rojo, azul y dorado (estilo guerrera amazona)</summary>
+        AmazonWarrior,
+        
+        /// <summary>Emerald Lantern - Verde brillante (estilo portador de anillo)</summary>
+        EmeraldLantern,
+        
+        /// <summary>Ocean King - Verde azulado y naranja (estilo rey marino)</summary>
+        OceanKing,
+        
+        /// <summary>Cyber Warrior - Gris metálico y azul (estilo cyborg)</summary>
+        CyberWarrior,
+        
+        /// <summary>Scarlet Speedster - Carmesí vibrante (estilo corredor escarlata)</summary>
+        ScarletSpeedster,
+        
+        /// <summary>Emerald Archer - Verde bosque y negro (estilo arquero)</summary>
+        EmeraldArcher,
+        
+        /// <summary>Feline Burglar - Negro y morado (estilo ladrona felina)</summary>
+        FelineBurglar,
+        
+        /// <summary>Mercenary Red - Rojo y negro (estilo mercenario)</summary>
+        MercenaryRed,
+        
+        /// <summary>Mystic Arts - Naranja místico y azul (estilo hechicero)</summary>
+        MysticArts,
+        
+        /// <summary>Panther King - Negro y morado real (estilo rey felino)</summary>
+        PantherKing,
 
-        // DC-inspired / heroic palettes
-        BatNight,
-        KryptonBlue,
-        MetroNeon,
-        AmazonEmerald,
-        OracleGray,
-
-        // Manga styles
+        // ═══════════════════════════════════════════════════════════════════
+        // TEMAS MANGA Y ANIME
+        // ═══════════════════════════════════════════════════════════════════
+        
+        /// <summary>Shonen Burst - Colores vibrantes para acción</summary>
         ShonenBurst,
+        
+        /// <summary>Shojo Bloom - Pasteles rosados para romance</summary>
         ShojoBloom,
+        
+        /// <summary>Seinen Noir - Oscuro y maduro</summary>
         SeinenNoir,
+        
+        /// <summary>Gekiga Sepia - Tonos sepia dramáticos</summary>
         GekigaSepia,
+        
+        /// <summary>Manga Ink - Blanco y negro puro</summary>
         MangaInk,
 
-        // Classic comic ages & styles
+        // ═══════════════════════════════════════════════════════════════════
+        // TEMAS DE ERAS DE CÓMICS
+        // ═══════════════════════════════════════════════════════════════════
+        
+        /// <summary>Golden Age - Era dorada (1938-1956)</summary>
         GoldenAge,
+        
+        /// <summary>Silver Age - Era plateada (1956-1970)</summary>
         SilverAge,
+        
+        /// <summary>Bronze Age - Era bronce (1970-1985)</summary>
         BronzeAge,
+        
+        /// <summary>Modern Age - Era moderna (1985+)</summary>
+        ModernAge,
+
+        // ═══════════════════════════════════════════════════════════════════
+        // TEMAS ARTÍSTICOS
+        // ═══════════════════════════════════════════════════════════════════
+        
+        /// <summary>Pop Art - Estilo Andy Warhol</summary>
         PopArt,
-        Pulps,
-
-        // Retro / modern hybrids
+        
+        /// <summary>Noir Strip - Blanco y negro con alto contraste</summary>
         NoirStrip,
-        PastelRetro,
-        NeonCyber,
-        Vaporwave,
-        Retro80s,
+        
+        /// <summary>Pulp Fiction - Estilo revistas pulp</summary>
+        PulpFiction,
+        
+        /// <summary>Cel Shading - Colores planos tipo animación</summary>
+        CelShading,
+        
+        /// <summary>Watercolor - Acuarela suave</summary>
+        Watercolor,
 
-        // Misc stylistic palettes
-        ComicPop,
+        // ═══════════════════════════════════════════════════════════════════
+        // TEMAS RETRO Y MODERNOS
+        // ═══════════════════════════════════════════════════════════════════
+        
+        /// <summary>Neon Cyber - Neón y cyberpunk</summary>
+        NeonCyber,
+        
+        /// <summary>Vaporwave - Estética retro-futurista</summary>
+        Vaporwave,
+        
+        /// <summary>Retro 80s - Colores vibrantes de los 80</summary>
+        Retro80s,
+        
+        /// <summary>Pastel Retro - Pasteles vintage</summary>
+        PastelRetro,
+        
+        /// <summary>Synthwave - Neón y atardeceres</summary>
+        Synthwave,
+
+        // ═══════════════════════════════════════════════════════════════════
+        // TEMAS ESPECIALES
+        // ═══════════════════════════════════════════════════════════════════
+        
+        /// <summary>Vintage Paper - Papel envejecido</summary>
         VintagePaper,
-        CelShade,
+        
+        /// <summary>Cartoon Bright - Colores brillantes de caricatura</summary>
         CartoonBright,
+        
+        /// <summary>Monochrome High Contrast - Blanco y negro puro</summary>
         MonochromeHighContrast,
-        PastelGentle
+        
+        /// <summary>Pastel Gentle - Pasteles suaves</summary>
+        PastelGentle,
+        
+        /// <summary>Comic Pop - Colores pop vibrantes</summary>
+        ComicPop,
+        
+        /// <summary>Percy's Library - Tema oficial de la aplicación</summary>
+        PercysLibrary,
+        
+        /// <summary>Test Theme - Solo para pruebas de persistencia</summary>
+        TestHotPink
     }
 
     public class AdvancedSettings : INotifyPropertyChanged

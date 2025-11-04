@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
@@ -210,6 +211,7 @@ namespace ComicReader.Views
             if (openDialog.ShowDialog() == true)
             {
                 int addedCount = 0;
+                var coverTasks = new System.Collections.Generic.List<Task>();
                 foreach (var filename in openDialog.FileNames)
                 {
                     // VALIDACIÓN MODERNA con ValidationService
@@ -236,7 +238,7 @@ namespace ComicReader.Views
                     addedCount++;
                     
                     // CARGAR PORTADA ASYNC en background (estilo dinámico)
-                    _ = LoadComicCoverAsync(comic);
+                    coverTasks.Add(LoadComicCoverAsync(comic));
                 }
                 
                 ApplyFilter();
@@ -247,6 +249,8 @@ namespace ComicReader.Views
                 ComicReader.Services.Notifications.NotificationService.Instance.Success(
                     $"{addedCount} cómic(s) agregado(s) a '{_selectedCollection.Name}'", 
                     "Cómics agregados");
+
+                await Task.WhenAll(coverTasks);
             }
         }
 

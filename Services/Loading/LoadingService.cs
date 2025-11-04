@@ -19,8 +19,6 @@ namespace ComicReader.Services.Loading
         public static LoadingService Instance => _instance ??= new LoadingService();
 
         private Window _mainWindow;
-        private Grid _loadingOverlay;
-        private LoadingIndicator _currentIndicator;
 
         private LoadingService() { }
 
@@ -60,7 +58,7 @@ namespace ComicReader.Services.Loading
                 NotificationService.Instance.Warning("Operación cancelada", "Cancelado");
                 throw;
             }
-            catch (Exception ex)
+            catch
             {
                 NotificationService.Instance.Close(toast);
                 throw;

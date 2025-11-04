@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using ComicReader.Services;
+using ComicReader.Utils;
 
 namespace ComicReader.Themes
 {
@@ -108,6 +109,16 @@ namespace ComicReader.Themes
             _themes[ThemeMode.MonochromeHighContrast] = P(Color.FromRgb(0,0,0), Color.FromRgb(255,255,255), Color.FromRgb(255,255,255), Color.FromRgb(0,0,0), Color.FromRgb(24,24,24), Color.FromRgb(255,255,255));
             _themes[ThemeMode.PastelGentle] = P(Color.FromRgb(200,220,240), Color.FromRgb(240,200,220), Color.FromRgb(220,240,200), Color.FromRgb(250,250,250), Color.FromRgb(255,255,255), Color.FromRgb(30,30,30));
 
+            // TEST: Rosa fucsia brillante para verificar persistencia visual
+            _themes[ThemeMode.TestHotPink] = P(
+                Color.FromRgb(255, 20, 147),   // PrimaryColor - rosa fucsia brillante
+                Color.FromRgb(255, 255, 0),    // SecondaryColor - amarillo brillante
+                Color.FromRgb(255, 20, 147),   // AccentColor - rosa fucsia
+                Color.FromRgb(139, 0, 139),    // WindowBackgroundColor - morado oscuro
+                Color.FromRgb(160, 32, 160),   // PanelBackgroundColor - morado más claro
+                Color.FromRgb(255, 255, 255)   // TextColor - blanco
+            );
+
             // Exclusive branded theme for the app: "Percy's Library"
             // Palette uses the app's signature deep-navy background and bright blue accent,
             // with a warm secondary for highlights. Ensure contrast-safe choices.
@@ -154,6 +165,64 @@ namespace ComicReader.Themes
                     {
                         app.Resources[key] = themeResource[key];
                     }
+                    
+                    // Actualizar el tema actual
+                    _currentTheme = theme;
+                    
+                    // LOG: Mostrar colores clave que se están aplicando
+                    try
+                    {
+                        if (themeResource.Contains("WindowBackgroundColor") && themeResource["WindowBackgroundColor"] is Color windowBg)
+                        {
+                            DevLogger.Info($"🎨 TEMA APLICADO: {theme}");
+                            DevLogger.Info($"   WindowBackground: #{windowBg.R:X2}{windowBg.G:X2}{windowBg.B:X2}");
+                            
+                            if (themeResource.Contains("PanelBackgroundColor") && themeResource["PanelBackgroundColor"] is Color panelBg)
+                                DevLogger.Info($"   PanelBackground: #{panelBg.R:X2}{panelBg.G:X2}{panelBg.B:X2}");
+                            
+                            if (themeResource.Contains("PrimaryColor") && themeResource["PrimaryColor"] is Color primary)
+                                DevLogger.Info($"   Primary: #{primary.R:X2}{primary.G:X2}{primary.B:X2}");
+                        }
+                    }
+                    catch { }
+                    
+                    // FORZAR ACTUALIZACIÓN VISUAL DE TODAS LAS VENTANAS
+                    try
+                    {
+                        DevLogger.Info("→ Forzando actualización visual de ventanas...");
+                        
+                        // Método 1: Invalidar visual de todas las ventanas abiertas
+                        foreach (Window window in app.Windows)
+                        {
+                            try
+                            {
+                                // Forzar re-evaluación de recursos
+                                window.InvalidateVisual();
+                                
+                                // Forzar actualización de todos los elementos hijos
+                                InvalidateVisualTree(window);
+                                
+                                DevLogger.Info($"  ✓ Ventana actualizada: {window.GetType().Name}");
+                            }
+                            catch (Exception winEx)
+                            {
+                                DevLogger.Error($"  ✗ Error actualizando ventana: {winEx.Message}");
+                            }
+                        }
+                        
+                        DevLogger.Info("✓ Actualización visual completada");
+                    }
+                    catch (Exception updateEx)
+                    {
+                        DevLogger.Error($"Error en actualización visual: {updateEx.Message}");
+                    }
+                    
+                    // Notificar cambio de tema
+                    try
+                    {
+                        ThemeChanged?.Invoke(theme);
+                    }
+                    catch { }
                 }
             }
         }
@@ -182,6 +251,42 @@ namespace ComicReader.Themes
                 app.Resources["AccentBrush"] = brush;
             }
             catch { }
+        }
+
+        /// <summary>
+        /// Invalida recursivamente todo el árbol visual para forzar actualización
+        /// </summary>
+        private static void InvalidateVisualTree(System.Windows.DependencyObject obj)
+        {
+            if (obj == null) return;
+
+            try
+            {
+                // Si es un UIElement, invalidar visual
+                if (obj is System.Windows.UIElement uiElement)
+                {
+                    uiElement.InvalidateVisual();
+                }
+
+                // Si es un FrameworkElement, forzar actualización de layout
+                if (obj is System.Windows.FrameworkElement frameworkElement)
+                {
+                    frameworkElement.InvalidateVisual();
+                    frameworkElement.UpdateLayout();
+                }
+
+                // Recorrer todos los hijos
+                int childrenCount = System.Windows.Media.VisualTreeHelper.GetChildrenCount(obj);
+                for (int i = 0; i < childrenCount; i++)
+                {
+                    var child = System.Windows.Media.VisualTreeHelper.GetChild(obj, i);
+                    InvalidateVisualTree(child);
+                }
+            }
+            catch
+            {
+                // Ignorar errores en elementos individuales
+            }
         }
 
         private static ResourceDictionary CreateLightTheme()
@@ -479,50 +584,51 @@ namespace ComicReader.Themes
             return Color.FromRgb(R, G, B);
         }
 
+        /// <summary>
+        /// Guarda el tema actual usando el nuevo sistema de persistencia v3.0
+        /// </summary>
         public static void SaveCurrentTheme()
         {
             try
             {
-                var settingsDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PercysLibrary");
-                Directory.CreateDirectory(settingsDir);
+                string themeName = CurrentTheme.ToString();
+                var task = ComicReader.Services.PersistenceIntegrator.Instance.ChangeThemeAsync(themeName);
+                task.Wait();
                 
-                var themePath = Path.Combine(settingsDir, "CurrentTheme.txt");
-                File.WriteAllText(themePath, CurrentTheme.ToString());
+                ComicReader.Utils.ModernLogger.Info($"✓ Tema guardado con v3.0: {themeName}");
             }
             catch (Exception ex)
             {
-                Logger.Log($"Error saving theme: {ex.Message}");
+                Logger.Log($"✗ Excepción guardando tema: {ex.Message}");
+                ComicReader.Utils.DevLogger.Error($"Stack: {ex.StackTrace}");
             }
         }
 
+        /// <summary>
+        /// Carga el tema guardado usando el nuevo sistema de persistencia v3.0
+        /// </summary>
         public static void LoadSavedTheme()
         {
             try
             {
-                var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                var newDir = Path.Combine(appData, "PercysLibrary");
-                var newPath = Path.Combine(newDir, "CurrentTheme.txt");
-                var oldPath = Path.Combine(appData, "ComicReader", "CurrentTheme.txt");
-
-                string themeText = null;
-                if (File.Exists(newPath))
+                var config = ComicReader.Services.PersistenceIntegrator.Instance.GetThemeConfiguration();
+                string savedThemeName = config?.CurrentTheme;
+                
+                if (!string.IsNullOrWhiteSpace(savedThemeName) && 
+                    Enum.TryParse<ThemeMode>(savedThemeName, out var savedTheme))
                 {
-                    themeText = File.ReadAllText(newPath);
-                }
-                else if (File.Exists(oldPath))
-                {
-                    themeText = File.ReadAllText(oldPath);
-                    try { Directory.CreateDirectory(newDir); File.Copy(oldPath, newPath, overwrite: true); } catch { }
-                }
-
-                if (!string.IsNullOrWhiteSpace(themeText) && Enum.TryParse<ThemeMode>(themeText, out var savedTheme))
-                {
+                    ComicReader.Utils.ModernLogger.Info($"📖 Cargando tema con v3.0: {savedTheme}");
                     CurrentTheme = savedTheme;
+                }
+                else
+                {
+                    ComicReader.Utils.ModernLogger.Info($"⚠ No se encontró tema válido, usando: {CurrentTheme}");
                 }
             }
             catch (Exception ex)
             {
-                Logger.Log($"Error loading saved theme: {ex.Message}");
+                Logger.Log($"✗ Error cargando tema guardado: {ex.Message}");
+                ComicReader.Utils.DevLogger.Error($"Stack: {ex.StackTrace}");
             }
         }
 
@@ -577,8 +683,8 @@ namespace ComicReader.Themes
                 new ThemeInfo(ThemeMode.CelShade, "Cel Shading", "Colores planos y contrastes tipo cel"),
                 new ThemeInfo(ThemeMode.CartoonBright, "Cartoon Brillante", "Colores brillantes y amigables"),
                 new ThemeInfo(ThemeMode.MonochromeHighContrast, "Monocromo Alto Contraste", "Blanco y negro con máxima legibilidad"),
-                new ThemeInfo(ThemeMode.PastelGentle, "Pastel Suave", "Tonos suaves y relajados para lectura tranquila")
-                ,
+                new ThemeInfo(ThemeMode.PastelGentle, "Pastel Suave", "Tonos suaves y relajados para lectura tranquila"),
+                new ThemeInfo(ThemeMode.TestHotPink, "⚠️ TEST ROSA", "Tema de prueba para verificar persistencia visual"),
                 new ThemeInfo(ThemeMode.PercysLibrary, "Percy's Library", "Tema exclusivo con los colores oficiales de la aplicación: fondo azul profundo y acentos brand.")
             };
         }

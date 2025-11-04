@@ -12,6 +12,7 @@
         Background="{DynamicResource WindowBackgroundBrush}"
     Icon="icono.ico"
     WindowStyle="None" AllowsTransparency="False" ResizeMode="CanResize"
+    WindowState="Maximized"
     AllowDrop="True"
     Closing="MainWindow_Closing"
     StateChanged="Window_StateChanged">

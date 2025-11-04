@@ -74,6 +74,8 @@ namespace ComicReader.Services
         CartoonBright,
         MonochromeHighContrast,
         PastelGentle,
+        // Test theme
+        TestHotPink,
         // Exclusive app-branded theme
         PercysLibrary
     }

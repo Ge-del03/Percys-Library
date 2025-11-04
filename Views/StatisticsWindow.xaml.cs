@@ -13,13 +13,44 @@ namespace ComicReader.Views
     {
         public StatisticsWindow()
         {
+            // Cargar XAML normalmente; si hay un error de recursos o bindings queremos verlo en logs
+            InitializeComponent();
+            this.DataContext = new ReadingStatsViewModel();
+            
+            // ✅ SUSCRIBIRSE A CAMBIOS DE TEMA
             try
             {
-                var mi = this.GetType().GetMethod("InitializeComponent", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
-                mi?.Invoke(this, null);
+                ComicReader.Themes.ThemeManager.ThemeChanged += OnThemeChanged;
+                UpdateThemeResources();
             }
             catch { }
-            this.DataContext = new ReadingStatsViewModel();
+        }
+        
+        private void OnThemeChanged(ComicReader.Services.ThemeMode mode)
+        {
+            // Ejecutar en UI thread
+            this.Dispatcher?.BeginInvoke(new Action(() =>
+            {
+                try
+                {
+                    UpdateThemeResources();
+                    this.InvalidateVisual();
+                    this.UpdateLayout();
+                    ComicReader.Utils.ModernLogger.Info("✓ StatisticsWindow actualizada con nuevo tema");
+                }
+                catch { }
+            }));
+        }
+        
+        private void UpdateThemeResources()
+        {
+            try
+            {
+                this.Background = this.TryFindResource("WindowBackgroundBrush") as System.Windows.Media.Brush 
+                    ?? this.TryFindResource("BackgroundBrush") as System.Windows.Media.Brush
+                    ?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(18, 18, 18));
+            }
+            catch { }
         }
 
         private void SessionItem_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

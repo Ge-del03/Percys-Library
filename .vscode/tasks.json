@@ -34,48 +34,21 @@
 		{
 			"label": "Run ComicReader",
 			"type": "shell",
-			"command": "${workspaceFolder}\\bin\\Debug\\net6.0-windows\\PercysLibrary.exe",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"--project",
+				"${workspaceFolder}\\ComicReader.csproj",
+				"-c",
+				"Debug"
+			],
 			"group": "none",
 			"dependsOn": [
 				"Build ComicReader"
 			],
 			"problemMatcher": []
 		},
-		{
-			"label": "Run ComicReader (fixed)",
-			"type": "shell",
-			"command": "dotnet",
-			"args": [
-				"run",
-				"--project",
-				"c:\\Users\\O11CE\\OneDrive\\Desktop\\ComicReader\\ComicReader.csproj",
-				"-c",
-				"Debug"
-			],
-			"isBackground": false,
-			"group": "none",
-			"dependsOn": [
-				"Kill PercysLibrary"
-			]
-		},
-		{
-			"label": "Run ComicReader (no-build)",
-			"type": "shell",
-			"command": "dotnet",
-			"args": [
-				"run",
-				"--no-build",
-				"--project",
-				"c:\\Users\\O11CE\\OneDrive\\Desktop\\ComicReader\\ComicReader.csproj",
-				"-c",
-				"Debug"
-			],
-			"isBackground": false,
-			"group": "none",
-			"dependsOn": [
-				"Kill PercysLibrary"
-			]
-		},
+		
 		{
 			"label": "Clean + Build ComicReader",
 			"type": "shell",
@@ -92,25 +65,14 @@
 			],
 			"group": "build"
 		},
-		{
-			"label": "Build ComicReader",
-			"type": "shell",
-			"command": "dotnet",
-			"args": [
-				"build",
-				"${workspaceFolder}\\ComicReader.sln",
-				"-c",
-				"Debug"
-			],
-			"group": "build"
-		},
+
 		{
 			"label": "Build ComicReader (temp)",
 			"type": "shell",
 			"command": "dotnet",
 			"args": [
 				"build",
-				"c:\\Users\\O11CE\\OneDrive\\Desktop\\ComicReader\\ComicReader.sln",
+				"${workspaceFolder}\\ComicReader.sln",
 				"-c",
 				"Debug"
 			],
@@ -126,7 +88,7 @@
 			"command": "dotnet",
 			"args": [
 				"build",
-				"c:\\Users\\O11CE\\OneDrive\\Desktop\\ComicReader\\ComicReader.sln",
+				"${workspaceFolder}\\ComicReader.sln",
 				"-c",
 				"Debug"
 			],

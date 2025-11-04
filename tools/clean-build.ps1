@@ -15,21 +15,44 @@ try {
     Get-Process PercysLibrary -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 } catch {}
 
-# Esperar a que el EXE no esté bloqueado
-$exePath = Join-Path $workspace "bin/Debug/net6.0-windows/PercysLibrary.exe"
-if (Test-Path $exePath) {
-    Write-Host "Esperando a que se libere: $exePath"
-    for ($i = 0; $i -lt 50; $i++) {
-        try {
-            $fs = [System.IO.File]::Open($exePath, 'Open', 'ReadWrite', 'None')
-            $fs.Close()
-            Write-Host "Archivo liberado."
-            break
-        } catch {
-            Start-Sleep -Milliseconds 200
+# Esperar a que ejecutables/DLL no estén bloqueados (net6 y net8)
+$exePathNet6 = Join-Path $workspace "bin/Debug/net6.0-windows/PercysLibrary.exe"
+$exePathNet8 = Join-Path $workspace "bin/Debug/net8.0-windows10.0.19041/PercysLibrary.exe"
+$dllSkiaNet8 = Join-Path $workspace "bin/Debug/net8.0-windows10.0.19041/SkiaSharp.dll"
+
+foreach ($p in @($exePathNet6,$exePathNet8,$dllSkiaNet8)) {
+    if (Test-Path $p) {
+        Write-Host "Esperando a que se libere: $p"
+        for ($i = 0; $i -lt 50; $i++) {
+            try {
+                $fs = [System.IO.File]::Open($p, 'Open', 'ReadWrite', 'None')
+                $fs.Close()
+                Write-Host "Archivo liberado: $p"
+                break
+            } catch {
+                Start-Sleep -Milliseconds 200
+            }
         }
     }
 }
+
+# Intentar detectar procesos .NET que tengan módulos cargados desde nuestro bin Debug net8
+try {
+    $binPath = (Join-Path $workspace "bin/Debug/net8.0-windows10.0.19041")
+    Write-Host "Buscando procesos que bloquean archivos en: $binPath"
+    $lockers = @()
+    foreach ($proc in Get-Process -ErrorAction SilentlyContinue) {
+        try {
+            if ($proc.Modules | Where-Object { $_.FileName -like "$binPath*" }) {
+                $lockers += $proc
+            }
+        } catch { }
+    }
+    if ($lockers.Count -gt 0) {
+        Write-Host ("Deteniendo procesos que bloquean bin: {0}" -f (($lockers | ForEach-Object { $_.Name + ' (' + $_.Id + ')' }) -join ', '))
+        $lockers | Stop-Process -Force -ErrorAction SilentlyContinue
+    }
+} catch { }
 
 # Limpiar bin y obj en todo el árbol
 Write-Host "Eliminando carpetas bin/obj..."

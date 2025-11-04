@@ -143,21 +143,70 @@ namespace ComicReader.Services
             try
             {
                 var path = GetSettingsFilePath();
-                if (string.IsNullOrWhiteSpace(path)) return;
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    ComicReader.Utils.DevLogger.Error("WriteToFileAsync: Path is null or empty");
+                    return;
+                }
+                
                 var dir = Path.GetDirectoryName(path);
-                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                    ComicReader.Utils.DevLogger.Info($"Directorio creado: {dir}");
+                }
+                
                 var txt = JsonSerializer.Serialize(Settings, _jsonOptions);
+                ComicReader.Utils.DevLogger.Info($"JSON serializado, longitud: {txt.Length} caracteres");
+                
                 // Write atomically: write to temp then move
                 var tmp = path + ".tmp";
                 await File.WriteAllTextAsync(tmp, txt).ConfigureAwait(false);
-                try { File.Replace(tmp, path, null); }
-                catch
+                ComicReader.Utils.DevLogger.Info($"Archivo temporal escrito: {tmp}");
+                
+                try 
+                { 
+                    File.Replace(tmp, path, null);
+                    ComicReader.Utils.DevLogger.Info($"✓ Archivo reemplazado exitosamente: {path}");
+                }
+                catch (Exception replaceEx)
                 {
+                    ComicReader.Utils.DevLogger.Info($"⚠ Replace falló, intentando Delete+Move: {replaceEx.Message}");
                     try { File.Delete(path); } catch { }
-                    try { File.Move(tmp, path); } catch { }
+                    try 
+                    { 
+                        File.Move(tmp, path);
+                        ComicReader.Utils.DevLogger.Info($"✓ Archivo movido exitosamente: {path}");
+                    } 
+                    catch (Exception moveEx)
+                    {
+                        ComicReader.Utils.DevLogger.Error($"✗ Move también falló: {moveEx.Message}");
+                    }
+                }
+                
+                // Verificar que el archivo se escribió correctamente
+                if (File.Exists(path))
+                {
+                    var verifyContent = await File.ReadAllTextAsync(path).ConfigureAwait(false);
+                    if (verifyContent.Length > 0)
+                    {
+                        ComicReader.Utils.DevLogger.Info($"✓✓ Archivo verificado, tamaño: {verifyContent.Length} caracteres");
+                    }
+                    else
+                    {
+                        ComicReader.Utils.DevLogger.Error("✗ Archivo existe pero está vacío");
+                    }
+                }
+                else
+                {
+                    ComicReader.Utils.DevLogger.Error($"✗ Archivo NO existe después de escribir: {path}");
                 }
             }
-            catch { /* swallow to avoid bubbling IO errors in caller */ }
+            catch (Exception ex)
+            {
+                ComicReader.Utils.DevLogger.Error($"✗✗✗ ERROR en WriteToFileAsync: {ex.Message}");
+                ComicReader.Utils.DevLogger.Error($"Stack: {ex.StackTrace}");
+            }
         }
 
         public static string GetSettingsFilePath()

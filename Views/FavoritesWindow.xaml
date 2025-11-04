@@ -7,12 +7,12 @@
         WindowStartupLocation="Manual"
         WindowState="Normal"
         Left="100" Top="50"
-        Background="{DynamicResource DarkBg}"
+        Background="{DynamicResource WindowBackgroundBrush}"
         ResizeMode="CanResize">
 
     <Window.Resources>
         <!-- ============================================ -->
-        <!-- COMIC BOOK STYLE COLORS -->
+        <!-- COMIC BOOK STYLE COLORS - Usando tema global -->
         <!-- ============================================ -->
         <SolidColorBrush x:Key="ComicRed" Color="#FF3131"/>
         <SolidColorBrush x:Key="ComicYellow" Color="#FFD700"/>
@@ -20,11 +20,12 @@
         <SolidColorBrush x:Key="ComicPurple" Color="#9370DB"/>
         <SolidColorBrush x:Key="ComicGreen" Color="#32CD32"/>
         <SolidColorBrush x:Key="ComicOrange" Color="#FF8C00"/>
-        <SolidColorBrush x:Key="DarkBg" Color="#1A1A2E"/>
-        <SolidColorBrush x:Key="MediumBg" Color="#16213E"/>
-        <SolidColorBrush x:Key="AccentBg" Color="#0F3460"/>
-        <SolidColorBrush x:Key="TextLight" Color="#EAEAEA"/>
-        <SolidColorBrush x:Key="TextMuted" Color="#94A1B2"/>
+        <!-- Colores de tema aplicados dinámicamente -->
+        <SolidColorBrush x:Key="DarkBg" Color="{DynamicResource WindowBackgroundColor}"/>
+        <SolidColorBrush x:Key="MediumBg" Color="{DynamicResource PanelBackgroundColor}"/>
+        <SolidColorBrush x:Key="AccentBg" Color="{DynamicResource HeaderBackgroundColor}"/>
+        <SolidColorBrush x:Key="TextLight" Color="{DynamicResource TextColor}"/>
+        <SolidColorBrush x:Key="TextMuted" Color="{DynamicResource SecondaryTextColor}"/>
 
         <!-- ============================================ -->
         <!-- COMIC BOOK SHADOWS & EFFECTS -->

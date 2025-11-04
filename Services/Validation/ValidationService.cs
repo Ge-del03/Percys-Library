@@ -150,24 +150,68 @@ namespace ComicReader.Services.Validation
         {
             try
             {
-                using var archive = System.IO.Compression.ZipFile.OpenRead(filePath);
+                // Usar SharpCompress para mejor tolerancia a errores
+                using var stream = File.OpenRead(filePath);
+                using var archive = SharpCompress.Archives.Zip.ZipArchive.Open(stream, new SharpCompress.Readers.ReaderOptions
+                {
+                    LeaveStreamOpen = false
+                });
                 
-                if (archive.Entries.Count == 0)
+                var entries = archive.Entries.Where(e => !e.IsDirectory).ToList();
+                
+                if (entries.Count == 0)
                     return ValidationResult.Fail("El archivo ZIP está vacío");
 
-                var imageEntries = archive.Entries.Where(e => IsImageFile(e.Name)).ToList();
+                var imageEntries = entries.Where(e => IsImageFile(e.Key ?? "")).ToList();
                 
                 if (imageEntries.Count == 0)
                     return ValidationResult.Fail("El archivo no contiene imágenes");
 
-                return ValidationResult.Success();
+                // Intentar leer al menos una imagen para verificar integridad
+                try
+                {
+                    using var entryStream = imageEntries[0].OpenEntryStream();
+                    using var ms = new System.IO.MemoryStream();
+                    entryStream.CopyTo(ms);
+                    if (ms.Length > 0)
+                    {
+                        ComicReader.Utils.ModernLogger.Debug($"✓ ZIP validado: {imageEntries.Count} imágenes encontradas");
+                        return ValidationResult.Success();
+                    }
+                }
+                catch
+                {
+                    // Si falla la primera, intentar con las primeras 3
+                    int successCount = 0;
+                    for (int i = 0; i < Math.Min(3, imageEntries.Count); i++)
+                    {
+                        try
+                        {
+                            using var entryStream = imageEntries[i].OpenEntryStream();
+                            using var ms = new System.IO.MemoryStream();
+                            entryStream.CopyTo(ms);
+                            if (ms.Length > 0) successCount++;
+                        }
+                        catch { }
+                    }
+                    
+                    if (successCount > 0)
+                    {
+                        ComicReader.Utils.ModernLogger.Warning($"⚠ ZIP con errores menores: {successCount}/3 imágenes legibles");
+                        return ValidationResult.Success(); // Tolerante: permitir si al menos algunas imágenes funcionan
+                    }
+                }
+
+                return ValidationResult.Fail("No se pudieron leer las imágenes del ZIP");
             }
-            catch (System.IO.InvalidDataException)
+            catch (System.IO.InvalidDataException ex)
             {
+                ComicReader.Utils.ModernLogger.Error($"ZIP corrupto: {filePath} - {ex.Message}");
                 return ValidationResult.Fail("El archivo ZIP está corrupto o dañado");
             }
             catch (Exception ex)
             {
+                ComicReader.Utils.ModernLogger.Error($"Error validando ZIP: {filePath} - {ex.Message}");
                 return ValidationResult.Fail($"Error al abrir el archivo: {ex.Message}");
             }
         }
@@ -178,24 +222,66 @@ namespace ComicReader.Services.Validation
             try
             {
                 using var stream = File.OpenRead(filePath);
-                using var reader = SharpCompress.Archives.Rar.RarArchive.Open(stream);
+                using var reader = SharpCompress.Archives.Rar.RarArchive.Open(stream, new SharpCompress.Readers.ReaderOptions
+                {
+                    LeaveStreamOpen = false
+                });
                 
-                if (!reader.Entries.Any())
+                var entries = reader.Entries.Where(e => !e.IsDirectory).ToList();
+                
+                if (!entries.Any())
                     return ValidationResult.Fail("El archivo RAR está vacío");
 
-                var imageEntries = reader.Entries.Where(e => !e.IsDirectory && IsImageFile(e.Key)).ToList();
+                var imageEntries = entries.Where(e => IsImageFile(e.Key ?? "")).ToList();
                 
                 if (imageEntries.Count == 0)
                     return ValidationResult.Fail("El archivo no contiene imágenes");
 
-                return ValidationResult.Success();
+                // Intentar leer al menos una imagen para verificar integridad
+                try
+                {
+                    using var entryStream = imageEntries[0].OpenEntryStream();
+                    using var ms = new System.IO.MemoryStream();
+                    entryStream.CopyTo(ms);
+                    if (ms.Length > 0)
+                    {
+                        ComicReader.Utils.ModernLogger.Debug($"✓ RAR validado: {imageEntries.Count} imágenes encontradas");
+                        return ValidationResult.Success();
+                    }
+                }
+                catch
+                {
+                    // Tolerante: intentar con varias imágenes
+                    int successCount = 0;
+                    for (int i = 0; i < Math.Min(3, imageEntries.Count); i++)
+                    {
+                        try
+                        {
+                            using var entryStream = imageEntries[i].OpenEntryStream();
+                            using var ms = new System.IO.MemoryStream();
+                            entryStream.CopyTo(ms);
+                            if (ms.Length > 0) successCount++;
+                        }
+                        catch { }
+                    }
+                    
+                    if (successCount > 0)
+                    {
+                        ComicReader.Utils.ModernLogger.Warning($"⚠ RAR con errores menores: {successCount}/3 imágenes legibles");
+                        return ValidationResult.Success();
+                    }
+                }
+
+                return ValidationResult.Fail("No se pudieron leer las imágenes del RAR");
             }
-            catch (SharpCompress.Common.InvalidFormatException)
+            catch (SharpCompress.Common.InvalidFormatException ex)
             {
+                ComicReader.Utils.ModernLogger.Error($"RAR corrupto: {filePath} - {ex.Message}");
                 return ValidationResult.Fail("El archivo RAR está corrupto o dañado");
             }
             catch (Exception ex)
             {
+                ComicReader.Utils.ModernLogger.Error($"Error validando RAR: {filePath} - {ex.Message}");
                 return ValidationResult.Fail($"Error al abrir el archivo RAR: {ex.Message}");
             }
         }

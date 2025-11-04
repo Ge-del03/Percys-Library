@@ -6,7 +6,7 @@
 	xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
 		Title="📊 Estadísticas de Lectura - Comic Style!" Height="640" Width="1024"
 		WindowStartupLocation="CenterOwner"
-		Background="{StaticResource RS_AppBackgroundBrush}">
+		Background="{DynamicResource BackgroundBrush}">
 
 	<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly">
 		<Grid Margin="18">
@@ -17,14 +17,14 @@
 		</Grid.RowDefinitions>
 
 		<!-- 💥 Header tipo cómic con efecto POW! -->
-		<Border Background="#16213E" CornerRadius="12" Padding="12,8" Margin="0,0,0,12" BorderBrush="#00D9FF" BorderThickness="3">
+		<Border Background="#1A2332" CornerRadius="12" Padding="12,8" Margin="0,0,0,12" BorderBrush="#00D9FF" BorderThickness="3">
 			<Border.Effect>
 				<DropShadowEffect Color="#00D9FF" BlurRadius="20" Opacity="0.4" ShadowDepth="0"/>
 			</Border.Effect>
 			<TextBlock Text="📊 ESTADÍSTICAS DE LECTURA 💥" FontSize="32" FontWeight="Black" 
-					   Foreground="#FFD700" HorizontalAlignment="Center" TextAlignment="Center">
+					   Foreground="#FFE44D" HorizontalAlignment="Center" TextAlignment="Center">
 				<TextBlock.Effect>
-					<DropShadowEffect Color="#E94560" BlurRadius="8" Opacity="0.8" ShadowDepth="2"/>
+					<DropShadowEffect Color="#FF1744" BlurRadius="8" Opacity="0.8" ShadowDepth="2"/>
 				</TextBlock.Effect>
 			</TextBlock>
 		</Border>
@@ -60,7 +60,7 @@
 							<RowDefinition Height="Auto" />
 							<RowDefinition Height="*" />
 						</Grid.RowDefinitions>
-						<TextBlock Text="⚡ PROGRESO ACTUAL" Foreground="#FFD700" FontWeight="Black" FontSize="16" Margin="4">
+						<TextBlock Text="⚡ PROGRESO ACTUAL" Foreground="#FFE44D" FontWeight="Black" FontSize="16" Margin="4">
 							<TextBlock.Effect>
 								<DropShadowEffect Color="#000000" BlurRadius="4" Opacity="0.8" ShadowDepth="2"/>
 							</TextBlock.Effect>
@@ -86,7 +86,7 @@
 							</ScrollViewer>
 
 							<!-- Placeholder when no progress items exist -->
-							<TextBlock Text="💤 No hay progreso reciente" Foreground="{StaticResource RS_TextOnDarkBrush}" 
+							<TextBlock Text="💤 No hay progreso reciente" Foreground="{DynamicResource SecondaryTextBrush}" 
 									   Opacity="0.75" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" FontStyle="Italic">
 								<TextBlock.Style>
 									<Style TargetType="TextBlock">
@@ -106,7 +106,7 @@
 				<!-- Chart con estilo panel de cómic -->
 				<Border Style="{StaticResource RS_StatCardStyle}" Padding="12" Margin="0,0,0,12">
 					<StackPanel>
-						<TextBlock Text="📈 LECTURAS POR DÍA" Foreground="#00D9FF" FontWeight="Black" FontSize="16" Margin="4">
+						<TextBlock Text="📈 LECTURAS POR DÍA" Foreground="#00E5FF" FontWeight="Black" FontSize="16" Margin="4">
 							<TextBlock.Effect>
 								<DropShadowEffect Color="#000000" BlurRadius="4" Opacity="0.8" ShadowDepth="2"/>
 							</TextBlock.Effect>
@@ -123,17 +123,17 @@
 				<!-- Panel de favoritos estilo cómic -->
 				<Border Style="{StaticResource RS_StatCardStyle}" Padding="14" Margin="0,0,0,16">
 					<StackPanel>
-						<TextBlock Text="⭐ FAVORITOS" Foreground="#9D4EDD" FontWeight="Black" FontSize="16" Margin="0,0,0,10">
+						<TextBlock Text="⭐ FAVORITOS" Foreground="#B388FF" FontWeight="Black" FontSize="16" Margin="0,0,0,10">
 							<TextBlock.Effect>
 								<DropShadowEffect Color="#000000" BlurRadius="4" Opacity="0.8" ShadowDepth="2"/>
 							</TextBlock.Effect>
 						</TextBlock>
 						<StackPanel Margin="8,0,0,0">
-							<TextBlock Foreground="{StaticResource RS_TextOnDarkBrush}" FontWeight="SemiBold" 
+							<TextBlock Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" 
 									   Text="{Binding FavoriteGenre, StringFormat='🎭 Género: {0}'}" Margin="0,4" />
-							<TextBlock Foreground="{StaticResource RS_TextOnDarkBrush}" FontWeight="SemiBold" 
+							<TextBlock Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" 
 									   Text="{Binding FavoriteDay, StringFormat='📅 Día: {0}'}" Margin="0,4" />
-							<TextBlock Foreground="{StaticResource RS_TextOnDarkBrush}" FontWeight="SemiBold" 
+							<TextBlock Foreground="{DynamicResource TextBrush}" FontWeight="SemiBold" 
 									   Text="{Binding PreferredFormat, StringFormat='📚 Formato: {0}'}" Margin="0,4" />
 						</StackPanel>
 					</StackPanel>
@@ -142,7 +142,7 @@
 				<!-- Sesiones con efecto viñeta -->
 				<Border Style="{StaticResource RS_StatCardStyle}" Padding="12">
 					<StackPanel>
-						<TextBlock Text="🕐 SESIONES DE HOY" Foreground="#06FFA5" FontWeight="Black" FontSize="16" Margin="0,0,0,10">
+						<TextBlock Text="🕐 SESIONES DE HOY" Foreground="#00FFA3" FontWeight="Black" FontSize="16" Margin="0,0,0,10">
 							<TextBlock.Effect>
 								<DropShadowEffect Color="#000000" BlurRadius="4" Opacity="0.8" ShadowDepth="2"/>
 							</TextBlock.Effect>
@@ -177,12 +177,12 @@
 													<ColumnDefinition Width="*" />
 													<ColumnDefinition Width="Auto" />
 												</Grid.ColumnDefinitions>
-												<TextBlock Text="{Binding StartText}" Foreground="#00D9FF" FontWeight="Bold" FontSize="13" VerticalAlignment="Top" />
+												<TextBlock Text="{Binding StartText}" Foreground="#00E5FF" FontWeight="Bold" FontSize="13" VerticalAlignment="Top" />
 												<StackPanel Grid.Column="1" Orientation="Vertical" Margin="10,0,0,0">
-													<TextBlock Text="{Binding Title}" Foreground="{StaticResource RS_TextOnDarkBrush}" FontWeight="Bold" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" />
-													<TextBlock Text="{Binding PagesText}" Foreground="#94A3B8" FontSize="11" />
+													<TextBlock Text="{Binding Title}" Foreground="{DynamicResource TextBrush}" FontWeight="Bold" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" />
+													<TextBlock Text="{Binding PagesText}" Foreground="{DynamicResource SecondaryTextBrush}" FontSize="11" />
 												</StackPanel>
-												<TextBlock Grid.Column="2" Text="{Binding DurationText}" Foreground="#FFD700" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" Margin="12,0,0,0" />
+												<TextBlock Grid.Column="2" Text="{Binding DurationText}" Foreground="#FFE44D" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" Margin="12,0,0,0" />
 											</Grid>
 										</Border>
 									</DataTemplate>
@@ -196,7 +196,7 @@
 
 		<!-- 🎯 Footer: acciones con botones estilo cómic -->
 		<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
-			<Button Content="💾 EXPORTAR" Background="#06FFA5" Foreground="#000000" FontWeight="Black" 
+			<Button Content="💾 EXPORTAR" Background="#00E676" Foreground="#000000" FontWeight="Black" 
 					Padding="16,8" Margin="8" Click="ExportButton_Click" BorderBrush="#000000" BorderThickness="2">
 				<Button.Effect>
 					<DropShadowEffect Color="#000000" BlurRadius="8" Opacity="0.6" ShadowDepth="3"/>
