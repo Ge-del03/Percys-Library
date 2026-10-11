@@ -1,0 +1,118 @@
+<UserControl x:Class="ComicReader.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1000">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="28,24">
+            <!-- Header Título -->
+            <TextBlock Text="Dashboard" Style="{StaticResource HeaderTextStyle}" Margin="0,0,0,4"/>
+            <TextBlock Text="Bienvenido a Percy's Comic Studio &amp; Manager" Style="{StaticResource SubheaderTextStyle}" Margin="0,0,0,24"/>
+
+            <!-- HERO: CONTINUAR LECTURA ACTUAL -->
+            <Border x:Name="HeroSection" Background="{StaticResource CardBackground}" CornerRadius="12" Padding="20" Margin="0,0,0,28" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Portada Hero -->
+                    <Border Grid.Column="0" Width="120" Height="180" CornerRadius="8" Background="#151820" Margin="0,0,20,0" ClipToBounds="True">
+                        <Image x:Name="HeroCoverImage" Stretch="UniformToFill"/>
+                    </Border>
+
+                    <!-- Info Hero -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <Border Background="{StaticResource PrimaryAccent}" HorizontalAlignment="Left" CornerRadius="4" Padding="8,2" Margin="0,0,0,8">
+                            <TextBlock Text="LECTURA ACTUAL" Foreground="White" FontSize="11" FontWeight="Bold"/>
+                        </Border>
+
+                        <TextBlock x:Name="HeroTitleText" Text="Spider-Man: Blue #03" Foreground="{StaticResource TextPrimaryBrush}" FontSize="20" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock x:Name="HeroSubtitleText" Text="Jeph Loeb &amp; Tim Sale • Marvel Comics" Foreground="{StaticResource TextSecondaryBrush}" FontSize="13" Margin="0,2,0,12"/>
+
+                        <!-- Barra de Progreso -->
+                        <Grid Margin="0,0,0,12" MaxWidth="500" HorizontalAlignment="Left" Width="400">
+                            <ProgressBar x:Name="HeroProgressBar" Height="8" Minimum="0" Maximum="100" Value="68" Foreground="{StaticResource PrimaryAccent}" Background="#151820" BorderThickness="0"/>
+                        </Grid>
+
+                        <TextBlock x:Name="HeroProgressText" Text="Página 22 de 32 (68%)" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,16"/>
+
+                        <!-- Botón Continuar -->
+                        <Button Content="▶  CONTINUAR LECTURA" Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Left" Click="ContinueReadingHero_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- SECCIÓN: EN CURSO (CONTINUAR LEYENDO) -->
+            <Grid Margin="0,0,0,12">
+                <TextBlock Text="Continuar Leyendo" Foreground="{StaticResource TextPrimaryBrush}" FontSize="16" FontWeight="Bold"/>
+                <Button Content="Ver todos ->" Foreground="{StaticResource PrimaryAccent}" Background="Transparent" BorderThickness="0" HorizontalAlignment="Right" Cursor="Hand" Click="SeeAllInCourse_Click"/>
+            </Grid>
+
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="0,0,0,28">
+                <ItemsControl x:Name="InCourseItemsControl">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="140" Margin="0,0,16,0" Background="{StaticResource CardBackground}" CornerRadius="10" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Cursor="Hand" MouseDown="Card_MouseDown">
+                                <Grid Margin="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.Row="0" Height="180" CornerRadius="6" Background="#151820" ClipToBounds="True" Margin="0,0,0,8">
+                                        <Image Source="{Binding CoverThumbnail}" Stretch="UniformToFill"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="1" Text="{Binding DisplayName}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Grid.Row="2" Text="{Binding LastPage, StringFormat='Pág. {0}'}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" Margin="0,2,0,6"/>
+                                    <ProgressBar Grid.Row="3" Height="4" Value="{Binding ProgressPercent, Mode=OneWay}" Foreground="{StaticResource PrimaryAccent}" Background="#151820" BorderThickness="0"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- SECCIÓN: AÑADIDOS RECIENTEMENTE -->
+            <Grid Margin="0,0,0,12">
+                <TextBlock Text="Añadidos Recientemente" Foreground="{StaticResource TextPrimaryBrush}" FontSize="16" FontWeight="Bold"/>
+                <Button Content="Explorar catálogo ->" Foreground="{StaticResource PrimaryAccent}" Background="Transparent" BorderThickness="0" HorizontalAlignment="Right" Cursor="Hand" Click="ExploreCatalog_Click"/>
+            </Grid>
+
+            <ItemsControl x:Name="RecentItemsControl">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="150" Margin="0,0,16,16" Background="{StaticResource CardBackground}" CornerRadius="10" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Cursor="Hand" MouseDown="ComicCard_MouseDown">
+                            <Grid Margin="8">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" Height="190" CornerRadius="6" Background="#151820" ClipToBounds="True" Margin="0,0,0,8">
+                                    <Image Source="{Binding CoverThumbnailUri}" Stretch="UniformToFill"/>
+                                </Border>
+                                <TextBlock Grid.Row="1" Text="{Binding Title}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Row="2" Text="{Binding Format}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" Margin="0,2,0,0"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

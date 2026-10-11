@@ -13,18 +13,18 @@ namespace ComicReader.Views
     // Minimal stubs para satisfacer InitializeComponent en tiempo de diseño
     public partial class ComicView : UserControl { public void InitializeComponent() { } }
     public partial class ContinuousComicView : UserControl { public void InitializeComponent() { } }
-    public partial class HomeView : UserControl { public void InitializeComponent() { } }
-    // Stub ligero para SettingsView: solo InitializeComponent para evitar errores de diseño
+    public partial class DashboardView : UserControl { public void InitializeComponent() { } }
+    public partial class LibraryCatalogView : UserControl { public void InitializeComponent() { } }
+    public partial class SeriesView : UserControl { public void InitializeComponent() { } }
+    public partial class MetadataInspectorView : UserControl { public void InitializeComponent() { } }
+    public partial class ReaderHudOverlay : UserControl { public void InitializeComponent() { } }
+    public partial class StatsView : UserControl { public void InitializeComponent() { } }
     public partial class SettingsView : UserControl { public void InitializeComponent() { } }
     public partial class ThumbnailGridView : UserControl { public void InitializeComponent() { } }
 
     // Windows/dialogs
-    public partial class ComicStatsWindow : Window { public void InitializeComponent() { } }
-    public partial class FavoritesWindow : Window { public void InitializeComponent() { } }
-    public partial class ComicSearchWindow : Window { public void InitializeComponent() { } }
     public partial class SettingsDialog : Window { public void InitializeComponent() { } }
     public partial class PresentationModeWindow : Window { public void InitializeComponent() { } }
-    public partial class LibraryManagerWindow : Window { public void InitializeComponent() { } }
 }
 
 namespace ComicReader

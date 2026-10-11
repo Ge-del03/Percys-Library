@@ -1,0 +1,132 @@
+<UserControl x:Class="ComicReader.Views.LibraryCatalogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1000">
+    <Grid Margin="28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Título y Filtros Superiores -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="Catálogo de Cómics" Style="{StaticResource HeaderTextStyle}"/>
+                <TextBlock Text="Explora y filtra toda tu colección" Style="{StaticResource SubheaderTextStyle}" Margin="0,2,0,0"/>
+            </StackPanel>
+
+            <!-- Controles de Vista: Slider Zoom & Conmutador Cuadrícula / Lista -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <TextBlock Text="Zoom:" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <Slider x:Name="ZoomSlider" Width="100" Minimum="120" Maximum="260" Value="{Binding CardWidth, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,20,0"/>
+
+                <Border Background="{StaticResource PanelBackground}" CornerRadius="6" Padding="2" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="■■ Grid" Command="{Binding SetViewModeGridCommand}" Style="{StaticResource WindowControlButton}" Width="60" Height="28" FontSize="11"/>
+                        <Button Content="≡ Lista" Command="{Binding SetViewModeListCommand}" Style="{StaticResource WindowControlButton}" Width="60" Height="28" FontSize="11"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <!-- Barra de Herramientas y Filtros -->
+        <Border Grid.Row="1" Background="{StaticResource CardBackground}" CornerRadius="10" Padding="12,10" Margin="0,0,0,20" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Búsqueda -->
+                <TextBox Grid.Column="0" Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}" Margin="0,0,12,0" ToolTip="Buscar cómics..."/>
+
+                <!-- Filtro Editorial -->
+                <ComboBox Grid.Column="1" SelectedItem="{Binding SelectedPublisherFilter}" Width="140" Margin="0,0,12,0">
+                    <ComboBoxItem Content="Todas" IsSelected="True"/>
+                    <ComboBoxItem Content="DC Comics"/>
+                    <ComboBoxItem Content="Marvel"/>
+                    <ComboBoxItem Content="Image"/>
+                    <ComboBoxItem Content="Vertigo"/>
+                    <ComboBoxItem Content="Manga"/>
+                </ComboBox>
+
+                <!-- Filtro Estado -->
+                <ComboBox Grid.Column="2" SelectedItem="{Binding SelectedStatusFilter}" Width="130" Margin="0,0,12,0">
+                    <ComboBoxItem Content="Todos" IsSelected="True"/>
+                    <ComboBoxItem Content="Leídos"/>
+                    <ComboBoxItem Content="En curso"/>
+                    <ComboBoxItem Content="Pendientes"/>
+                </ComboBox>
+
+                <!-- Ordenación -->
+                <ComboBox Grid.Column="3" SelectedItem="{Binding SelectedSortOption}" Width="130">
+                    <ComboBoxItem Content="Título" IsSelected="True"/>
+                    <ComboBoxItem Content="Serie"/>
+                    <ComboBoxItem Content="Año"/>
+                    <ComboBoxItem Content="Recientes"/>
+                </ComboBox>
+            </Grid>
+        </Border>
+
+        <!-- CONTENIDO: VISTA CUADRÍCULA / LISTA -->
+        <Grid Grid.Row="2">
+            <!-- VISTA CUADRÍCULA -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Visibility="{Binding IsGridView, Converter={StaticResource BoolToVisibilityConverter}}">
+                <ItemsControl ItemsSource="{Binding ComicsView}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="{Binding DataContext.CardWidth, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    Margin="0,0,16,20" Background="{StaticResource CardBackground}" CornerRadius="10" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Cursor="Hand" MouseDown="ComicCard_MouseDown">
+                                <Grid Margin="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.Row="0" Height="{Binding DataContext.CardHeight, RelativeSource={RelativeSource AncestorType=UserControl}}" CornerRadius="6" Background="#151820" ClipToBounds="True" Margin="0,0,0,8">
+                                        <Image Source="{Binding CoverThumbnailUri}" Stretch="UniformToFill"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="1" Text="{Binding Title}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Grid.Row="2" Text="{Binding Author}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" Margin="0,2,0,4" TextTrimming="CharacterEllipsis"/>
+                                    <ProgressBar Grid.Row="3" Height="3" Value="{Binding ProgressPercentage, Mode=OneWay}" Foreground="{StaticResource PrimaryAccent}" Background="#151820" BorderThickness="0"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- VISTA TABULAR LISTA -->
+            <ListView ItemsSource="{Binding ComicsView}" Visibility="{Binding IsListView, Converter={StaticResource BoolToVisibilityConverter}}" Background="Transparent" BorderThickness="0" SelectionChanged="ListView_SelectionChanged">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Título" Width="260">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Title}" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Serie" Width="160" DisplayMemberBinding="{Binding Series}"/>
+                        <GridViewColumn Header="Número" Width="80" DisplayMemberBinding="{Binding IssueNumberFormatted}"/>
+                        <GridViewColumn Header="Año" Width="80" DisplayMemberBinding="{Binding Year}"/>
+                        <GridViewColumn Header="Editorial" Width="140" DisplayMemberBinding="{Binding Publisher}"/>
+                        <GridViewColumn Header="Estado" Width="120" DisplayMemberBinding="{Binding ReadStatusText}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+    </Grid>
+</UserControl>

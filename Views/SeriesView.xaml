@@ -1,0 +1,78 @@
+<UserControl x:Class="ComicReader.Views.SeriesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1000">
+    <Grid Margin="28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Series &amp; Colecciones" Style="{StaticResource HeaderTextStyle}"/>
+            <TextBlock Text="Navega por franquicias y arcos argumentales" Style="{StaticResource SubheaderTextStyle}" Margin="0,2,0,0"/>
+        </StackPanel>
+
+        <!-- Contenido principal: Lista de Series a la izquierda y Volúmenes a la derecha -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Lista de Series -->
+            <Border Grid.Column="0" Background="{StaticResource CardBackground}" CornerRadius="10" Padding="12" Margin="0,0,20,0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <DockPanel>
+                    <TextBlock Text="COLECCIONES" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" FontWeight="Bold" DockPanel.Dock="Top" Margin="4,0,0,12"/>
+                    <ListBox x:Name="SeriesListBox" Background="Transparent" BorderThickness="0" SelectionChanged="SeriesListBox_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="4,6">
+                                    <TextBlock Text="{Binding Key}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="14" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding Count, StringFormat='{}{0} números'}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+
+            <!-- Detalle de la Serie Seleccionada -->
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="SeriesDetailPanel">
+                    <TextBlock x:Name="SeriesTitleText" Text="Selecciona una serie" Foreground="{StaticResource TextPrimaryBrush}" FontSize="20" FontWeight="Bold" Margin="0,0,0,16"/>
+
+                    <ItemsControl x:Name="SeriesComicsItemsControl">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Width="150" Margin="0,0,16,16" Background="{StaticResource CardBackground}" CornerRadius="10" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Cursor="Hand" MouseDown="ComicCard_MouseDown">
+                                    <Grid Margin="8">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Border Grid.Row="0" Height="190" CornerRadius="6" Background="#151820" ClipToBounds="True" Margin="0,0,0,8">
+                                            <Image Source="{Binding CoverThumbnailUri}" Stretch="UniformToFill"/>
+                                        </Border>
+                                        <TextBlock Grid.Row="1" Text="{Binding Title}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Row="2" Text="{Binding IssueNumberFormatted}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" Margin="0,2,0,0"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

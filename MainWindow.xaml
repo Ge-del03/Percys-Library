@@ -3,18 +3,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:ComicReader.Views"
-    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        xmlns:local="clr-namespace:ComicReader.Views"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:models="clr-namespace:ComicReader.Models"
         xmlns:services="clr-namespace:ComicReader.Services"
+        xmlns:vm="clr-namespace:ComicReader.ViewModels"
         mc:Ignorable="d"
-        Title="{Binding Title, RelativeSource={RelativeSource Self}}"
-        Background="{DynamicResource WindowBackgroundBrush}"
-    Icon="icono.ico"
-    WindowStyle="None" AllowsTransparency="False" ResizeMode="CanResize"
-    AllowDrop="True"
-    Closing="MainWindow_Closing"
-    StateChanged="Window_StateChanged">
+        Title="Percy's Comic Studio &amp; Manager"
+        Background="{StaticResource AppSurfaceBackground}"
+        Icon="icono.ico"
+        WindowStyle="None" AllowsTransparency="False" ResizeMode="CanResize"
+        AllowDrop="True"
+        Closing="MainWindow_Closing"
+        StateChanged="Window_StateChanged">
 
     <shell:WindowChrome.WindowChrome>
         <shell:WindowChrome CaptionHeight="40"
@@ -27,15 +28,14 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Barra de Título Personalizada (sin Effect para compatibilidad) -->
-    <Border Grid.Row="0" x:Name="CustomTitleBar" 
-                Background="{DynamicResource HeaderBackgroundBrush}" 
+        <!-- BARRA DE TÍTULO PERSONALIZADA -->
+        <Border Grid.Row="0" x:Name="CustomTitleBar"
+                Background="{StaticResource SidebarBackground}"
                 MouseLeftButtonDown="DragWindow_MouseLeftButtonDown"
-                Height="40">
+                Height="40" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -43,151 +43,167 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
-                    <TextBlock Text="📚 Percy's Library" 
-                               Style="{DynamicResource AppTitleTextStyle}" 
-                               FontSize="20" 
-                               Foreground="{DynamicResource AccentColorBrush}" 
+                <!-- Marca & Logo -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0">
+                    <TextBlock Text="✦ Percy's Comic Studio"
+                               Style="{StaticResource AppTitleTextStyle}"
+                               FontSize="14"
+                               Foreground="{StaticResource TextPrimaryBrush}"
                                VerticalAlignment="Center"/>
                 </StackPanel>
 
-        <!-- Botones del encabezado removidos por solicitud -->
+                <!-- Omnibox Búsqueda Global (Ctrl+K) -->
+                <Border Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="360" Height="28" Background="{StaticResource CardBackground}" CornerRadius="6" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Grid Margin="8,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="🔍" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBox Grid.Column="1" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" Foreground="{StaticResource TextPrimaryBrush}" BorderThickness="0" FontSize="12" VerticalAlignment="Center" CaretBrush="White"/>
+                        <TextBlock Grid.Column="2" Text="Ctrl+K" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" VerticalAlignment="Center" ToolTip="Atajo de búsqueda"/>
+                    </Grid>
+                </Border>
 
-        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right"
-                shell:WindowChrome.IsHitTestVisibleInChrome="True">
-            <Button Content="📖" ToolTip="Entrar al modo lectura" Click="EnterReadingMode_Click" Style="{StaticResource WindowControlButton}"
-                shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
-            <Button Content="⚙" ToolTip="Configuración" Click="OpenSettingsDialog_Click" Style="{StaticResource WindowControlButton}"
-                shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
-            <Button Content="─" Click="Minimize_Click" Style="{StaticResource WindowControlButton}"
-                shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
-            <Button x:Name="MaxRestoreButton"
-                    Click="MaximizeRestore_Click"
-                    shell:WindowChrome.IsHitTestVisibleInChrome="True">
-                <Button.Style>
-                    <Style TargetType="Button" BasedOn="{StaticResource WindowControlButton}">
-                        <!-- Segoe MDL2 Assets: Maximize = E922, Restore = E923 -->
-                        <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
-                        <Setter Property="Content" Value="&#xE922;"/>
-                        <Setter Property="ToolTip" Value="Maximizar"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
-                                <!-- Icono de restaurar (dos cuadros superpuestos) MDL2 = E923 -->
-                                <Setter Property="Content" Value="&#xE923;"/>
-                                <Setter Property="ToolTip" Value="Restaurar"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-            <Button Content="✕" Click="Close_Click" Style="{StaticResource WindowControlButton}"
-                shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
+                <!-- Control de Ventana -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Button Content="⚙" ToolTip="Ajustes" Click="OpenSettingsDialog_Click" Style="{StaticResource WindowControlButton}"/>
+                    <Button Content="─" Click="Minimize_Click" Style="{StaticResource WindowControlButton}"/>
+                    <Button x:Name="MaxRestoreButton" Click="MaximizeRestore_Click">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource WindowControlButton}">
+                                <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+                                <Setter Property="Content" Value="&#xE922;"/>
+                                <Setter Property="ToolTip" Value="Maximizar"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                                        <Setter Property="Content" Value="&#xE923;"/>
+                                        <Setter Property="ToolTip" Value="Restaurar"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Content="✕" Click="Close_Click" Style="{StaticResource WindowControlButton}"/>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- Área de Contenido Principal -->
-    <!-- Barra superior de controles del lector -->
-    <Border Grid.Row="1" x:Name="ReaderTopBar"
-            Background="{DynamicResource HeaderBackgroundBrush}"
-            Padding="8" Panel.ZIndex="1000"
-            IsEnabled="{Binding IsReaderViewActive, RelativeSource={RelativeSource AncestorType=Window}}">
-        <Border.Style>
-            <Style TargetType="Border">
-                <Setter Property="Visibility" Value="Collapsed"/>
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsReaderViewActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                        <Setter Property="Visibility" Value="Visible"/>
-                    </DataTrigger>
-                    <!-- Ocultar explícitamente si estamos en Home o en Configuración -->
-                    <DataTrigger Binding="{Binding IsHomeViewActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding IsSettingsViewActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Border.Style>
-        <DockPanel>
-            <!-- Izquierda: navegación -->
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
-                <Button Content="🏠" ToolTip="Inicio" Click="HomeButton_Click" Style="{StaticResource SecondaryButtonStyle}" Margin="2,0"/>
-                <Button Content="📂" ToolTip="Abrir cómic (Ctrl+O)" Click="OpenFile_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0"/>
-                <Button Content="⟨" ToolTip="Anterior" Click="PrevPage_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0"/>
-                <Button Content="⟩" ToolTip="Siguiente" Click="NextPage_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0"/>
-            </StackPanel>
-            <!-- Centro: indicador + slider -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock Text="Pág" Foreground="#ccc" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                <TextBlock x:Name="PageIndicator" Text="— / —" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
-                <Slider x:Name="PageSlider" Width="220" Minimum="1" Maximum="1" Value="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="PageSlider_ValueChanged" Margin="12,0,0,0"/>
-            </StackPanel>
-            <!-- Derecha: zoom y utilidades -->
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <Button Content="－" ToolTip="Zoom Out" Click="ZoomOut_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
-                <Button Content="100%" ToolTip="Restablecer" Click="Zoom100_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
-                <Button Content="＋" ToolTip="Zoom In" Click="ZoomIn_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
-                <Separator Width="10" Background="Transparent"/>
-                <Button Content="⟳" ToolTip="Rotar" Click="Rotate_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
-                <Separator Width="10" Background="Transparent"/>
-                    <Button Content="☰" ToolTip="Miniaturas" Click="ToggleThumbnails_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
-                    <Button Content="⚙" ToolTip="Opciones de lectura" Click="ToggleReadingQuickPanel_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
-                <Button Content="☾" ToolTip="Modo Nocturno" Click="ToggleNightMode_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
-                <Button Content="⛶" ToolTip="Pantalla Completa Total" Click="ImmersiveFullScreen_Click" Style="{StaticResource ComicButtonStyle}" Margin="2,0"/>
-            </StackPanel>
-        </DockPanel>
-    </Border>
+        <!-- CONTENEDOR PRINCIPAL SHELL 3 COLUMNAS -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <!-- Columna 0: Sidebar Navegación -->
+                <ColumnDefinition x:Name="SidebarCol" Width="220"/>
+                <!-- Columna 1: Canvas Central de Contenido -->
+                <ColumnDefinition Width="*"/>
+                <!-- Columna 2: Inspector de Metadatos Derecho -->
+                <ColumnDefinition x:Name="InspectorCol" Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-    <!-- Contenido principal con panel de miniaturas -->
-    <Grid Grid.Row="2">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition x:Name="ThumbCol" Width="0"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <!-- Panel lateral de miniaturas (sin ScrollViewer externo para mantener virtualización) -->
-        <Border x:Name="ThumbPanel" Grid.Column="0" Width="240" Background="#1E1E1E" Visibility="Collapsed">
-            <ListBox x:Name="ThumbList"
-                     BorderThickness="0"
-                     Background="Transparent"
-                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                     ScrollViewer.CanContentScroll="True"
-                     VirtualizingPanel.IsVirtualizing="True"
-                     VirtualizingPanel.VirtualizationMode="Recycling"
-                     SelectionChanged="ThumbList_SelectionChanged">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel/>
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Border Margin="8" Background="#2A2A2A" CornerRadius="6" Padding="6">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <Image Source="{Binding Thumbnail}" Stretch="Uniform" Height="140"/>
-                                <TextBlock Grid.Row="1" Text="{Binding PageNumber}" Foreground="#DDD" HorizontalAlignment="Center" Margin="0,6,0,0"/>
-                            </Grid>
+            <!-- 1. SIDEBAR IZQUIERDO -->
+            <Border Grid.Column="0" Background="{StaticResource SidebarBackground}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
+                <DockPanel Margin="12,16">
+                    <!-- Estado & Almacenamiento Abajo -->
+                    <StackPanel DockPanel.Dock="Bottom" Margin="0,16,0,0">
+                        <Border Height="1" Background="{StaticResource BorderBrush}" Margin="0,0,0,12"/>
+                        <TextBlock Text="BIBLIOTECA LOCAL" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold" Margin="4,0,0,4"/>
+                        <TextBlock x:Name="SidebarComicsCountText" Text="1,248 Cómics Indexados" Foreground="{StaticResource TextPrimaryBrush}" FontSize="12"/>
+                        <TextBlock x:Name="SidebarStorageText" Text="142 GB en disco" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" Margin="0,2,0,12"/>
+                        <Border Background="#1010B981" CornerRadius="6" Padding="8,4">
+                            <TextBlock Text="● Sincronizado" Foreground="{StaticResource StatusCompletedBrush}" FontSize="11" FontWeight="SemiBold"/>
                         </Border>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </Border>
+                    </StackPanel>
 
-        <!-- Área de contenido -->
-        <Grid Grid.Column="1" x:Name="MainContentGrid" ClipToBounds="True">
-            <ContentControl x:Name="MainContentArea" Content="{Binding CurrentView}"/>
-            <!-- Overlay host para paneles flotantes (ej. ReadingQuickPanel) -->
-            <ContentControl x:Name="ReadingQuickOverlayHost" HorizontalAlignment="Right" VerticalAlignment="Top"
-                            Margin="12" Visibility="Collapsed"/>
+                    <!-- Menú de Navegación Lateral -->
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <TextBlock Text="BIBLIOTECA" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold" Margin="8,0,0,8"/>
+
+                            <Button Content="❖  Dashboard" Click="NavDashboard_Click" Style="{StaticResource SecondaryButtonStyle}" HorizontalContentAlignment="Left" Margin="0,2" Height="36"/>
+                            <Button Content="📚  Catálogo Completo" Click="NavCatalog_Click" Style="{StaticResource SecondaryButtonStyle}" HorizontalContentAlignment="Left" Margin="0,2" Height="36"/>
+                            <Button Content="📑  Series &amp; Colecciones" Click="NavSeries_Click" Style="{StaticResource SecondaryButtonStyle}" HorizontalContentAlignment="Left" Margin="0,2" Height="36"/>
+                            <Button Content="📊  Estadísticas" Click="NavStats_Click" Style="{StaticResource SecondaryButtonStyle}" HorizontalContentAlignment="Left" Margin="0,2" Height="36"/>
+
+                            <TextBlock Text="GESTIÓN" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold" Margin="8,16,0,8"/>
+                            <Button Content="📂  Escanear Carpeta" Click="OpenFolder_Click" Style="{StaticResource SecondaryButtonStyle}" HorizontalContentAlignment="Left" Margin="0,2" Height="36"/>
+                            <Button Content="📖  Lector Inmersivo" Click="EnterReadingMode_Click" Style="{StaticResource PrimaryButtonStyle}" HorizontalContentAlignment="Left" Margin="0,8,0,2" Height="36"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- 2. CANVAS CENTRAL PRINCIPAL -->
+            <Grid Grid.Column="1" x:Name="MainContentGrid" ClipToBounds="True">
+                <!-- Barra superior de lector (visible solo en lectura) -->
+                <Border x:Name="ReaderTopBar"
+                        Background="{StaticResource PanelBackground}"
+                        Padding="8" Panel.ZIndex="1000" VerticalAlignment="Top" Visibility="Collapsed">
+                    <DockPanel>
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                            <Button Content="❖ Dashboard" Click="NavDashboard_Click" Style="{StaticResource SecondaryButtonStyle}" Margin="2,0"/>
+                            <Button Content="📂 Abrir" Click="OpenFile_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0"/>
+                            <Button Content="⟨ Anterior" Click="PrevPage_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0"/>
+                            <Button Content="Siguiente ⟩" Click="NextPage_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock x:Name="PageIndicator" Text="— / —" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <Slider x:Name="PageSlider" Width="220" Minimum="1" Maximum="1" Value="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="PageSlider_ValueChanged" Margin="12,0,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Button Content="－" ToolTip="Zoom Out" Click="ZoomOut_Click" Style="{StaticResource SecondaryButtonStyle}" Margin="2,0"/>
+                            <Button Content="100%" ToolTip="Restablecer" Click="Zoom100_Click" Style="{StaticResource SecondaryButtonStyle}" Margin="2,0"/>
+                            <Button Content="＋" ToolTip="Zoom In" Click="ZoomIn_Click" Style="{StaticResource SecondaryButtonStyle}" Margin="2,0"/>
+                            <Button Content="⟳" ToolTip="Rotar" Click="Rotate_Click" Style="{StaticResource SecondaryButtonStyle}" Margin="2,0"/>
+                            <Button Content="☰ Miniaturas" Click="ToggleThumbnails_Click" Style="{StaticResource SecondaryButtonStyle}" Margin="2,0"/>
+                            <Button Content="⛶ Pantalla Completa" Click="ImmersiveFullScreen_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="2,0"/>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+
+                <!-- Panel lateral de miniaturas -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition x:Name="ThumbCol" Width="0"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border x:Name="ThumbPanel" Grid.Column="0" Width="240" Background="{StaticResource SidebarBackground}" Visibility="Collapsed">
+                        <ListBox x:Name="ThumbList"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 VirtualizingPanel.IsVirtualizing="True"
+                                 SelectionChanged="ThumbList_SelectionChanged">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="8" Background="{StaticResource CardBackground}" CornerRadius="6" Padding="6">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Image Source="{Binding Thumbnail}" Stretch="Uniform" Height="140"/>
+                                            <TextBlock Grid.Row="1" Text="{Binding PageNumber}" Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+
+                    <!-- Host para Vistas Dinámicas -->
+                    <ContentControl Grid.Column="1" x:Name="MainContentArea" Content="{Binding CurrentView}"/>
+                </Grid>
+
+                <!-- Overlay Host para Paneles Flotantes / HUD -->
+                <ContentControl x:Name="ReadingQuickOverlayHost" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="12" Visibility="Collapsed"/>
+            </Grid>
+
+            <!-- 3. INSPECTOR DE METADATOS DERECHO -->
+            <local:MetadataInspectorView Grid.Column="2" x:Name="MetadataInspector" DataContext="{Binding SelectedComic}" Visibility="{Binding IsInspectorOpen, Converter={StaticResource BoolToVisibilityConverter}}" Width="300"/>
         </Grid>
-    </Grid>
-
-        
     </Grid>
 </Window>
