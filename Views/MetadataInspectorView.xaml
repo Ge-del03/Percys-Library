@@ -10,7 +10,7 @@
             <StackPanel Margin="20">
                 <!-- Header con Botón de Cierre -->
                 <Grid Margin="0,0,0,16">
-                    <TextBlock Text="FICHA TÉCNICA" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
+                    <TextBlock Text="FICHA TÉCNICA Y EDICIÓN" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
                     <Button Content="✕" Style="{StaticResource WindowControlButton}" HorizontalAlignment="Right" Click="CloseButton_Click"/>
                 </Grid>
 
@@ -19,58 +19,49 @@
                     <Image Source="{Binding CoverThumbnailUri}" Stretch="UniformToFill"/>
                 </Border>
 
-                <!-- Título y Serie -->
-                <TextBlock Text="{Binding Title}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="18" FontWeight="Bold" TextWrapping="Wrap" Margin="0,0,0,4"/>
-                <TextBlock Text="{Binding Series}" Foreground="{StaticResource PrimaryAccent}" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,12"/>
-
                 <!-- Botón Primario de Lectura -->
-                <Button Content="▶  LEER AHORA" Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,0,20" Click="ReadNowButton_Click"/>
+                <Button Content="▶  LEER AHORA" Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,0,16" Click="ReadNowButton_Click"/>
 
                 <Border Height="1" Background="{StaticResource BorderBrush}" Margin="0,0,0,16"/>
 
-                <!-- Grid de Detalle -->
+                <!-- FORMULARIO DE EDICIÓN EN TIEMPO REAL -->
+                <TextBlock Text="TÍTULO" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}" Margin="0,0,0,12"/>
+
+                <TextBlock Text="SERIE / COLECCIÓN" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding Series, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}" Margin="0,0,0,12"/>
+
                 <Grid Margin="0,0,0,12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="NÚMERO" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding IssueNumberFormatted}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" Margin="0,2,0,8"/>
+                    <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                        <TextBlock Text="NÚMERO (#)" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding IssueNumber, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Column="1">
-                        <TextBlock Text="AÑO" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding Year}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" Margin="0,2,0,8"/>
+                    <StackPanel Grid.Column="1" Margin="6,0,0,0">
+                        <TextBlock Text="AÑO" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding Year, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}"/>
                     </StackPanel>
                 </Grid>
 
-                <StackPanel Margin="0,0,0,12">
-                    <TextBlock Text="EDITORIAL" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold"/>
-                    <TextBlock Text="{Binding Publisher}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" Margin="0,2,0,0"/>
-                </StackPanel>
+                <TextBlock Text="EDITORIAL" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding Publisher, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}" Margin="0,0,0,12"/>
 
-                <StackPanel Margin="0,0,0,12">
-                    <TextBlock Text="AUTOR / GUION" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold"/>
-                    <TextBlock Text="{Binding Author}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" Margin="0,2,0,0"/>
-                </StackPanel>
+                <TextBlock Text="AUTOR / GUIONISTA" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding Author, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}" Margin="0,0,0,12"/>
 
-                <StackPanel Margin="0,0,0,12">
-                    <TextBlock Text="FORMATO Y TAMAÑO" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold"/>
-                    <TextBlock Text="{Binding FileSizeFormatted}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" Margin="0,2,0,0"/>
-                </StackPanel>
+                <TextBlock Text="CALIFICACIÓN (1 - 5 ESTRELLAS)" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding Rating, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}" Margin="0,0,0,12"/>
 
-                <StackPanel Margin="0,0,0,16">
-                    <TextBlock Text="CALIFICACIÓN" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold"/>
-                    <TextBlock Text="{Binding RatingStars}" Foreground="#F59E0B" FontSize="14" Margin="0,2,0,0"/>
-                </StackPanel>
+                <TextBlock Text="SINOPSIS / RESUMEN" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding Summary, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}" Height="80" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,16"/>
 
-                <Border Height="1" Background="{StaticResource BorderBrush}" Margin="0,0,0,16"/>
-
-                <!-- Sinopsis -->
-                <TextBlock Text="SINOPSIS" Foreground="{StaticResource TextSecondaryBrush}" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
-                <TextBlock Text="{Binding Summary}" Foreground="{StaticResource TextPrimaryBrush}" FontSize="12" TextWrapping="Wrap" LineHeight="18"/>
+                <!-- Botón Guardar Metadatos -->
+                <Button Content="💾  GUARDAR METADATOS" Style="{StaticResource PrimaryButtonStyle}" Click="SaveMetadataButton_Click"/>
             </StackPanel>
         </ScrollViewer>
     </Border>
