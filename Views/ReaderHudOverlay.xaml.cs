@@ -34,7 +34,19 @@ namespace ComicReader.Views
 
         private void PageHudSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            // Paginación vinculada si aplica
+        }
+
+        private void MangaMode_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Modo Manga (Lectura de Derecha a Izquierda R->L) activado.", "Lector Pro", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void Fullscreen_Click(object sender, RoutedEventArgs e)
+        {
+            if (Application.Current.MainWindow is MainWindow main)
+            {
+                main.ImmersiveFullScreen_Click(sender, e);
+            }
         }
     }
 }
