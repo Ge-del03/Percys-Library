@@ -1073,7 +1073,7 @@ namespace ComicReader
             }
         }
 
-        private void ImmersiveFullScreen_Click(object sender, RoutedEventArgs e) => ToggleImmersiveFullScreen();
+        public void ImmersiveFullScreen_Click(object sender, RoutedEventArgs e) => ToggleImmersiveFullScreen();
 
         private void ToggleImmersiveFullScreen()
         {

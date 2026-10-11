@@ -16,6 +16,19 @@ namespace ComicReader.ViewModels
         List
     }
 
+    public enum SmartCollectionType
+    {
+        All,
+        Favorites,
+        Reading,
+        Unread,
+        Completed,
+        TopRated,
+        Manga,
+        WesternComics,
+        RecentlyAdded
+    }
+
     public class CatalogViewModel : INotifyPropertyChanged
     {
         private ObservableCollection<ComicItem> _allComics = new ObservableCollection<ComicItem>();
@@ -24,6 +37,7 @@ namespace ComicReader.ViewModels
         private string _selectedPublisherFilter = "Todas";
         private string _selectedStatusFilter = "Todos";
         private string _selectedSortOption = "Título";
+        private SmartCollectionType _selectedSmartCollection = SmartCollectionType.All;
         private ViewMode _currentViewMode = ViewMode.Grid;
         private double _cardWidth = 160;
 
@@ -34,6 +48,17 @@ namespace ComicReader.ViewModels
 
             SetViewModeGridCommand = new RelayCommand(() => CurrentViewMode = ViewMode.Grid);
             SetViewModeListCommand = new RelayCommand(() => CurrentViewMode = ViewMode.List);
+            SetSmartCollectionCommand = new RelayCommand(param =>
+            {
+                if (param is SmartCollectionType st)
+                {
+                    SelectedSmartCollection = st;
+                }
+                else if (param is string s && Enum.TryParse<SmartCollectionType>(s, out var parsed))
+                {
+                    SelectedSmartCollection = parsed;
+                }
+            });
         }
 
         public ObservableCollection<ComicItem> AllComics
@@ -47,10 +72,12 @@ namespace ComicReader.ViewModels
                 _comicsView.Filter = FilterComicItem;
                 ApplySorting();
                 OnPropertyChanged(nameof(ComicsView));
+                OnPropertyChanged(nameof(TotalComicsCount));
             }
         }
 
         public ICollectionView ComicsView => _comicsView;
+        public int TotalComicsCount => AllComics?.Count ?? 0;
 
         public string SearchFilter
         {
@@ -96,6 +123,37 @@ namespace ComicReader.ViewModels
             }
         }
 
+        public SmartCollectionType SelectedSmartCollection
+        {
+            get => _selectedSmartCollection;
+            set
+            {
+                _selectedSmartCollection = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(CollectionTitle));
+                _comicsView?.Refresh();
+            }
+        }
+
+        public string CollectionTitle
+        {
+            get
+            {
+                return SelectedSmartCollection switch
+                {
+                    SmartCollectionType.Favorites => "★ Favoritos",
+                    SmartCollectionType.Reading => "▶ En Curso",
+                    SmartCollectionType.Unread => "• Sin Empezar",
+                    SmartCollectionType.Completed => "✓ Finalizados",
+                    SmartCollectionType.TopRated => "⭐⭐⭐⭐⭐ Mejor Valorados",
+                    SmartCollectionType.Manga => "⛩️ Manga & Manhwa",
+                    SmartCollectionType.WesternComics => "🦸 Cómic Americano & Europeo",
+                    SmartCollectionType.RecentlyAdded => "⚡ Añadidos Recientemente",
+                    _ => "Catálogo Completo"
+                };
+            }
+        }
+
         public ViewMode CurrentViewMode
         {
             get => _currentViewMode;
@@ -126,10 +184,38 @@ namespace ComicReader.ViewModels
 
         public ICommand SetViewModeGridCommand { get; }
         public ICommand SetViewModeListCommand { get; }
+        public ICommand SetSmartCollectionCommand { get; }
 
         private bool FilterComicItem(object obj)
         {
             if (obj is not ComicItem item) return false;
+
+            // Smart Collections
+            switch (SelectedSmartCollection)
+            {
+                case SmartCollectionType.Favorites:
+                    if (item.Rating < 4) return false;
+                    break;
+                case SmartCollectionType.Reading:
+                    if (item.CurrentPage <= 0 || item.IsRead) return false;
+                    break;
+                case SmartCollectionType.Unread:
+                    if (item.CurrentPage > 0 || item.IsRead) return false;
+                    break;
+                case SmartCollectionType.Completed:
+                    if (!item.IsRead) return false;
+                    break;
+                case SmartCollectionType.TopRated:
+                    if (item.Rating < 5) return false;
+                    break;
+                case SmartCollectionType.Manga:
+                    if (item.Genre?.ToLower().Contains("manga") != true && item.Publisher?.ToLower().Contains("shueisha") != true && item.Publisher?.ToLower().Contains("kodansha") != true)
+                        return false;
+                    break;
+                case SmartCollectionType.WesternComics:
+                    if (item.Genre?.ToLower().Contains("manga") == true) return false;
+                    break;
+            }
 
             // Filtro por búsqueda
             if (!string.IsNullOrWhiteSpace(SearchFilter))
@@ -138,7 +224,8 @@ namespace ComicReader.ViewModels
                 bool matchTitle = item.Title?.ToLower().Contains(q) == true;
                 bool matchSeries = item.Series?.ToLower().Contains(q) == true;
                 bool matchAuthor = item.Author?.ToLower().Contains(q) == true;
-                if (!matchTitle && !matchSeries && !matchAuthor) return false;
+                bool matchPublisher = item.Publisher?.ToLower().Contains(q) == true;
+                if (!matchTitle && !matchSeries && !matchAuthor && !matchPublisher) return false;
             }
 
             // Filtro por editorial
@@ -148,7 +235,7 @@ namespace ComicReader.ViewModels
                     return false;
             }
 
-            // Filtro por estado
+            // Filtro por estado manual
             if (SelectedStatusFilter == "Leídos" && !item.IsRead) return false;
             if (SelectedStatusFilter == "En curso" && (item.CurrentPage <= 0 || item.IsRead)) return false;
             if (SelectedStatusFilter == "Pendientes" && (item.CurrentPage > 0 || item.IsRead)) return false;
@@ -168,6 +255,9 @@ namespace ComicReader.ViewModels
                     break;
                 case "Recientes":
                     _comicsView.SortDescriptions.Add(new SortDescription(nameof(ComicItem.DateAdded), ListSortDirection.Descending));
+                    break;
+                case "Rating":
+                    _comicsView.SortDescriptions.Add(new SortDescription(nameof(ComicItem.Rating), ListSortDirection.Descending));
                     break;
                 case "Serie":
                     _comicsView.SortDescriptions.Add(new SortDescription(nameof(ComicItem.Series), ListSortDirection.Ascending));

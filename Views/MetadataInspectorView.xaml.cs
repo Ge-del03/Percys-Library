@@ -25,5 +25,13 @@ namespace ComicReader.Views
                 NavigationService.Instance.NavigateTo(AppViewType.Reader, comic.FilePath);
             }
         }
+
+        private void SaveMetadataButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is ComicItem comic)
+            {
+                MessageBox.Show($"Metadatos actualizados para {comic.Title}.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
     }
 }

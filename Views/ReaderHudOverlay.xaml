@@ -6,18 +6,18 @@
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="1000">
     <Grid>
-        <!-- HUD SUPERIOR FLOTANTE -->
+        <!-- HUD SUPERIOR FLOTANTE CON EFECTO VIDRIO ACRÍLICO -->
         <Border VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,20,0,0" Background="{StaticResource GlassBackground}" CornerRadius="14" Padding="16,10" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
             <StackPanel Orientation="Horizontal">
                 <Button Content="← Biblioteca" Style="{StaticResource WindowControlButton}" Width="90" Height="28" FontSize="11" Click="BackToLibrary_Click"/>
                 <Border Width="1" Background="{StaticResource BorderBrush}" Margin="12,2"/>
-                <TextBlock x:Name="ComicTitleText" Text="Batman: The Long Halloween #01" Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,16,0"/>
-                <TextBlock x:Name="PageIndicatorText" Text="Pág. 14 / 36" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
+                <TextBlock x:Name="ComicTitleText" Text="Percy's Comic Studio • Modo Lectura Professional" Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                <TextBlock x:Name="PageIndicatorText" Text="Página Activa" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
             </StackPanel>
         </Border>
 
-        <!-- HUD INFERIOR FLOTANTE -->
-        <Border VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,24" Background="{StaticResource GlassBackground}" CornerRadius="14" Padding="20,12" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Width="600">
+        <!-- HUD INFERIOR FLOTANTE MULTIFUNCIÓN -->
+        <Border VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,24" Background="{StaticResource GlassBackground}" CornerRadius="14" Padding="20,12" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Width="680">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -25,11 +25,17 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Content="◄ Anterior" Style="{StaticResource WindowControlButton}" Width="75" Height="28" FontSize="11" Click="PrevPage_Click"/>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Button Content="◄ Prev" Style="{StaticResource WindowControlButton}" Width="60" Height="28" FontSize="11" Click="PrevPage_Click"/>
+                    <Button Content="Next ►" Style="{StaticResource WindowControlButton}" Width="60" Height="28" FontSize="11" Click="NextPage_Click" Margin="4,0,0,0"/>
+                </StackPanel>
 
                 <Slider Grid.Column="1" x:Name="PageHudSlider" VerticalAlignment="Center" Margin="16,0" ValueChanged="PageHudSlider_ValueChanged"/>
 
-                <Button Grid.Column="2" Content="Siguiente ►" Style="{StaticResource WindowControlButton}" Width="80" Height="28" FontSize="11" Click="NextPage_Click"/>
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Content="⛩️ Manga (R->L)" Style="{StaticResource WindowControlButton}" Width="100" Height="28" FontSize="11" Click="MangaMode_Click" Margin="0,0,4,0"/>
+                    <Button Content="⛶ Fullscreen" Style="{StaticResource PrimaryButtonStyle}" Height="28" FontSize="11" Click="Fullscreen_Click"/>
+                </StackPanel>
             </Grid>
         </Border>
     </Grid>
